@@ -2,6 +2,7 @@ package ajbc.doodle.calendar.utils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +12,11 @@ import org.springframework.stereotype.Component;
 
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.Event;
+import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.enums.EventRepeating;
 import ajbc.doodle.calendar.services.EventService;
+import ajbc.doodle.calendar.services.NotificationService;
 import ajbc.doodle.calendar.services.UserService;
 
 @Component
@@ -23,12 +26,15 @@ public class SeedDB {
 	private UserService userService;
 	@Autowired
 	private EventService eventService;
+	@Autowired
+	private NotificationService notificationService;
 
 	@EventListener
 	public void seedDB(ContextRefreshedEvent event) {
 		try {
 			seedUsers();
 			seedEvents();
+			seedNotifications();
 		} catch (DaoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -36,7 +42,9 @@ public class SeedDB {
 	}
 
 	public void seedUsers() throws DaoException {
-
+		
+		notificationService.deleteAllNotifications();
+		eventService.deleteAllEvents();
 		userService.deleteAllUsers();
 
 		userService.addUser(
@@ -53,8 +61,6 @@ public class SeedDB {
 	public void seedEvents() throws DaoException {
 		
 		List<User> users = userService.getAllUsers();
-		
-		eventService.deleteAllEvents();
 
 		eventService.addEventToDB(new Event(users.get(1).getUserId(), "wedding", 0, LocalDate.of(2022, 8, 7), LocalDate.of(2022, 8, 7),
 				LocalTime.of(20, 0), LocalTime.of(23, 30), "Troya", "Tomer getting married", EventRepeating.NONE, 0));
@@ -64,5 +70,21 @@ public class SeedDB {
 
 		eventService.getAllEvents().stream().forEach(System.out::println);
 	}
-
+	
+	public void seedNotifications() throws DaoException {
+		List<Event> events = eventService.getAllEvents();
+		
+		notificationService.addNotificationToDB(new Notification( events.get(0).getEventId(), 
+				"Remember take the check", 90, ChronoUnit.MINUTES, 0));
+		
+		notificationService.addNotificationToDB(new Notification( events.get(1).getEventId(), 
+				"Remember your wallet!", 15, ChronoUnit.MINUTES, 0));
+		
+		notificationService.addNotificationToDB(new Notification( events.get(1).getEventId(), 
+				"Wash the car after", 30, ChronoUnit.MINUTES, 0));
+		
+		notificationService.getAllNotifications().stream().forEach(System.out::println);
+		
+	}
+		
 }

@@ -2,21 +2,17 @@ package ajbc.doodle.calendar.daos;
 
 import java.util.List;
 
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate5.HibernateTemplate;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import ajbc.doodle.calendar.entities.User;
 
 @SuppressWarnings("unchecked")
 @Repository("htUserDao")
-public class HibernateTemplateUserDao implements UserDao {
+public class HTUserDao implements UserDao {
 
 	@Autowired
 	private HibernateTemplate template;

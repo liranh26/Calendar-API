@@ -11,7 +11,7 @@ import ajbc.doodle.calendar.entities.Event;
 
 @SuppressWarnings("unchecked")
 @Repository("htEventDao")
-public class HibernateTemplateEventDao implements EventDao {
+public class HTEventDao implements EventDao {
 
 	@Autowired
 	private HibernateTemplate template;
