@@ -7,40 +7,45 @@ import org.springframework.transaction.annotation.Transactional;
 import ajbc.doodle.calendar.entities.User;
 
 @Transactional(rollbackFor = {DaoException.class}, readOnly = true)
-public interface EmailDao {
+public interface UserDao {
 
 	//CRUD operations
 	@Transactional(readOnly = false)
-	public default void addEmail(User email) throws DaoException {
+	public default void addUser(User user) throws DaoException {
 		throw new DaoException("Method not implemented");
 	}
 
 	@Transactional(readOnly = false)
-	public default void updateEmail(User email) throws DaoException {
+	public default void updateUser(User user) throws DaoException {
 		throw new DaoException("Method not implemented");
 	}
 
-	public default User getEmail(Integer emailId) throws DaoException {
+	public default User getUser(Integer userId) throws DaoException {
 		throw new DaoException("Method not implemented");
 	}
 
 	@Transactional(readOnly = false)
-	public default void deleteEmail(Integer emailId) throws DaoException {
+	public default void deleteUser(Integer userId) throws DaoException {
+		throw new DaoException("Method not implemented");
+	}
+	
+	@Transactional(readOnly = false)
+	public default void deleteAllUsers() throws DaoException {
 		throw new DaoException("Method not implemented");
 	}
 
 	//Queries
 	
 	// QUERIES
-		public default List<User> getAllEmails() throws DaoException {
+		public default List<User> getAllUsers() throws DaoException {
 			throw new DaoException("Method not implemented");
 		}
 
-		public default List<User> getDiscontinuedEmails() throws DaoException {
+		public default List<User> getDiscontinuedUsers() throws DaoException {
 			throw new DaoException("Method not implemented");
 		}
 
-		public default long countEmails() throws DaoException {
+		public default long countUsers() throws DaoException {
 			throw new DaoException("Method not implemented");
 		}
 

@@ -19,12 +19,23 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "emails")
+@Table(name = "users")
 public class User {
 
+	
+	public User(String firstName, String lastName, String email, LocalDate birthDate, LocalDate joinDate,
+			Integer discontinued) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.birthDate = birthDate;
+		this.joinDate = joinDate;
+		this.discontinued = discontinued;
+	}
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer emailId;
+	private Integer userId;
 	private String firstName;
 	private String lastName;
 	private String email;
