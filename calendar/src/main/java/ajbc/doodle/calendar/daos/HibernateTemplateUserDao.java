@@ -12,9 +12,7 @@ import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
-import ajbc.doodle.calendar.entities.Category;
 import ajbc.doodle.calendar.entities.User;
-import ajbc.doodle.calendar.entities.Product;
 
 @SuppressWarnings("unchecked")
 @Repository("htUserDao")
@@ -35,10 +33,10 @@ public class HibernateTemplateUserDao implements UserDao {
 
 	@Override
 	public User getUser(Integer userId) throws DaoException {
-		User prod = template.get(User.class, userId);
-		if (prod == null)
+		User user = template.get(User.class, userId);
+		if (user == null)
 			throw new DaoException("No such product in the DB");
-		return prod;
+		return user;
 	}
 
 	@Override

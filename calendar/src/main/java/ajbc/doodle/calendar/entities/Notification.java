@@ -1,7 +1,6 @@
 package ajbc.doodle.calendar.entities;
 
-import java.time.LocalDateTime;
-import java.util.concurrent.TimeUnit;
+import java.time.LocalTime;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,8 +22,9 @@ public class Notification {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
+	private Integer eventId;
 	private String title;
-	private TimeUnit unit;
-	private Integer period;
-
+	private LocalTime time;
+	private Integer discontinued;
+	
 }

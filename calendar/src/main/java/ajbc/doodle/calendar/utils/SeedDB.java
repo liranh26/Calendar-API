@@ -1,65 +1,68 @@
 package ajbc.doodle.calendar.utils;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
-import org.hibernate.criterion.DetachedCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RestController;
 
 import ajbc.doodle.calendar.daos.DaoException;
-import ajbc.doodle.calendar.daos.UserDao;
-import ajbc.doodle.calendar.entities.ErrorMessage;
+import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.User;
+import ajbc.doodle.calendar.enums.EventRepeating;
+import ajbc.doodle.calendar.services.EventService;
 import ajbc.doodle.calendar.services.UserService;
 
 @Component
 public class SeedDB {
 
-
 	@Autowired
 	private UserService userService;
-	
-	
+	@Autowired
+	private EventService eventService;
+
 	@EventListener
 	public void seedDB(ContextRefreshedEvent event) {
 		try {
 			seedUsers();
+			seedEvents();
 		} catch (DaoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	
+
 	public void seedUsers() throws DaoException {
-		
+
 		userService.deleteAllUsers();
-		
-		userService.addUser(new User("Liran", "Hadad", "test@test.com", 
-						LocalDate.of(1990, 2, 26), 
-						LocalDate.of(2022, 1, 1), 0));
-		userService.addUser(new User("Snir", "Hadad", "test2@test.com", 
-				LocalDate.of(1993, 7, 8), 
-				LocalDate.of(2022, 5, 5), 0));
-		userService.addUser(new User("Sapir", "Hadad", "test3@test.com", 
-				LocalDate.of(1990, 7, 23), 
-				LocalDate.of(2022, 6, 6), 0));
-		
+
+		userService.addUser(
+				new User("Liran", "Hadad", "test@test.com", LocalDate.of(1990, 2, 26), LocalDate.of(2022, 1, 1), 0));
+		userService.addUser(
+				new User("Snir", "Hadad", "test2@test.com", LocalDate.of(1993, 7, 8), LocalDate.of(2022, 5, 5), 0));
+		userService.addUser(
+				new User("Sapir", "Hadad", "test3@test.com", LocalDate.of(1990, 7, 23), LocalDate.of(2022, 6, 6), 0));
+
 		userService.getAllUsers().stream().forEach(System.out::println);
-		
+
 	}
-	
-	
-	
-	
+
+	public void seedEvents() throws DaoException {
+		
+		List<User> users = userService.getAllUsers();
+		
+		eventService.deleteAllEvents();
+
+		eventService.addEventToDB(new Event(users.get(1).getUserId(), "wedding", 0, LocalDate.of(2022, 8, 7), LocalDate.of(2022, 8, 7),
+				LocalTime.of(20, 0), LocalTime.of(23, 30), "Troya", "Tomer getting married", EventRepeating.NONE, 0));
+
+		eventService.addEventToDB(new Event(users.get(2).getUserId(), "shopping", 0, LocalDate.of(2022, 7, 7), LocalDate.of(2022, 7, 7),
+				LocalTime.of(16, 0), LocalTime.of(18, 30), "Tel-Aviv", "buying equipment", EventRepeating.WEEKLY, 0));
+
+		eventService.getAllEvents().stream().forEach(System.out::println);
+	}
+
 }
