@@ -1,9 +1,10 @@
-package ajbc.doodle.calendar.daos;
+package ajbc.doodle.calendar.daos.interfaces;
 
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.Notification;
 
 @Transactional(rollbackFor = { DaoException.class }, readOnly = true)

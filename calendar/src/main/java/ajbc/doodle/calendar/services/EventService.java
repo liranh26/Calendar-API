@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import ajbc.doodle.calendar.daos.DaoException;
-import ajbc.doodle.calendar.daos.EventDao;
+import ajbc.doodle.calendar.daos.interfaces.EventDao;
 import ajbc.doodle.calendar.entities.Event;
 
 @Service

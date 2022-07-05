@@ -36,7 +36,7 @@ public class Notification {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Integer notificationId;
 	private Integer eventId;
 	private String title;
 	private Integer timeToAlertBefore;

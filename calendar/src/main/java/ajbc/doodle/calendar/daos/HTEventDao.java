@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.stereotype.Repository;
 
+import ajbc.doodle.calendar.daos.interfaces.EventDao;
 import ajbc.doodle.calendar.entities.Event;
 
 @SuppressWarnings("unchecked")
@@ -39,6 +40,7 @@ public class HTEventDao implements EventDao {
 	public void deleteAllEvents() throws DaoException {
 		template.deleteAll(getAllEvents());
 	}
+
 
 	
 	

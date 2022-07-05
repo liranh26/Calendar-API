@@ -2,12 +2,15 @@ package ajbc.doodle.calendar.daos;
 
 import java.util.List;
 
+import javax.persistence.Query;
+
 import org.hibernate.criterion.DetachedCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.stereotype.Repository;
 
+import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.User;
 
 @SuppressWarnings("unchecked")
@@ -53,5 +56,11 @@ public class HTUserDao implements UserDao {
 		template.deleteAll(getAllUsers());
 	}
 
+
+//	public void resestTable() {
+//	    Query query = template.getSessionFactory().getCurrentSession().createQuery("truncate table users");
+//	    query.executeUpdate();
+////	    template.flush();
+//	}
 
 }

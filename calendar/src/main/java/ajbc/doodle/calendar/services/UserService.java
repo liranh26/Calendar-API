@@ -8,7 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import ajbc.doodle.calendar.daos.DaoException;
-import ajbc.doodle.calendar.daos.UserDao;
+import ajbc.doodle.calendar.daos.interfaces.EventUserDao;
+import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.User;
 
 @Service
@@ -16,18 +17,18 @@ public class UserService {
 
 	@Autowired
 	@Qualifier("htUserDao")
-	UserDao dao;
+	UserDao userDao;
 
 	public void addUser(User user) throws DaoException {
-		dao.addUser(user);
+		userDao.addUser(user);
 	}
 
 	public List<User> getAllUsers() throws DaoException {
-		return dao.getAllUsers();
+		return userDao.getAllUsers();
 	}
 
 	public void deleteAllUsers() throws DaoException {
-		dao.deleteAllUsers();
+		userDao.deleteAllUsers();
 	}
 
 }

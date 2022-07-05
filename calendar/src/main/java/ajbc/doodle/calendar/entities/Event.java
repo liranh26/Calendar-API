@@ -26,8 +26,6 @@ import lombok.ToString;
 @Table(name = "events")
 public class Event {
 
-	
-	
 	public Event(Integer eventOwnerId, String title, Integer isAllDay, LocalDate startDate, LocalDate endDate,
 			LocalTime startTime, LocalTime endTime, String address, String description, EventRepeating repeating,
 			Integer discontinued) {

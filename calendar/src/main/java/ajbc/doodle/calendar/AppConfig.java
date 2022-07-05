@@ -3,6 +3,7 @@ package ajbc.doodle.calendar;
 import org.springframework.context.annotation.Configuration;
 
 import ajbc.doodle.calendar.entities.Event;
+import ajbc.doodle.calendar.entities.EventUser;
 import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.User;
 
@@ -14,6 +15,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
@@ -61,7 +63,7 @@ public class AppConfig {
 	public LocalSessionFactoryBean sessionFactory(DataSource  dataSource) {
 		LocalSessionFactoryBean factory = new LocalSessionFactoryBean();
 		factory.setDataSource(dataSource);
-		factory.setAnnotatedClasses(User.class, Event.class, Notification.class);
+		factory.setAnnotatedClasses(User.class, Event.class, Notification.class, EventUser.class);
 		
 		Properties props = new Properties();
 		props.setProperty("hibernate.dialect", "org.hibernate.dialect.SQLServerDialect");
@@ -72,7 +74,10 @@ public class AppConfig {
 		return factory;
 	}
 	
-	
+	@Bean
+	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+		return new JdbcTemplate(dataSource);
+	}
 	
 	@Bean
 	public HibernateTemplate hibernateTemplate(SessionFactory sessionFactory) {
