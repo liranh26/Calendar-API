@@ -5,12 +5,14 @@ import java.util.List;
 import javax.persistence.Query;
 
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.stereotype.Repository;
 
 import ajbc.doodle.calendar.daos.interfaces.UserDao;
+import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.User;
 
 @SuppressWarnings("unchecked")
@@ -30,6 +32,8 @@ public class HTUserDao implements UserDao {
 		template.merge(user);
 	}
 
+	
+	
 	@Override
 	public User getUser(Integer userId) throws DaoException {
 		User user = template.get(User.class, userId);
@@ -45,6 +49,7 @@ public class HTUserDao implements UserDao {
 		updateUser(product);
 	}
 
+	
 	@Override
 	public List<User> getAllUsers() throws DaoException {
 		DetachedCriteria criteria = DetachedCriteria.forClass(User.class);
@@ -56,11 +61,21 @@ public class HTUserDao implements UserDao {
 		template.deleteAll(getAllUsers());
 	}
 
+	@Override
+	public boolean doesEmailExist(String email) throws DaoException {
+		DetachedCriteria criteria = DetachedCriteria.forClass(User.class);
+		criteria.add(Restrictions.eq("email", email));
+		List<User> user = (List<User>) template.findByCriteria(criteria);
+		System.out.println(user.size());
+		return user.size() > 0;
+	}
 
-//	public void resestTable() {
-//	    Query query = template.getSessionFactory().getCurrentSession().createQuery("truncate table users");
-//	    query.executeUpdate();
-////	    template.flush();
+//	@Override
+//	public List<Event> getUserEvents(Integer userId) throws DaoException {
+//		User user = getUser(userId);
+//		return user.getEvents();
 //	}
+	
+
 
 }

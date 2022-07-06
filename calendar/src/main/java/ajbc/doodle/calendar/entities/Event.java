@@ -2,21 +2,29 @@ package ajbc.doodle.calendar.entities;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ajbc.doodle.calendar.enums.EventRepeating;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
 
 @Getter
 @Setter
@@ -40,8 +48,9 @@ public class Event {
 		this.description = description;
 		this.repeating = repeating;
 		this.discontinued = discontinued;
+
 	}
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer eventId;
@@ -57,5 +66,26 @@ public class Event {
 	@Enumerated(EnumType.STRING)
 	private EventRepeating repeating;
 	private Integer discontinued;
+
+
+//	@ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
+//	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "eventId"), inverseJoinColumns = @JoinColumn(name = "userId"))
+//	@ManyToMany(mappedBy="guests",cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
+	@ManyToMany(mappedBy="events",cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
+	private List<User> guests;
+
+	
+//	private List<Notification> notifications;
+	
+//	@ManyToMany
+//	@JoinTable(name = "Event_Users", joinColumns = @JoinColumn(name = "userId"))
+////			  joinColumns = @JoinColumn(name = "student_id"), 
+////			  inverseJoinColumns = @JoinColumn(name = "course_id"))
+//	@JsonIgnore
+	
+//	@ManyToMany(mappedBy = "events")
+//	private List<User> guests;
+	
+	
 
 }

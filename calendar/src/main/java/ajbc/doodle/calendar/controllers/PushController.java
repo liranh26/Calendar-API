@@ -25,7 +25,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,11 +42,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ajbc.doodle.calendar.Application;
 import ajbc.doodle.calendar.ServerKeys;
+import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.webpush.PushMessage;
 import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
 import ajbc.doodle.calendar.services.CryptoService;
+import ajbc.doodle.calendar.services.UserService;
 
 
 
@@ -71,6 +73,9 @@ public class PushController {
 	private final ObjectMapper objectMapper;
 	
 	private int counter;
+	
+	@Autowired
+	private UserService userService;
 
 	public PushController(ServerKeys serverKeys, CryptoService cryptoService, ObjectMapper objectMapper) {
 		this.serverKeys = serverKeys;
@@ -91,11 +96,20 @@ public class PushController {
 		return this.serverKeys.getPublicKeyBase64();
 	}
 
+	//TODO refactor to login , and check the 
 	@PostMapping("/subscribe/{email}")
 	@ResponseStatus(HttpStatus.CREATED)
 	public void subscribe(@RequestBody Subscription subscription, @PathVariable(required = false) String email) {
-		//if user is registered allow subscription
-		this.subscriptions.put(subscription.getEndpoint(), subscription);
+		
+		try {
+			if(userService.emailExistInDB(email))
+				this.subscriptions.put(subscription.getEndpoint(), subscription);
+			else
+				System.out.println("Sign up first before login.");
+		} catch (DaoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println("Subscription added with email "+email);
 	}
 

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.daos.interfaces.EventUserDao;
+import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.EventUser;
 
 @Service
@@ -18,7 +19,8 @@ public class EventUserService {
 	@Qualifier("htEventUserDao")
 	EventUserDao dao;
 
-	public void addEventToDB(EventUser eventUser) throws DaoException {
+	
+	public void addUserToEvent(EventUser eventUser) throws DaoException {
 		dao.addEventToUser(eventUser);
 	}
 

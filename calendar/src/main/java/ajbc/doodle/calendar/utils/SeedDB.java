@@ -3,6 +3,7 @@ package ajbc.doodle.calendar.utils;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,6 @@ public class SeedDB {
 			seedNotifications();
 			seedEventUsers();
 		} catch (DaoException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -86,11 +86,13 @@ public class SeedDB {
 		
 		query = "CREATE TABLE Notifications(\r\n"
 				+ "notificationId int not null identity(1,1),\r\n"
+				+ "userId int not null, \r\n"
 				+ "eventId int not null, \r\n"
 				+ "title nvarchar(40),\r\n"
 				+ "timeToAlertBefore int,\r\n"
 				+ "units nvarchar(40),\r\n"
 				+ "discontinued int,\r\n"
+				+ "foreign key(userId) references users(userId),\r\n"
 				+ "foreign key(eventId) references events(eventId),\r\n"
 				+ "primary key(notificationId)\r\n"
 				+ ") ";
@@ -125,16 +127,12 @@ public class SeedDB {
 	
 	public void seedUsers() throws DaoException {
 
-//		notificationService.deleteAllNotifications();
-//		eventService.deleteAllEvents();
-//		userService.deleteAllUsers();
-
 		userService.addUser(
-				new User("Liran", "Hadad", "test@test.com", LocalDate.of(1990, 2, 26), LocalDate.of(2022, 1, 1), 0));
+				new User("Liran", "Hadad", "test@test.com", LocalDate.of(1990, 2, 26), LocalDate.of(2022, 1, 1), 0, new ArrayList<Event>()));
 		userService.addUser(
-				new User("Snir", "Hadad", "test2@test.com", LocalDate.of(1993, 7, 8), LocalDate.of(2022, 5, 5), 0));
+				new User("Snir", "Hadad", "test2@test.com", LocalDate.of(1993, 7, 8), LocalDate.of(2022, 5, 5), 0, new ArrayList<Event>()));
 		userService.addUser(
-				new User("Sapir", "Hadad", "test3@test.com", LocalDate.of(1990, 7, 23), LocalDate.of(2022, 6, 6), 0));
+				new User("Sapir", "Hadad", "test3@test.com", LocalDate.of(1990, 7, 23), LocalDate.of(2022, 6, 6), 0, new ArrayList<Event>()));
 
 		userService.getAllUsers().stream().forEach(System.out::println);
 
@@ -152,36 +150,33 @@ public class SeedDB {
 				LocalDate.of(2022, 7, 7), LocalTime.of(16, 0), LocalTime.of(18, 30), "Tel-Aviv", "buying equipment",
 				EventRepeating.WEEKLY, 0));
 
-		eventService.getAllEvents().stream().forEach(System.out::println);
 	}
 
 	public void seedNotifications() throws DaoException {
+		List<User> users = userService.getAllUsers();
 		List<Event> events = eventService.getAllEvents();
 
 		notificationService.addNotificationToDB(
-				new Notification(events.get(0).getEventId(), "Remember take the check", 90, ChronoUnit.MINUTES, 0));
+				new Notification(users.get(0).getUserId(), events.get(0).getEventId(), "Remember take the check", 90, ChronoUnit.MINUTES, 0));
 
 		notificationService.addNotificationToDB(
-				new Notification(events.get(1).getEventId(), "Remember your wallet!", 15, ChronoUnit.MINUTES, 0));
+				new Notification(users.get(0).getUserId(), events.get(1).getEventId(), "Remember your wallet!", 15, ChronoUnit.MINUTES, 0));
 
 		notificationService.addNotificationToDB(
-				new Notification(events.get(1).getEventId(), "Wash the car after", 30, ChronoUnit.MINUTES, 0));
-
-		notificationService.getAllNotifications().stream().forEach(System.out::println);
+				new Notification(users.get(1).getUserId(), events.get(1).getEventId(), "Wash the car after", 30, ChronoUnit.MINUTES, 0));
 
 	}
 
 	public void seedEventUsers() throws DaoException {
 		List<Event> events = eventService.getAllEvents();
 		List<User> users = userService.getAllUsers();
-		System.out.println("yay");
-		eventUserService.addEventToDB(new EventUser(events.get(0).getEventId(), users.get(0).getUserId()));
-		eventUserService.addEventToDB(new EventUser(events.get(0).getEventId(), users.get(1).getUserId()));
-		eventUserService.addEventToDB(new EventUser(events.get(0).getEventId(), users.get(2).getUserId()));
-		eventUserService.addEventToDB(new EventUser(events.get(1).getEventId(), users.get(1).getUserId()));
-		eventUserService.addEventToDB(new EventUser(events.get(1).getEventId(), users.get(2).getUserId()));
 
-		eventUserService.getAllEventUsersList().stream().forEach(System.out::println);
+		userService.addUserToEvent(events.get(0).getEventId(), users.get(0).getUserId());
+		userService.addUserToEvent(events.get(0).getEventId(), users.get(1).getUserId());
+		userService.addUserToEvent(events.get(0).getEventId(), users.get(2).getUserId());
+		userService.addUserToEvent(events.get(1).getEventId(), users.get(1).getUserId());
+		userService.addUserToEvent(events.get(1).getEventId(), users.get(2).getUserId());
+	
 
 	}
 

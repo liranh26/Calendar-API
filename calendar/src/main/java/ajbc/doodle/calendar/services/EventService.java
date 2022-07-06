@@ -2,6 +2,8 @@ package ajbc.doodle.calendar.services;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -9,7 +11,9 @@ import org.springframework.stereotype.Service;
 
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.daos.interfaces.EventDao;
+import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.Event;
+import ajbc.doodle.calendar.entities.User;
 
 @Service
 public class EventService {
@@ -17,12 +21,18 @@ public class EventService {
 	@Autowired
 	@Qualifier("htEventDao")
 	EventDao dao;
+	@Autowired
+	@Qualifier("htUserDao")
+	UserDao userDao;
 
-	//TODO check valid events date?
 	public void addEventToDB(Event event) throws DaoException {
 		dao.addEvent(event);
 	}
-
+	
+	public void addEventToUser(Integer usedId) {
+		
+	}
+	
 	public List<Event> getAllEvents() throws DaoException {
 		return dao.getAllEvents();
 	}
@@ -31,4 +41,15 @@ public class EventService {
 		dao.deleteAllEvents();
 	}
 
+	public Event getEventById(Integer eventId) throws DaoException {
+		return dao.getEvent(eventId);
+	}
+	
+	@Transactional
+	public List<Event> getEventsOfUser(Integer userId) throws DaoException
+	{
+		User user = userDao.getUser(userId);
+		System.out.println(user);
+		return user.getEvents();
+	}
 }

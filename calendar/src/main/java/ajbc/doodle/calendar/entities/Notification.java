@@ -25,8 +25,9 @@ public class Notification {
 
 
 
-	public Notification(Integer eventId, String title, Integer timeToAlertBefore, ChronoUnit units,
+	public Notification(Integer userId, Integer eventId, String title, Integer timeToAlertBefore, ChronoUnit units,
 			Integer discontinued) {
+		this.userId = userId;
 		this.eventId = eventId;
 		this.title = title;
 		this.timeToAlertBefore = timeToAlertBefore;
@@ -37,7 +38,10 @@ public class Notification {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer notificationId;
+	private Integer userId;
+
 	private Integer eventId;
+	
 	private String title;
 	private Integer timeToAlertBefore;
 	@Enumerated(EnumType.STRING)

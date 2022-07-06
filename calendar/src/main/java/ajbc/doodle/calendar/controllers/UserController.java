@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.ErrorMessage;
+import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.services.UserService;
 
@@ -27,10 +28,10 @@ public class UserController {
 	private UserService userService;
 	
 	@PostMapping
-	public ResponseEntity<?> addUser(User user) throws DaoException {
+	public ResponseEntity<?> addUser(@RequestBody User user) throws DaoException {
 		try {
 			userService.addUser(user);
-		
+			
 			return ResponseEntity.status(HttpStatus.CREATED).body(user);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
@@ -40,6 +41,38 @@ public class UserController {
 		}
 	}
 	
+	@GetMapping(path="/{id}")
+	public ResponseEntity<?> getUserById(@PathVariable Integer id){
+		User user;
+		try {
+			user = userService.getUserById(id);
+			return ResponseEntity.ok(user);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to get user with id: "+id);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg) ;
+			
+		}
+		
+	}
+	
+	@GetMapping
+	public ResponseEntity<?> getAllUser(){
+		List<User> users;
+		try {
+			users = userService.getAllUsers();
+			return ResponseEntity.ok(users);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("failed to get users");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg) ;
+			
+		}
+		
+	}
+
 	
 
 	
