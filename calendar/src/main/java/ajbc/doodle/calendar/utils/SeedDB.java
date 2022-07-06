@@ -39,18 +39,18 @@ public class SeedDB {
 
 	@EventListener
 	public void seedDB(ContextRefreshedEvent event) {
-		try {
+//		try {
 			
-			dropTables();
-			createTables();
-			
-			seedUsers();
-			seedEvents();
-			seedNotifications();
-			seedEventUsers();
-		} catch (DaoException e) {
-			e.printStackTrace();
-		}
+//			dropTables();
+//			createTables();
+//			
+//			seedUsers();
+//			seedEvents();
+//			seedNotifications();
+//			seedEventUsers();
+//		} catch (DaoException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	public void createTables() {

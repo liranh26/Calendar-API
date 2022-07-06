@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -16,9 +17,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import ajbc.doodle.calendar.enums.EventRepeating;
 import lombok.Getter;
@@ -54,7 +60,11 @@ public class Event {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer eventId;
+	
+	@JsonIgnore
+	@Column(insertable = false, updatable = false)
 	private Integer eventOwnerId;
+		
 	private String title;
 	private Integer isAllDay;
 	private LocalDate startDate;
@@ -63,29 +73,26 @@ public class Event {
 	private LocalTime endTime;
 	private String address;
 	private String description;
+	
 	@Enumerated(EnumType.STRING)
 	private EventRepeating repeating;
-	private Integer discontinued;
+	
+	private Integer discontinued; //TODO change to inactive and bit in db
 
-
-//	@ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
-//	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "eventId"), inverseJoinColumns = @JoinColumn(name = "userId"))
-//	@ManyToMany(mappedBy="guests",cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
+	@ManyToOne
+	@JoinColumn(name = "eventOwnerId")
+	private User owner;
+	
+	
 	@ManyToMany(mappedBy="events",cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
 	private List<User> guests;
 
 	
-//	private List<Notification> notifications;
-	
-//	@ManyToMany
-//	@JoinTable(name = "Event_Users", joinColumns = @JoinColumn(name = "userId"))
-////			  joinColumns = @JoinColumn(name = "student_id"), 
-////			  inverseJoinColumns = @JoinColumn(name = "course_id"))
-//	@JsonIgnore
-	
-//	@ManyToMany(mappedBy = "events")
-//	private List<User> guests;
-	
-	
+	@JsonProperty(access = Access.WRITE_ONLY)
+	@OneToMany(mappedBy = "event", cascade = { CascadeType.MERGE })
+	private List<Notification> notifications = new ArrayList<>();
 
+	
+	
+	
 }

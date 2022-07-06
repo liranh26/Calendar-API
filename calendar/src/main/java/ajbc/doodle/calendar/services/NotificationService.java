@@ -29,5 +29,9 @@ public class NotificationService {
 	public void deleteAllNotifications() throws DaoException {
 		dao.deleteAllNotifications();
 	}
+	
+	public Notification getNotificationById(Integer id) throws DaoException {
+		return dao.getNotification(id);
+	}
 
 }

@@ -27,11 +27,11 @@ public class UserService {
 	public void addUser(User user) throws DaoException {
 		userDao.addUser(user);
 	}
-	
+
 	public void addUserToEvent(Integer eventId, Integer userId) throws DaoException {
 		eventUserDao.addEventToUser(new EventUser(eventId, userId));
 	}
-	
+
 	public User getUserById(Integer userId) throws DaoException {
 		return userDao.getUser(userId);
 	}
@@ -43,21 +43,26 @@ public class UserService {
 	public void deleteAllUsers() throws DaoException {
 		userDao.deleteAllUsers();
 	}
-	
+
 	public boolean emailExistInDB(String email) throws DaoException {
 		System.out.println(userDao.doesEmailExist(email));
 		return userDao.doesEmailExist(email);
 	}
-	
-	public List<Event> getUserEvents(Integer userId) throws DaoException{
+
+	public List<Event> getUserEvents(Integer userId) throws DaoException {
 		User user = userDao.getUser(userId);
 		return user.getEvents();
 	}
 
-	
-	public List<Event> getEventsOfUser(Integer userId) throws DaoException
-	{
+	public List<Event> getEventsOfUser(Integer userId) throws DaoException {
 		User user = userDao.getUser(userId);
 		return user.getEvents();
 	}
+	
+	public List<User> getUserGuestsForEvent(Integer userId) throws DaoException{
+		User user = userDao.getUser(userId);
+		return user.getEvents().get(0).getGuests();
+	}
+
+
 }

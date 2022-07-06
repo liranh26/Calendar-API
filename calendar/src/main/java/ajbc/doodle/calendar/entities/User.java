@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -52,17 +53,13 @@ public class User {
 	private LocalDate joinDate;
 	private Integer discontinued;
 
-//	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-//	@JoinTable(name = "event_user", joinColumns = { @JoinColumn(name = "userId") }, inverseJoinColumns = {
-//			@JoinColumn(name = "eventId") })
-//	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE})
-//	@JoinTable(name = "event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
-//	private List<Event> events;
+
 	@JsonIgnore
 	@ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
 	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
-	List<Event> events;
-
+	List<Event> events = new ArrayList<>();
 	
-	//list notifications;
+	
+	
+	
 }
