@@ -31,7 +31,6 @@ public class NotificationService {
 		not.setEvent(event);
 		
 		addNotificationToDB(not);
-		System.out.println(not);
 		return not;
 	}
 

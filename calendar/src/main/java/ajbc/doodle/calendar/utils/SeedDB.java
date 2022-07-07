@@ -156,11 +156,11 @@ public class SeedDB {
 		List<User> users = userService.getAllUsers();
 		List<Event> events = eventService.getAllEvents();
 		
-		Notification not = new Notification(users.get(0).getUserId(), events.get(0).getEventId(), "Remember take the check", 90, ChronoUnit.MINUTES, 0);
+		Notification not = new Notification(users.get(1).getUserId(), events.get(0).getEventId(), "Remember take the check", 90, ChronoUnit.MINUTES, 0);
 		not.setEvent(events.get(0));
 		notificationService.addNotificationToDB(not);
 		
-		not = new Notification(users.get(0).getUserId(), events.get(1).getEventId(), "Remember your wallet!", 15, ChronoUnit.MINUTES, 0);
+		not = new Notification(users.get(2).getUserId(), events.get(1).getEventId(), "Remember your wallet!", 15, ChronoUnit.MINUTES, 0);
 		not.setEvent(events.get(1));
 		notificationService.addNotificationToDB(not);
 

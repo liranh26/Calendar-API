@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.Query;
 
+import org.hibernate.Criteria;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +31,7 @@ public class HTUserDao implements UserDao {
 	@Override
 	public void updateUser(User user) throws DaoException {
 		template.merge(user);
-	}
-
-	
+	}	
 	
 	@Override
 	public User getUser(Integer userId) throws DaoException {
@@ -53,7 +52,7 @@ public class HTUserDao implements UserDao {
 	@Override
 	public List<User> getAllUsers() throws DaoException {
 		DetachedCriteria criteria = DetachedCriteria.forClass(User.class);
-//		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		return (List<User>) template.findByCriteria(criteria);
 	}
 	
@@ -71,6 +70,20 @@ public class HTUserDao implements UserDao {
 		return user.size() > 0;
 	}
 
+	@Override
+	public User getUserByEmail(String email) throws DaoException {
+		DetachedCriteria criteria = DetachedCriteria.forClass(User.class);
+		criteria.add(Restrictions.eq("email", email));
+		List<User> user = (List<User>) template.findByCriteria(criteria);
+		
+		if (user.isEmpty())
+			throw new DaoException("No such product in the DB");
+		return user.get(0);
+	}
+
+	
+	
+	
 //	@Override
 //	public List<Event> getUserEvents(Integer userId) throws DaoException {
 //		User user = getUser(userId);

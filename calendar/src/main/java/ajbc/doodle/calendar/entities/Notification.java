@@ -47,10 +47,8 @@ public class Notification {
 	
 	private Integer notificationId;
 	
-//	@JsonIgnore
 	private Integer userId;
 	
-//	@JsonIgnore
 	@Column(insertable = false, updatable = false)
 	private Integer eventId;
 	

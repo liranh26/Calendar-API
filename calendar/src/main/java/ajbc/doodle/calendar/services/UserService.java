@@ -25,7 +25,6 @@ public class UserService {
 	EventUserDao eventUserDao;
 
 	public void addUser(User user) throws DaoException {
-//		System.out.println(user);
 		userDao.addUser(user);
 	}
 
@@ -49,6 +48,12 @@ public class UserService {
 		System.out.println(userDao.doesEmailExist(email));
 		return userDao.doesEmailExist(email);
 	}
+
+	public User getUserByEmail(String email) throws DaoException {
+		return userDao.getUserByEmail(email);
+	}
+	
+	
 
 //	public List<Event> getUserEvents(Integer userId) throws DaoException {
 //		User user = userDao.getUser(userId);

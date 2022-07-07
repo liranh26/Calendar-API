@@ -61,4 +61,8 @@ public interface UserDao {
 		throw new DaoException("Method not implemented");
 	}
 
+	public default User getUserByEmail(String email) throws DaoException {
+		throw new DaoException("Method not implemented");
+	}
+
 }

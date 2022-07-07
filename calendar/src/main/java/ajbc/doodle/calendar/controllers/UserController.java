@@ -27,6 +27,23 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
+	
+	@GetMapping(path="/email/{email}")
+	public ResponseEntity<?> getUserByEmail(@PathVariable String email){
+		User user;
+		try {
+			user = userService.getUserByEmail(email);
+			return ResponseEntity.ok(user);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to get user with email: " + email);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg) ;
+			
+		}
+		
+	}
+	
 	@PostMapping
 	public ResponseEntity<?> addUser(@RequestBody User user) throws DaoException {
 		try {
@@ -41,7 +58,7 @@ public class UserController {
 		}
 	}
 	
-	@GetMapping(path="/{id}")
+	@GetMapping(path="/id/{id}")
 	public ResponseEntity<?> getUserById(@PathVariable Integer id){
 		User user;
 		try {

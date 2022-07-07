@@ -106,7 +106,7 @@ public class PushController {
 		
 	}
 
-	//		try {
+//		try {
 //			if(userService.emailExistInDB(email))
 //				this.subscriptions.put(subscription.getEndpoint(), subscription);
 //			else

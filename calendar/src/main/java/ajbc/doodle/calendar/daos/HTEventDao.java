@@ -33,7 +33,7 @@ public class HTEventDao implements EventDao {
 	@Override
 	public List<Event> getAllEvents() throws DaoException {
 		DetachedCriteria criteria = DetachedCriteria.forClass(Event.class);
-//		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+//		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		return (List<Event>) template.findByCriteria(criteria);
 	}
 

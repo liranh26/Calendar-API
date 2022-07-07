@@ -38,11 +38,8 @@ public class EventService {
 		
 		eventDao.addEvent(event);		
 		
-		System.out.println(event);
 		event.getNotifications().add(
 				notificationService.createDefaultNotification(event)); 
-		
-//		eventDao.updateEvent(event);
 		
 		EventUser eventUser = new EventUser(event.getEventId(), event.getEventOwnerId());
 		eventUserDao.addEventToUser(eventUser);
