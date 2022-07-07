@@ -46,11 +46,11 @@ public class Notification {
 	private Integer notificationId;
 	
 //	@JsonIgnore
-	@Column(insertable = false, updatable = false)
+//	@Column(insertable = false, updatable = false)
 	private Integer userId;
 	
 //	@JsonIgnore
-	@Column(insertable = false, updatable = false)
+//	@Column(insertable = false, updatable = false)
 	private Integer eventId;
 	
 	private String title;
@@ -61,14 +61,14 @@ public class Notification {
 	
 	private Integer discontinued;
 
-	@ManyToOne
-	@JoinColumn(name="eventId")
-	@JsonIgnore
-	private Event event;
-//	
 //	@ManyToOne
-//    @JoinColumn(name="userId")
-//	private User user;
+//	@JoinColumn(name="eventId")
+//	@JsonIgnore
+//	private Event event;
+	
+	
+	
+	
 
 	
 	

@@ -26,7 +26,7 @@ public class EventService {
 	UserDao userDao;
 
 	public void addEventToDB(Event event) throws DaoException {
-		System.out.println(event);
+//		System.out.println(event);
 		//TODO add the eventid + userid to the table event_user
 		dao.addEvent(event);
 	}
@@ -44,11 +44,11 @@ public class EventService {
 		return dao.getEvent(eventId);
 	}
 	
-	@Transactional
-	public List<Event> getEventsOfUser(Integer userId) throws DaoException
-	{
-		User user = userDao.getUser(userId);
-		System.out.println(user);
-		return user.getEvents();
-	}
+//	@Transactional
+//	public List<Event> getEventsOfUser(Integer userId) throws DaoException
+//	{
+//		User user = userDao.getUser(userId);
+//		System.out.println(user);
+//		return user.getEvents();
+//	}
 }

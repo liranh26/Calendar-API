@@ -42,13 +42,14 @@ public class User {
 	private LocalDate joinDate;
 	private Integer discontinued;
 
-//	@JsonIgnore
+	
 	@ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
 	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
 	List<Event> events = new ArrayList<Event>();
 	
+	
 	public User(String firstName, String lastName, String email, LocalDate birthDate, LocalDate joinDate,
-			Integer discontinued, List<Event> events) {
+			Integer discontinued) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -56,6 +57,6 @@ public class User {
 		this.birthDate = birthDate;
 		this.joinDate = joinDate;
 		this.discontinued = discontinued;
-		this.events = events;
+//		this.events = events;
 	}
 }

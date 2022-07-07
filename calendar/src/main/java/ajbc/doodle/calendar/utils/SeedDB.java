@@ -128,13 +128,13 @@ public class SeedDB {
 	public void seedUsers() throws DaoException {
 
 		userService.addUser(
-				new User("Liran", "Hadad", "test@test.com", LocalDate.of(1990, 2, 26), LocalDate.of(2022, 1, 1), 0, new ArrayList<Event>()));
+				new User("Liran", "Hadad", "test@test.com", LocalDate.of(1990, 2, 26), LocalDate.of(2022, 1, 1), 0));
 		userService.addUser(
-				new User("Snir", "Hadad", "test2@test.com", LocalDate.of(1993, 7, 8), LocalDate.of(2022, 5, 5), 0, new ArrayList<Event>()));
+				new User("Snir", "Hadad", "test2@test.com", LocalDate.of(1993, 7, 8), LocalDate.of(2022, 5, 5), 0));
 		userService.addUser(
-				new User("Sapir", "Hadad", "test3@test.com", LocalDate.of(1990, 7, 23), LocalDate.of(2022, 6, 6), 0, new ArrayList<Event>()));
+				new User("Sapir", "Hadad", "test3@test.com", LocalDate.of(1990, 7, 23), LocalDate.of(2022, 6, 6), 0));
 
-		userService.getAllUsers().stream().forEach(System.out::println);
+//		userService.getAllUsers().stream().forEach(System.out::println);
 
 	}
 
@@ -156,6 +156,12 @@ public class SeedDB {
 		List<User> users = userService.getAllUsers();
 		List<Event> events = eventService.getAllEvents();
 
+//		System.out.println("----------------------");
+//		System.out.println(users);
+//		System.out.println(events);
+//		System.out.println("----------------------");
+
+		
 		notificationService.addNotificationToDB(
 				new Notification(users.get(0).getUserId(), events.get(0).getEventId(), "Remember take the check", 90, ChronoUnit.MINUTES, 0));
 

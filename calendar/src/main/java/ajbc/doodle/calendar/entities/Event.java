@@ -46,8 +46,6 @@ public class Event {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer eventId;
 
-//	@JsonIgnore
-//	@Column(insertable = false, updatable = false)
 	private Integer eventOwnerId;
 
 	private String title;
@@ -62,20 +60,16 @@ public class Event {
 	@Enumerated(EnumType.STRING)
 	private EventRepeating repeating;
 
-	private Integer discontinued; // TODO change to inactive and bit in db
+	private Integer discontinued; 
 
-//	@ManyToOne
-//	@JoinColumn(name = "eventOwnerId")
-//	private User owner;
 
-	@JsonProperty(access = Access.WRITE_ONLY)
-	@ManyToMany(mappedBy = "events", cascade = { CascadeType.MERGE }) //, fetch = FetchType.EAGER
+	@JsonIgnore
+	@ManyToMany(mappedBy = "events") 
 	private List<User> guests;
+	
 
-//	@JsonProperty(access = Access.WRITE_ONLY)
-	@OneToMany(mappedBy = "event", cascade = { CascadeType.MERGE })
-	private List<Notification> notifications;
-
+	
+	
 	public Event(Integer eventOwnerId, String title, Integer isAllDay, LocalDate startDate, LocalDate endDate,
 			LocalTime startTime, LocalTime endTime, String address, String description, EventRepeating repeating,
 			Integer discontinued) {

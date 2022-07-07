@@ -25,7 +25,7 @@ public class UserService {
 	EventUserDao eventUserDao;
 
 	public void addUser(User user) throws DaoException {
-		System.out.println(user);
+//		System.out.println(user);
 		userDao.addUser(user);
 	}
 
@@ -50,20 +50,20 @@ public class UserService {
 		return userDao.doesEmailExist(email);
 	}
 
-	public List<Event> getUserEvents(Integer userId) throws DaoException {
-		User user = userDao.getUser(userId);
-		return user.getEvents();
-	}
-
-	public List<Event> getEventsOfUser(Integer userId) throws DaoException {
-		User user = userDao.getUser(userId);
-		return user.getEvents();
-	}
-	
-	public List<User> getUserGuestsForEvent(Integer userId) throws DaoException{
-		User user = userDao.getUser(userId);
-		return user.getEvents().get(0).getGuests();
-	}
+//	public List<Event> getUserEvents(Integer userId) throws DaoException {
+//		User user = userDao.getUser(userId);
+//		return user.getEvents();
+//	}
+//
+//	public List<Event> getEventsOfUser(Integer userId) throws DaoException {
+//		User user = userDao.getUser(userId);
+//		return user.getEvents();
+//	}
+//	
+//	public List<User> getUserGuestsForEvent(Integer userId) throws DaoException{
+//		User user = userDao.getUser(userId);
+//		return user.getEvents().get(0).getGuests();
+//	}
 
 
 }
