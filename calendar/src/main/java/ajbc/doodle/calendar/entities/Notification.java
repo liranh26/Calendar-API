@@ -16,6 +16,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,12 +47,12 @@ public class Notification {
 	
 	private Integer notificationId;
 	
-//	@JsonIgnore
-//	@Column(insertable = false, updatable = false)
+	@JsonIgnore
+	@Column(insertable = false, updatable = false)
 	private Integer userId;
 	
-//	@JsonIgnore
-//	@Column(insertable = false, updatable = false)
+	@JsonIgnore
+	@Column(insertable = false, updatable = false)
 	private Integer eventId;
 	
 	private String title;
@@ -61,15 +63,12 @@ public class Notification {
 	
 	private Integer discontinued;
 
-//	@ManyToOne
-//	@JoinColumn(name="eventId")
-//	@JsonIgnore
-//	private Event event;
 	
-	
-	
+	@JsonProperty(access = Access.WRITE_ONLY)
+	@ManyToOne
+	@JoinColumn(name = "eventId")
+	private Event event;
 	
 
-	
 	
 }

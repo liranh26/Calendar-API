@@ -60,13 +60,17 @@ public class Event {
 	@Enumerated(EnumType.STRING)
 	private EventRepeating repeating;
 
-	private Integer discontinued; 
-
+	private Integer discontinued;  // TODO change to inactive and bit in db
 
 	@JsonIgnore
-	@ManyToMany(mappedBy = "events") 
+	@ManyToMany(mappedBy = "events")
 	private List<User> guests;
+
 	
+	@OneToMany(mappedBy = "event", cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
+	private List<Notification> notifications;   // = Arrays.asList(new Notification(eventOwnerId, this.eventId, title, 0,ChronoUnit.SECONDS, 0))
+
+
 
 	
 	
@@ -85,7 +89,6 @@ public class Event {
 		this.repeating = repeating;
 		this.discontinued = discontinued;
 
-	}
-	
-	
+	}	
+
 }
