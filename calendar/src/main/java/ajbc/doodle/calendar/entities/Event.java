@@ -2,7 +2,9 @@ package ajbc.doodle.calendar.entities;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -40,6 +42,40 @@ import lombok.ToString;
 @Table(name = "events")
 public class Event {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer eventId;
+
+//	@JsonIgnore
+//	@Column(insertable = false, updatable = false)
+	private Integer eventOwnerId;
+
+	private String title;
+	private Integer isAllDay;
+	private LocalDate startDate;
+	private LocalDate endDate;
+	private LocalTime startTime;
+	private LocalTime endTime;
+	private String address;
+	private String description;
+
+	@Enumerated(EnumType.STRING)
+	private EventRepeating repeating;
+
+	private Integer discontinued; // TODO change to inactive and bit in db
+
+//	@ManyToOne
+//	@JoinColumn(name = "eventOwnerId")
+//	private User owner;
+
+	@JsonProperty(access = Access.WRITE_ONLY)
+	@ManyToMany(mappedBy = "events", cascade = { CascadeType.MERGE }) //, fetch = FetchType.EAGER
+	private List<User> guests;
+
+//	@JsonProperty(access = Access.WRITE_ONLY)
+	@OneToMany(mappedBy = "event", cascade = { CascadeType.MERGE })
+	private List<Notification> notifications;
+
 	public Event(Integer eventOwnerId, String title, Integer isAllDay, LocalDate startDate, LocalDate endDate,
 			LocalTime startTime, LocalTime endTime, String address, String description, EventRepeating repeating,
 			Integer discontinued) {
@@ -56,43 +92,6 @@ public class Event {
 		this.discontinued = discontinued;
 
 	}
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer eventId;
-	
-	@JsonIgnore
-	@Column(insertable = false, updatable = false)
-	private Integer eventOwnerId;
-		
-	private String title;
-	private Integer isAllDay;
-	private LocalDate startDate;
-	private LocalDate endDate;
-	private LocalTime startTime;
-	private LocalTime endTime;
-	private String address;
-	private String description;
-	
-	@Enumerated(EnumType.STRING)
-	private EventRepeating repeating;
-	
-	private Integer discontinued; //TODO change to inactive and bit in db
-
-	@ManyToOne
-	@JoinColumn(name = "eventOwnerId")
-	private User owner;
-	
-	
-	@ManyToMany(mappedBy="events",cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
-	private List<User> guests;
-
-	
-	@JsonProperty(access = Access.WRITE_ONLY)
-	@OneToMany(mappedBy = "event", cascade = { CascadeType.MERGE })
-	private List<Notification> notifications = new ArrayList<>();
-
-	
 	
 	
 }

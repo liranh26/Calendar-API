@@ -31,6 +31,22 @@ import lombok.ToString;
 @Table(name = "users")
 public class User {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer userId;
+	
+	private String firstName;
+	private String lastName;
+	private String email;
+	private LocalDate birthDate;
+	private LocalDate joinDate;
+	private Integer discontinued;
+
+//	@JsonIgnore
+	@ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
+	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
+	List<Event> events = new ArrayList<Event>();
+	
 	public User(String firstName, String lastName, String email, LocalDate birthDate, LocalDate joinDate,
 			Integer discontinued, List<Event> events) {
 		super();
@@ -42,24 +58,4 @@ public class User {
 		this.discontinued = discontinued;
 		this.events = events;
 	}
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer userId;
-	private String firstName;
-	private String lastName;
-	private String email;
-	private LocalDate birthDate;
-	private LocalDate joinDate;
-	private Integer discontinued;
-
-
-	@JsonIgnore
-	@ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
-	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
-	List<Event> events = new ArrayList<>();
-	
-	
-	
-	
 }

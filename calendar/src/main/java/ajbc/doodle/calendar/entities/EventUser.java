@@ -24,6 +24,7 @@ public class EventUser {
 	
 	@Id
 	private Integer eventId;
+	@Id
 	private Integer userId;
 
 }

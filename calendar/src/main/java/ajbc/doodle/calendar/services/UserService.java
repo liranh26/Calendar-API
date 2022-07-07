@@ -25,6 +25,7 @@ public class UserService {
 	EventUserDao eventUserDao;
 
 	public void addUser(User user) throws DaoException {
+		System.out.println(user);
 		userDao.addUser(user);
 	}
 

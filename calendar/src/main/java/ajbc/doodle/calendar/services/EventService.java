@@ -26,12 +26,11 @@ public class EventService {
 	UserDao userDao;
 
 	public void addEventToDB(Event event) throws DaoException {
+		System.out.println(event);
+		//TODO add the eventid + userid to the table event_user
 		dao.addEvent(event);
 	}
 	
-	public void addEventToUser(Integer usedId) {
-		
-	}
 	
 	public List<Event> getAllEvents() throws DaoException {
 		return dao.getAllEvents();

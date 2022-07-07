@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,10 +24,17 @@ public class EventController {
 	@Autowired
 	private EventService eventService;
 	
+	
+
+	
 	@PostMapping
-	public ResponseEntity<?> addEvent(Event event) throws DaoException {
+	public ResponseEntity<?> addEvent(@RequestBody Event event) throws DaoException {
 		try {
+//			System.out.println(event);
 			eventService.addEventToDB(event);
+//			eventService.addEvent(event, id);
+//			event = eventService.getEventbyId(event.getEventId());
+//			event = eventService.getEventById(event.getEventId());
 			return ResponseEntity.status(HttpStatus.CREATED).body(event);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
