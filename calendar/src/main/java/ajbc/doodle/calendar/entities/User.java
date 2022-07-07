@@ -58,6 +58,5 @@ public class User {
 		this.birthDate = birthDate;
 		this.joinDate = joinDate;
 		this.discontinued = discontinued;
-//		this.events = events;
 	}
 }

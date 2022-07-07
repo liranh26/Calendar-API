@@ -11,7 +11,6 @@ import ajbc.doodle.calendar.entities.User;
 @Transactional(rollbackFor = { DaoException.class }, readOnly = true)
 public interface UserDao {
 
-//	extends JpaRepository<User, Integer>
 	// CRUD operations
 	@Transactional(readOnly = false)
 	public default void addUser(User user) throws DaoException {
@@ -65,4 +64,7 @@ public interface UserDao {
 		throw new DaoException("Method not implemented");
 	}
 
+	public default  List<User> getUsersByEventId(String eventId) throws DaoException {
+		throw new DaoException("Method not implemented");
+	}
 }

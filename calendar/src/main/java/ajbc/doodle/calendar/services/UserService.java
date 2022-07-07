@@ -1,5 +1,7 @@
 package ajbc.doodle.calendar.services;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +22,21 @@ public class UserService {
 	@Autowired
 	@Qualifier("htUserDao")
 	UserDao userDao;
+	
 	@Autowired
-	@Qualifier("htEventUserDao")
-	EventUserDao eventUserDao;
+	private EventService eventService;
+	
+	@Autowired
+	private EventUserService eventUserService;
+
+	
 
 	public void addUser(User user) throws DaoException {
 		userDao.addUser(user);
 	}
 
 	public void addUserToEvent(Integer eventId, Integer userId) throws DaoException {
-		eventUserDao.addEventToUser(new EventUser(eventId, userId));
+		eventUserService.addUserToEvent(new EventUser(eventId, userId));
 	}
 
 	public User getUserById(Integer userId) throws DaoException {
@@ -52,23 +59,32 @@ public class UserService {
 	public User getUserByEmail(String email) throws DaoException {
 		return userDao.getUserByEmail(email);
 	}
-	
-	
 
-//	public List<Event> getUserEvents(Integer userId) throws DaoException {
-//		User user = userDao.getUser(userId);
-//		return user.getEvents();
-//	}
-//
-//	public List<Event> getEventsOfUser(Integer userId) throws DaoException {
-//		User user = userDao.getUser(userId);
-//		return user.getEvents();
-//	}
-//	
-//	public List<User> getUserGuestsForEvent(Integer userId) throws DaoException{
-//		User user = userDao.getUser(userId);
-//		return user.getEvents().get(0).getGuests();
-//	}
+	//TODO refactor code
+	public List<User> getUsersForEvent(Integer eventId) throws DaoException {
+		List<User> users = new ArrayList<User>();
+		List<EventUser> eventsForUser = eventUserService.getEventsForUser(eventId);
+
+		eventsForUser.stream().forEach(e -> {
+			try {
+				users.add(getUserById(e.getUserId()));
+
+			} catch (DaoException e1) {
+				e1.printStackTrace();
+			}
+		});
+
+		return users;
+	}
+
+	public void updateUser(User user) throws DaoException {
+		userDao.updateUser(user);
+	}
+
+	public void deleteUser(Integer id) throws DaoException {
+		userDao.deleteUser(id);
+		
+	}
 
 
 }

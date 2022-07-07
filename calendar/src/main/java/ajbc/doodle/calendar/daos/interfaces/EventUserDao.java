@@ -48,5 +48,9 @@ public interface EventUserDao {
 	public default void deleteAllEventUsers() throws DaoException {
 		throw new DaoException("Method not implemented");
 	}
+	
+	public default List<EventUser> getEventsForUser(Integer eventId) throws DaoException {
+		throw new DaoException("Method not implemented");
+	}
 
 }

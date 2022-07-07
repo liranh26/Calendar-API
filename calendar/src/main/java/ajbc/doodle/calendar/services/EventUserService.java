@@ -31,5 +31,9 @@ public class EventUserService {
 	public void deleteAllEvents() throws DaoException {
 		dao.deleteAllEventUsers();
 	}
+	
+	public List<EventUser> getEventsForUser(Integer userId) throws DaoException{
+		return dao.getEventsForUser(userId);
+	}
 
 }

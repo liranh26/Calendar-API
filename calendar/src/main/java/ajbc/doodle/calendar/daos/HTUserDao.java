@@ -43,9 +43,9 @@ public class HTUserDao implements UserDao {
 
 	@Override
 	public void deleteUser(Integer userId) throws DaoException {	
-		User product = getUser(userId);
-		product.setDiscontinued(1);
-		updateUser(product);
+		User user = getUser(userId);
+		user.setDiscontinued(1);
+		updateUser(user);
 	}
 
 	
@@ -80,16 +80,6 @@ public class HTUserDao implements UserDao {
 			throw new DaoException("No such product in the DB");
 		return user.get(0);
 	}
-
-	
-	
-	
-//	@Override
-//	public List<Event> getUserEvents(Integer userId) throws DaoException {
-//		User user = getUser(userId);
-//		return user.getEvents();
-//	}
-	
 
 
 }

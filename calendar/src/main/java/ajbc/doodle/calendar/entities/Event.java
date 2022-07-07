@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -66,7 +67,7 @@ public class Event {
 
 	@JsonIgnore
 	@ManyToMany(mappedBy = "events")
-	private Set<User> guests;
+	private Set<User> guests = new HashSet<>();
 
 	
 	@OneToMany( cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
@@ -90,6 +91,27 @@ public class Event {
 		this.repeating = repeating;
 		this.discontinued = discontinued;
 
-	}	
+	}
 
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Event other = (Event) obj;
+		return Objects.equals(address, other.address) && Objects.equals(description, other.description)
+				&& Objects.equals(discontinued, other.discontinued) && Objects.equals(endDate, other.endDate)
+				&& Objects.equals(endTime, other.endTime) && Objects.equals(eventId, other.eventId)
+				&& Objects.equals(eventOwnerId, other.eventOwnerId) && Objects.equals(guests, other.guests)
+				&& Objects.equals(isAllDay, other.isAllDay) && Objects.equals(notifications, other.notifications)
+				&& repeating == other.repeating && Objects.equals(startDate, other.startDate)
+				&& Objects.equals(startTime, other.startTime) && Objects.equals(title, other.title);
+	}
+
+	
+	
 }

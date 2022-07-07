@@ -64,6 +64,13 @@ public class HTEventUserDao implements EventUserDao {
 		template.deleteAll(getAllEventsAndUsers());
 	}
 
+	@Override
+	public List<EventUser> getEventsForUser(Integer eventId) throws DaoException {
+		DetachedCriteria criteria = DetachedCriteria.forClass(EventUser.class);
+		criteria.add(Restrictions.eq("eventId", eventId));
+		return (List<EventUser>) template.findByCriteria(criteria);
+	}
+
 	
 
 	

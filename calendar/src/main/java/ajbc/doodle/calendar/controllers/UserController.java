@@ -5,9 +5,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,6 +30,22 @@ public class UserController {
 	private UserService userService;
 	
 	
+	@GetMapping(path="/event/{eventId}")
+	public ResponseEntity<?> getUsersForEvent(@PathVariable Integer eventId){
+		List<User> users;
+		try {
+			users = userService.getUsersForEvent(eventId);
+			return ResponseEntity.ok(users);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to get users with event id: " + eventId);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg) ;
+			
+		}
+		
+	}
+	
 	@GetMapping(path="/email/{email}")
 	public ResponseEntity<?> getUserByEmail(@PathVariable String email){
 		User user;
@@ -43,20 +61,7 @@ public class UserController {
 		}
 		
 	}
-	
-	@PostMapping
-	public ResponseEntity<?> addUser(@RequestBody User user) throws DaoException {
-		try {
-			userService.addUser(user);
-			
-			return ResponseEntity.status(HttpStatus.CREATED).body(user);
-		} catch (DaoException e) {
-			ErrorMessage errMsg = new ErrorMessage();
-			errMsg.setData(e.getMessage());
-			errMsg.setMessage("Failed to add category to DB.");
-			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
-		}
-	}
+
 	
 	@GetMapping(path="/id/{id}")
 	public ResponseEntity<?> getUserById(@PathVariable Integer id){
@@ -74,6 +79,7 @@ public class UserController {
 		
 	}
 	
+	
 	@GetMapping
 	public ResponseEntity<?> getAllUser(){
 		List<User> users;
@@ -89,8 +95,52 @@ public class UserController {
 		}
 		
 	}
-
 	
+	
+	@PostMapping
+	public ResponseEntity<?> addUser(@RequestBody User user) throws DaoException {
+		try {
+			userService.addUser(user);
+			
+			return ResponseEntity.status(HttpStatus.CREATED).body(user);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to add user to DB.");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
+		}
+	}
+	
+	@PutMapping(path="/{id}")
+	public ResponseEntity<?> updateProduct(@RequestBody User user, @PathVariable Integer id){
+		
+		try {
+			user.setUserId(id);
+			userService.updateUser(user);
+			user = userService.getUserById(user.getUserId());
+			return ResponseEntity.status(HttpStatus.OK).body(user);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("failed to update user in DB.");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg) ;
+		}
+	}
 
+	@DeleteMapping(path="/{id}")
+	public ResponseEntity<?> softDeleteUser(@PathVariable Integer id){
+		
+		try {
+			userService.deleteUser(id);
+			
+			User user = userService.getUserById(id);
+			return ResponseEntity.status(HttpStatus.OK).body(user);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("failed to delete user from DB.");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg) ;
+		}
+	}	
 	
 }
