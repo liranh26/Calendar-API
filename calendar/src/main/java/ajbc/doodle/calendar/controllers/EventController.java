@@ -1,5 +1,7 @@
 package ajbc.doodle.calendar.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,5 +58,22 @@ public class EventController {
 		}
 		
 	}
+	
+	@GetMapping
+	public ResponseEntity<?> getAllEvents(){
+		List<Event> events;
+		try {
+			events = eventService.getAllEvents();
+			return ResponseEntity.ok(events);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to get events.");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg) ;
+			
+		}
+		
+	}
+	
 	
 }

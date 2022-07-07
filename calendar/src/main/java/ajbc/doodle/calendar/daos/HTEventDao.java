@@ -2,6 +2,7 @@ package ajbc.doodle.calendar.daos;
 
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.criterion.DetachedCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.HibernateTemplate;
@@ -33,7 +34,7 @@ public class HTEventDao implements EventDao {
 	@Override
 	public List<Event> getAllEvents() throws DaoException {
 		DetachedCriteria criteria = DetachedCriteria.forClass(Event.class);
-//		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		return (List<Event>) template.findByCriteria(criteria);
 	}
 
