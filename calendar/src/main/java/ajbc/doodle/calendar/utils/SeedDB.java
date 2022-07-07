@@ -39,18 +39,18 @@ public class SeedDB {
 
 	@EventListener
 	public void seedDB(ContextRefreshedEvent event) {
-//		try {
-//			
-//			dropTables();
-//			createTables();
-//			
-//			seedUsers();
-//			seedEvents();
-//			seedNotifications();
+		try {
+			
+			dropTables();
+			createTables();
+			
+			seedUsers();
+			seedEvents();
+			seedNotifications();
 //			seedEventUsers();
-//		} catch (DaoException e) {
-//			e.printStackTrace();
-//		}
+		} catch (DaoException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void createTables() {
@@ -156,14 +156,16 @@ public class SeedDB {
 		List<User> users = userService.getAllUsers();
 		List<Event> events = eventService.getAllEvents();
 		
-		notificationService.addNotificationToDB(
-				new Notification(users.get(0).getUserId(), events.get(0).getEventId(), "Remember take the check", 90, ChronoUnit.MINUTES, 0));
+		Notification not = new Notification(users.get(0).getUserId(), events.get(0).getEventId(), "Remember take the check", 90, ChronoUnit.MINUTES, 0);
+		not.setEvent(events.get(0));
+		notificationService.addNotificationToDB(not);
+		
+		not = new Notification(users.get(0).getUserId(), events.get(1).getEventId(), "Remember your wallet!", 15, ChronoUnit.MINUTES, 0);
+		not.setEvent(events.get(1));
+		notificationService.addNotificationToDB(not);
 
-		notificationService.addNotificationToDB(
-				new Notification(users.get(0).getUserId(), events.get(1).getEventId(), "Remember your wallet!", 15, ChronoUnit.MINUTES, 0));
-
-		notificationService.addNotificationToDB(
-				new Notification(users.get(1).getUserId(), events.get(1).getEventId(), "Wash the car after", 30, ChronoUnit.MINUTES, 0));
+//		notificationService.addNotificationToDB(
+//				new Notification(users.get(1).getUserId(), events.get(1).getEventId(), "Wash the car after", 30, ChronoUnit.MINUTES, 0));
 
 	}
 

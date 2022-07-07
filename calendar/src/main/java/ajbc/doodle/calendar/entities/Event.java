@@ -5,7 +5,9 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -64,11 +66,12 @@ public class Event {
 
 	@JsonIgnore
 	@ManyToMany(mappedBy = "events")
-	private List<User> guests;
+	private Set<User> guests;
 
 	
-	@OneToMany(mappedBy = "event", cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
-	private List<Notification> notifications = new ArrayList<Notification>();   
+	@OneToMany( cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
+	@JoinColumn(name = "eventId")
+	private Set<Notification> notifications = new HashSet<>();   
 
 
 	

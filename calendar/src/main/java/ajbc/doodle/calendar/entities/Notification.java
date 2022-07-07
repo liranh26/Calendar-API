@@ -48,7 +48,6 @@ public class Notification {
 	private Integer notificationId;
 	
 //	@JsonIgnore
-	@Column(insertable = false, updatable = false)
 	private Integer userId;
 	
 //	@JsonIgnore
@@ -65,7 +64,7 @@ public class Notification {
 
 	
 	@JsonProperty(access = Access.WRITE_ONLY)
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "eventId")
 	private Event event;
 	

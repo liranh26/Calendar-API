@@ -28,6 +28,8 @@ public class NotificationService {
 		
 		Notification not = new Notification(event.getEventOwnerId(), event.getEventId(), 
 				event.getTitle(), 0, ChronoUnit.SECONDS, 0);
+		not.setEvent(event);
+		
 		addNotificationToDB(not);
 		System.out.println(not);
 		return not;

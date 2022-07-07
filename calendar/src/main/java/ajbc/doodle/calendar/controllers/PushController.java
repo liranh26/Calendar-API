@@ -63,9 +63,8 @@ public class PushController {
 
 	private final Map<String, Subscription> subscriptions = new ConcurrentHashMap<>();
 
-	private final Map<String, Subscription> subscriptionsAngular = new ConcurrentHashMap<>();
-
-	private String lastNumbersAPIFact = "";
+//	private final Map<String, Subscription> subscriptionsAngular = new ConcurrentHashMap<>();
+//	private String lastNumbersAPIFact = "";
 
 	private final HttpClient httpClient;
 
