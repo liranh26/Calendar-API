@@ -3,6 +3,7 @@ package ajbc.doodle.calendar.entities;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -45,7 +46,7 @@ public class User {
 	
 	@ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
 	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
-	List<Event> events = new ArrayList<Event>();
+	Set<Event> events;
 	
 	
 	public User(String firstName, String lastName, String email, LocalDate birthDate, LocalDate joinDate,

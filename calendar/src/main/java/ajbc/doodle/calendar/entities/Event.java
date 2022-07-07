@@ -68,11 +68,9 @@ public class Event {
 
 	
 	@OneToMany(mappedBy = "event", cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
-	private List<Notification> notifications;   // = Arrays.asList(new Notification(eventOwnerId, this.eventId, title, 0,ChronoUnit.SECONDS, 0))
+	private List<Notification> notifications;   
 
 
-
-	
 	
 	public Event(Integer eventOwnerId, String title, Integer isAllDay, LocalDate startDate, LocalDate endDate,
 			LocalTime startTime, LocalTime endTime, String address, String description, EventRepeating repeating,
