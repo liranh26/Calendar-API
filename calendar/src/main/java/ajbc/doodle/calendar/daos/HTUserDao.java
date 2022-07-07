@@ -53,6 +53,7 @@ public class HTUserDao implements UserDao {
 	@Override
 	public List<User> getAllUsers() throws DaoException {
 		DetachedCriteria criteria = DetachedCriteria.forClass(User.class);
+//		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		return (List<User>) template.findByCriteria(criteria);
 	}
 	

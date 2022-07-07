@@ -47,11 +47,11 @@ public class Notification {
 	
 	private Integer notificationId;
 	
-	@JsonIgnore
+//	@JsonIgnore
 	@Column(insertable = false, updatable = false)
 	private Integer userId;
 	
-	@JsonIgnore
+//	@JsonIgnore
 	@Column(insertable = false, updatable = false)
 	private Integer eventId;
 	
@@ -70,5 +70,7 @@ public class Notification {
 	private Event event;
 	
 
+	
+	
 	
 }

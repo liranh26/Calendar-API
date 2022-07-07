@@ -68,7 +68,7 @@ public class Event {
 
 	
 	@OneToMany(mappedBy = "event", cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
-	private List<Notification> notifications;   
+	private List<Notification> notifications = new ArrayList<Notification>();   
 
 
 	

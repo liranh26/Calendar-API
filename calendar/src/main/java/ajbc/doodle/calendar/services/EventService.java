@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.daos.interfaces.EventDao;
 import ajbc.doodle.calendar.daos.interfaces.EventUserDao;
+import ajbc.doodle.calendar.daos.interfaces.NotificationDao;
 import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.EventUser;
@@ -26,17 +27,26 @@ public class EventService {
 	@Autowired
 	@Qualifier("htEventUserDao")
 	EventUserDao eventUserDao;
+	@Autowired
+	private NotificationService notificationService;
 
+	EventService(){
+		
+	}
+	
 	public void addEventToDB(Event event) throws DaoException {
 		
 		eventDao.addEvent(event);		
+		
+		System.out.println(event);
+		event.getNotifications().add(notificationService.createDefaultNotification(event)); //TODO fix error mapped with insert="false" update="false"
+		
+		eventDao.updateEvent(event);
 		
 		EventUser eventUser = new EventUser(event.getEventId(), event.getEventOwnerId());
 		eventUserDao.addEventToUser(eventUser);
 	}
 
-	
-	
 	
 	public List<Event> getAllEvents() throws DaoException {
 		return eventDao.getAllEvents();

@@ -44,6 +44,7 @@ import ajbc.doodle.calendar.Application;
 import ajbc.doodle.calendar.ServerKeys;
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.Notification;
+import ajbc.doodle.calendar.entities.not;
 import ajbc.doodle.calendar.entities.webpush.PushMessage;
 import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
@@ -100,18 +101,22 @@ public class PushController {
 	@PostMapping("/subscribe/{email}")
 	@ResponseStatus(HttpStatus.CREATED)
 	public void subscribe(@RequestBody Subscription subscription, @PathVariable(required = false) String email) {
-		
-		try {
-			if(userService.emailExistInDB(email))
-				this.subscriptions.put(subscription.getEndpoint(), subscription);
-			else
-				System.out.println("Sign up first before login.");
-		} catch (DaoException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
+		this.subscriptions.put(subscription.getEndpoint(), subscription);
 		System.out.println("Subscription added with email "+email);
+		
 	}
+
+	//		try {
+//			if(userService.emailExistInDB(email))
+//				this.subscriptions.put(subscription.getEndpoint(), subscription);
+//			else
+//				System.out.println("Sign up first before login.");
+//		} catch (DaoException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		System.out.println("Subscription added with email "+email);
 
 	
 	@PostMapping("/unsubscribe/{email}")
@@ -128,23 +133,23 @@ public class PushController {
 
 
 	
-//	@Scheduled(fixedDelay = 3_000)
-//	public void testNotification() {
-//		if (this.subscriptions.isEmpty()) {
-//			return;
-//		}
-//		counter++;
-//		try {
-//			
-//			Notification notification = new Notification(counter, LocalDateTime.now(), "Test notification", "Test message");
-//			sendPushMessageToAllSubscribers(this.subscriptions, new PushMessage("message: " + counter, notification.toString()));
-//			System.out.println(notification);
-//		} catch (JsonProcessingException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-//	}
+	@Scheduled(fixedDelay = 3_000)
+	public void testNotification() {
+		if (this.subscriptions.isEmpty()) {
+			return;
+		}
+		counter++;
+		try {
+			
+			not notification = new not(counter, LocalDateTime.now(), "Test notification", "Test message");
+			sendPushMessageToAllSubscribers(this.subscriptions, new PushMessage("message: " + counter, notification.toString()));
+			System.out.println(notification);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 
 
 	private void sendPushMessageToAllSubscribersWithoutPayload() {
@@ -180,6 +185,7 @@ public class PushController {
 
 		failedSubscriptions.forEach(subs::remove);
 	}
+
 
 	/**
 	 * @return true if the subscription is no longer valid and can be removed, false
