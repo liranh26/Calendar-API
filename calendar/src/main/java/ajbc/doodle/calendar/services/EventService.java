@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.daos.interfaces.EventDao;
+import ajbc.doodle.calendar.daos.interfaces.EventUserDao;
 import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.Event;
+import ajbc.doodle.calendar.entities.EventUser;
 import ajbc.doodle.calendar.entities.User;
 
 @Service
@@ -20,28 +22,32 @@ public class EventService {
 
 	@Autowired
 	@Qualifier("htEventDao")
-	EventDao dao;
+	EventDao eventDao;
 	@Autowired
-	@Qualifier("htUserDao")
-	UserDao userDao;
+	@Qualifier("htEventUserDao")
+	EventUserDao eventUserDao;
 
 	public void addEventToDB(Event event) throws DaoException {
-//		System.out.println(event);
-		//TODO add the eventid + userid to the table event_user
-		dao.addEvent(event);
+		
+		eventDao.addEvent(event);		
+		
+		EventUser eventUser = new EventUser(event.getEventId(), event.getEventOwnerId());
+		eventUserDao.addEventToUser(eventUser);
 	}
+
+	
 	
 	
 	public List<Event> getAllEvents() throws DaoException {
-		return dao.getAllEvents();
+		return eventDao.getAllEvents();
 	}
 
 	public void deleteAllEvents() throws DaoException {
-		dao.deleteAllEvents();
+		eventDao.deleteAllEvents();
 	}
 
 	public Event getEventById(Integer eventId) throws DaoException {
-		return dao.getEvent(eventId);
+		return eventDao.getEvent(eventId);
 	}
 	
 //	@Transactional

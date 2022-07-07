@@ -25,16 +25,12 @@ public class EventController {
 	private EventService eventService;
 	
 	
-
-	
 	@PostMapping
 	public ResponseEntity<?> addEvent(@RequestBody Event event) throws DaoException {
 		try {
-//			System.out.println(event);
+
 			eventService.addEventToDB(event);
-//			eventService.addEvent(event, id);
-//			event = eventService.getEventbyId(event.getEventId());
-//			event = eventService.getEventById(event.getEventId());
+
 			return ResponseEntity.status(HttpStatus.CREATED).body(event);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
