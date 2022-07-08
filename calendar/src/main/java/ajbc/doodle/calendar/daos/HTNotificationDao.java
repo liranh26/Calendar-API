@@ -38,10 +38,8 @@ public class HTNotificationDao implements NotificationDao {
 	}
 
 	@Override
-	public void deleteNotification(Integer notificationId) throws DaoException {	
-		Notification notification = getNotification(notificationId);
-		notification.setDiscontinued(1);
-		updateNotification(notification);
+	public void deleteNotification(Notification notification) throws DaoException {	
+		template.delete(notification);
 	}
 
 	@Override

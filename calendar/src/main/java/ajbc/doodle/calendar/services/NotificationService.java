@@ -21,17 +21,16 @@ public class NotificationService {
 	@Qualifier("htNotificationDao")
 	NotificationDao dao;
 
-	public void addNotificationToDB(Notification notification,Event event) throws DaoException {
+	public void addNotificationToDB(Notification notification, Event event) throws DaoException {
 		notification.setEvent(event);
 		dao.addNotification(notification);
 	}
-	
+
 	public Notification createDefaultNotification(Event event) throws DaoException {
-		
-		Notification not = new Notification(event.getEventOwnerId(), event.getEventId(), 
-				event.getTitle(), 0, ChronoUnit.SECONDS, 0);
-//		not.setEvent(event);
-		
+
+		Notification not = new Notification(event.getEventOwnerId(), event.getEventId(), event.getTitle(), 0,
+				ChronoUnit.SECONDS, 0);
+
 		addNotificationToDB(not, event);
 		return not;
 	}
@@ -43,10 +42,24 @@ public class NotificationService {
 	public void deleteAllNotifications() throws DaoException {
 		dao.deleteAllNotifications();
 	}
-	
+
 	public Notification getNotificationById(Integer id) throws DaoException {
 		return dao.getNotification(id);
 	}
 
+	public void updateNotification(Notification notification) throws DaoException {
+		dao.updateNotification(notification);
+
+	}
+
+	public void softDelete(Notification notification) throws DaoException {
+		notification.setDiscontinued(1);
+		dao.updateNotification(notification);
+	}
+
+	public void hardDelete(Notification notification) throws DaoException {
+		dao.deleteNotification(notification);
+		
+	}
 
 }
