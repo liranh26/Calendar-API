@@ -1,9 +1,12 @@
 package ajbc.doodle.calendar.daos;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.stereotype.Repository;
@@ -30,6 +33,13 @@ public class HTEventDao implements EventDao {
 			throw new DaoException("No such event in the DB");
 		return event;
 	}
+	
+	
+
+	@Override
+	public void updateEvent(Event event) throws DaoException {
+		template.merge(event);
+	}
 
 	@Override
 	public List<Event> getAllEvents() throws DaoException {
@@ -42,6 +52,19 @@ public class HTEventDao implements EventDao {
 	public void deleteAllEvents() throws DaoException {
 		template.deleteAll(getAllEvents());
 	}
+
+//	@Override
+//	public List<Event> getEventsOfUserInRange(LocalDate startDate, LocalDate endDate, LocalTime startTime,
+//			LocalTime endTime) throws DaoException {
+//		DetachedCriteria criteria = DetachedCriteria.forClass(Event.class);
+//
+//		criteria.add(Restrictions.ge("startDate", startDate));
+//		criteria.add(Restrictions.le("endDate", endDate));
+//		criteria.add(Restrictions.ge("startTime", startTime));
+//		criteria.add(Restrictions.le("endTime", endTime));
+//		
+//		return (List<Event>) template.findByCriteria(criteria);
+//	}
 
 
 	

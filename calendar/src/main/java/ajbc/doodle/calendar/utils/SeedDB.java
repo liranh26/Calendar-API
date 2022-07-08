@@ -158,11 +158,11 @@ public class SeedDB {
 		
 		Notification not = new Notification(users.get(1).getUserId(), events.get(0).getEventId(), "Remember take the check", 90, ChronoUnit.MINUTES, 0);
 		not.setEvent(events.get(0));
-		notificationService.addNotificationToDB(not);
+		notificationService.addNotificationToDB(not, events.get(0));
 		
 		not = new Notification(users.get(2).getUserId(), events.get(1).getEventId(), "Remember your wallet!", 15, ChronoUnit.MINUTES, 0);
 		not.setEvent(events.get(1));
-		notificationService.addNotificationToDB(not);
+		notificationService.addNotificationToDB(not, events.get(1));
 
 //		notificationService.addNotificationToDB(
 //				new Notification(users.get(1).getUserId(), events.get(1).getEventId(), "Wash the car after", 30, ChronoUnit.MINUTES, 0));

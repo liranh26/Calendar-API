@@ -2,6 +2,7 @@ package ajbc.doodle.calendar.services;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,7 +21,8 @@ public class NotificationService {
 	@Qualifier("htNotificationDao")
 	NotificationDao dao;
 
-	public void addNotificationToDB(Notification notification) throws DaoException {
+	public void addNotificationToDB(Notification notification,Event event) throws DaoException {
+		notification.setEvent(event);
 		dao.addNotification(notification);
 	}
 	
@@ -28,9 +30,9 @@ public class NotificationService {
 		
 		Notification not = new Notification(event.getEventOwnerId(), event.getEventId(), 
 				event.getTitle(), 0, ChronoUnit.SECONDS, 0);
-		not.setEvent(event);
+//		not.setEvent(event);
 		
-		addNotificationToDB(not);
+		addNotificationToDB(not, event);
 		return not;
 	}
 
@@ -45,5 +47,6 @@ public class NotificationService {
 	public Notification getNotificationById(Integer id) throws DaoException {
 		return dao.getNotification(id);
 	}
+
 
 }

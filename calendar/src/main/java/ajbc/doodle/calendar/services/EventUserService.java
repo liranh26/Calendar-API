@@ -36,4 +36,9 @@ public class EventUserService {
 		return dao.getEventsForUser(userId);
 	}
 
+	public List<EventUser> getEventsByUserId(Integer id) throws DaoException {
+		return dao.getEventsByUserId(id);
+		
+	}
+
 }

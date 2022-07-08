@@ -1,5 +1,7 @@
 package ajbc.doodle.calendar.daos.interfaces;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -49,6 +51,11 @@ public interface EventDao {
 
 	@Transactional(readOnly = false)
 	public default void deleteAllEvents() throws DaoException {
+		throw new DaoException("Method not implemented");
+	}
+
+	public default List<Event> getEventsOfUserInRange(LocalDate startDate, 
+			LocalDate endDate, LocalTime startTime, LocalTime endTime) throws DaoException {
 		throw new DaoException("Method not implemented");
 	}
 
