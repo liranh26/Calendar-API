@@ -27,18 +27,20 @@ public class EventService {
 	@Autowired
 	@Qualifier("htEventDao")
 	EventDao eventDao;
+	
 	@Autowired
 	@Qualifier("htEventUserDao")
 	EventUserDao eventUserDao;
+	
 	@Autowired
 	private NotificationService notificationService;
 
 	@Autowired
 	private EventUserService eventUserService;
 
-	EventService() {
-
-	}
+	@Autowired
+	@Qualifier("htUserDao")
+	UserDao userDao;
 
 	public void addEventToDB(Event event) throws DaoException {
 
@@ -46,7 +48,7 @@ public class EventService {
 
 		event.getNotifications().add(notificationService.createDefaultNotification(event));
 
-		EventUser eventUser = new EventUser(event.getEventId(), event.getEventOwnerId());
+		EventUser eventUser = new EventUser(event.getEventId(), event.getEventOwnerId(), userDao.getUser(event.getEventOwnerId()) , event);
 		eventUserDao.addEventToUser(eventUser);
 	}
 
@@ -82,13 +84,17 @@ public class EventService {
 		return events.stream().filter(e -> eventUser.contains(e.getEventId())).toList();
 	}
 
-	public void addGuestToEvent(Integer eventId, Integer userId) throws DaoException {
-		eventUserService.addUserToEvent(new EventUser(eventId, userId));
+	public void addGuestToEvent(Event event, Integer userId) throws DaoException {
+		
+		event.getGuests().add(new EventUser(event.getEventId(), userId, userDao.getUser(userId) ,event) );
+		eventUserService.addUserToEvent(new EventUser(event.getEventId(), userId, userDao.getUser(event.getEventOwnerId()) , event));
+		
 	}
 
 	public void updateEvent(Event event, Integer userId) throws DaoException {
 		Event oldEvent = getEventById(event.getEventId());
-		if(oldEvent.getEventOwnerId() != userId)
+		
+		if(!userId.equals(oldEvent.getEventOwnerId()))
 			throw new DaoException("The user is not the owner of the event!");
 		
 //		event.setGuests(oldEvent.getGuests());
@@ -96,6 +102,7 @@ public class EventService {
 		
 		eventDao.updateEvent(event);
 	}
+
 
 
 }

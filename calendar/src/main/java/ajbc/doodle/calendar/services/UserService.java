@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import ajbc.doodle.calendar.daos.DaoException;
+import ajbc.doodle.calendar.daos.interfaces.EventDao;
 import ajbc.doodle.calendar.daos.interfaces.EventUserDao;
 import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.Event;
@@ -24,7 +25,13 @@ public class UserService {
 	UserDao userDao;
 	
 	@Autowired
+	@Qualifier("htEventDao")
+	EventDao eventDao;
+	
+	@Autowired
 	private EventService eventService;
+	
+
 	
 	@Autowired
 	private EventUserService eventUserService;
@@ -36,7 +43,9 @@ public class UserService {
 	}
 
 	public void addUserToEvent(Integer eventId, Integer userId) throws DaoException {
-		eventUserService.addUserToEvent(new EventUser(eventId, userId));
+		User user = userDao.getUser(userId);
+		Event event = eventDao.getEvent(eventId);
+		eventUserService.addUserToEvent(new EventUser(eventId, userId, user, event));
 	}
 
 	public User getUserById(Integer userId) throws DaoException {

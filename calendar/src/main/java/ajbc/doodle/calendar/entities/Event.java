@@ -42,7 +42,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "events")
+//@Table(name = "events")
 public class Event {
 
 	@Id
@@ -66,9 +66,9 @@ public class Event {
 	private Integer discontinued;  // TODO change to inactive and bit in db
 
 	@JsonIgnore
-	@ManyToMany(mappedBy = "events")
-	private Set<User> guests = new HashSet<>();
-
+	@OneToMany(mappedBy = "events", fetch = FetchType.EAGER)
+	private Set<EventUser> guests = new HashSet<>();	
+	
 	
 	@OneToMany( cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
 	@JoinColumn(name = "eventId")

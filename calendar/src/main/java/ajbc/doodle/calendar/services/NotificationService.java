@@ -62,4 +62,8 @@ public class NotificationService {
 		
 	}
 
+//	public void addListNotificationsToDB(List<Notification> notifications) {
+//		// TODO Auto-generated method stub
+//	}
+
 }

@@ -7,7 +7,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,9 +33,19 @@ public class EventUser implements Serializable {
 	
 	@Id
 	private Integer eventId;
+	
 	@Id
 	private Integer userId;
 
+	
+	@ManyToOne
+	@JoinColumn(name = "userId")
+	private User user;
+	
+	@ManyToOne
+	@JoinColumn(name = "eventId")
+	private Event event;
+	
 }
 
 //@IdClass(EventUsersPK.class)

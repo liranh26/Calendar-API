@@ -54,6 +54,24 @@ public class NotificationController {
 		}
 	}
 
+//	@PostMapping(path = "/{eventId}") //TODO -finish the api call*************************
+//	public ResponseEntity<?> addListOfNotifications(@RequestBody List<Notification> notifications, @PathVariable Integer eventId)
+//			throws DaoException {
+//		try {
+//			Event event = eventService.getEventById(eventId);
+//			notifications.stream().forEach(n -> {n.setEventId(eventId); n.setEvent(event);});
+//
+//			notificationService.addListNotificationsToDB(notifications);
+//			return ResponseEntity.status(HttpStatus.CREATED).body(notifications);
+//		} catch (DaoException e) {
+//			ErrorMessage errMsg = new ErrorMessage();
+//			errMsg.setData(e.getMessage());
+//			errMsg.setMessage("Failed to add event to DB.");
+//			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
+//		}
+//	}
+	
+	
 	@GetMapping(path = "/{id}")
 	public ResponseEntity<?> getNotificationById(@PathVariable Integer id) {
 		Notification notification;
@@ -129,4 +147,6 @@ public class NotificationController {
 		}
 	}
 
+	
+	
 }

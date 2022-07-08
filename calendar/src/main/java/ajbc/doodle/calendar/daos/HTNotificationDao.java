@@ -23,6 +23,13 @@ public class HTNotificationDao implements NotificationDao {
 	public void addNotification(Notification notification) throws DaoException {
 		template.persist(notification);
 	}
+	
+
+//	@Override
+//	public void addListNotifications(List<Notification> notifications) throws DaoException {
+//		//TODO
+//	}
+
 
 	@Override
 	public void updateNotification(Notification notification) throws DaoException {

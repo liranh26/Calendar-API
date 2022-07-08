@@ -142,13 +142,21 @@ public class SeedDB {
 
 		List<User> users = userService.getAllUsers();
 
-		eventService.addEventToDB(new Event(users.get(1).getUserId(), "wedding", 0, LocalDate.of(2022, 8, 7),
+		Event event = new Event(users.get(1).getUserId(), "wedding", 0, LocalDate.of(2022, 8, 7),
 				LocalDate.of(2022, 8, 7), LocalTime.of(20, 0), LocalTime.of(23, 30), "Troya", "Tomer getting married",
-				EventRepeating.NONE, 0));
+				EventRepeating.NONE, 0);
 
-		eventService.addEventToDB(new Event(users.get(2).getUserId(), "shopping", 0, LocalDate.of(2022, 7, 7),
+		eventService.addEventToDB(event);
+		eventService.addGuestToEvent(event, users.get(0).getUserId());
+
+		event = new Event(users.get(2).getUserId(), "shopping", 0, LocalDate.of(2022, 7, 7),
 				LocalDate.of(2022, 7, 7), LocalTime.of(16, 0), LocalTime.of(18, 30), "Tel-Aviv", "buying equipment",
-				EventRepeating.WEEKLY, 0));
+				EventRepeating.WEEKLY, 0);
+		
+//		eventService.addEventToDB(event);
+//		eventService.addGuestToEvent(event, users.get(0).getUserId());
+		
+		eventService.addEventToDB(event);
 
 	}
 

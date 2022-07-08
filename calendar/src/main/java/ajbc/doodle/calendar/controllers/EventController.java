@@ -50,8 +50,8 @@ public class EventController {
 	public ResponseEntity<?> addGuestToEvent(@PathVariable Integer eventId, @PathVariable Integer userId) throws DaoException {
 		Event event;
 		try {
-			 eventService.addGuestToEvent(eventId, userId);
 			event = eventService.getEventById(eventId);
+			eventService.addGuestToEvent(event, userId);
 			return ResponseEntity.status(HttpStatus.CREATED).body(event);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();

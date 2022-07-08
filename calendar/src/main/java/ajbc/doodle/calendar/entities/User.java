@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -29,7 +30,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "users")
+//@Table(name = "users")
 public class User {
 
 	@Id
@@ -44,9 +45,9 @@ public class User {
 	private Integer discontinued;
 
 	
-	@ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
-	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
-	Set<Event> events;
+	@OneToMany(mappedBy = "users", cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
+//	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
+	Set<EventUser> events;
 	
 	
 	public User(String firstName, String lastName, String email, LocalDate birthDate, LocalDate joinDate,
