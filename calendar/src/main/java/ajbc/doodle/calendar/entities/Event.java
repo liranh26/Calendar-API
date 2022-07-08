@@ -42,7 +42,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Entity
-//@Table(name = "events")
+@Table(name = "events")
 public class Event {
 
 	@Id
@@ -65,10 +65,15 @@ public class Event {
 
 	private Integer discontinued;  // TODO change to inactive and bit in db
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "events", fetch = FetchType.EAGER)
-	private Set<EventUser> guests = new HashSet<>();	
+//	@JsonIgnore
+//	@ManyToMany(mappedBy = "events")
+//	private Set<User> guests = new HashSet<>();
 	
+	@ManyToMany
+	@JoinTable(name = "event_users", joinColumns = @JoinColumn(name = "eventId"), inverseJoinColumns = @JoinColumn(name = "userId"))
+	@JsonIgnore
+	private Set<User> guests = new HashSet<>();
+
 	
 	@OneToMany( cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
 	@JoinColumn(name = "eventId")
@@ -94,24 +99,5 @@ public class Event {
 	}
 
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Event other = (Event) obj;
-		return Objects.equals(address, other.address) && Objects.equals(description, other.description)
-				&& Objects.equals(discontinued, other.discontinued) && Objects.equals(endDate, other.endDate)
-				&& Objects.equals(endTime, other.endTime) && Objects.equals(eventId, other.eventId)
-				&& Objects.equals(eventOwnerId, other.eventOwnerId) && Objects.equals(guests, other.guests)
-				&& Objects.equals(isAllDay, other.isAllDay) && Objects.equals(notifications, other.notifications)
-				&& repeating == other.repeating && Objects.equals(startDate, other.startDate)
-				&& Objects.equals(startTime, other.startTime) && Objects.equals(title, other.title);
-	}
-
-	
 	
 }

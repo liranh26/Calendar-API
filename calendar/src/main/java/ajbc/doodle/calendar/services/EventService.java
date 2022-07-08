@@ -3,14 +3,15 @@ package ajbc.doodle.calendar.services;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
-import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.stereotype.Service;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.daos.interfaces.EventDao;
@@ -48,7 +49,7 @@ public class EventService {
 
 		event.getNotifications().add(notificationService.createDefaultNotification(event));
 
-		EventUser eventUser = new EventUser(event.getEventId(), event.getEventOwnerId(), userDao.getUser(event.getEventOwnerId()) , event);
+		EventUser eventUser = new EventUser(event.getEventId(), event.getEventOwnerId());
 		eventUserDao.addEventToUser(eventUser);
 	}
 
@@ -85,19 +86,19 @@ public class EventService {
 	}
 
 	public void addGuestToEvent(Event event, Integer userId) throws DaoException {
-		
-		event.getGuests().add(new EventUser(event.getEventId(), userId, userDao.getUser(userId) ,event) );
-		eventUserService.addUserToEvent(new EventUser(event.getEventId(), userId, userDao.getUser(event.getEventOwnerId()) , event));
+		event.getGuests().add(userDao.getUser(userId));
+		eventUserService.addUserToEvent(new EventUser(event.getEventId(), userId));
 		
 	}
 
 	public void updateEvent(Event event, Integer userId) throws DaoException {
+		
 		Event oldEvent = getEventById(event.getEventId());
 		
 		if(!userId.equals(oldEvent.getEventOwnerId()))
 			throw new DaoException("The user is not the owner of the event!");
 		
-//		event.setGuests(oldEvent.getGuests());
+		
 		event.setNotifications(oldEvent.getNotifications());
 		
 		eventDao.updateEvent(event);

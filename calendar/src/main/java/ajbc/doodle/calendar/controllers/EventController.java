@@ -139,6 +139,7 @@ public class EventController {
 		
 		try {
 			event.setEventId(eventId);
+			event.setGuests(null);
 			
 			eventService.updateEvent(event, userId);
 			event = eventService.getEventById(event.getEventId());

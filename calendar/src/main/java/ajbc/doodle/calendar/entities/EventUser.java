@@ -14,6 +14,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,6 +27,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @Entity
+@EqualsAndHashCode
 @Table(name = "Event_Users")
 public class EventUser implements Serializable {
 	
@@ -38,14 +40,13 @@ public class EventUser implements Serializable {
 	private Integer userId;
 
 	
-	@ManyToOne
-	@JoinColumn(name = "userId")
-	private User user;
-	
-	@ManyToOne
-	@JoinColumn(name = "eventId")
-	private Event event;
+//	@ManyToOne
+//	@JoinColumn(name = "userId")
+//	private User user;
+//	
+//	@ManyToOne
+//	@JoinColumn(name = "eventId")
+//	private Event event;
 	
 }
 
-//@IdClass(EventUsersPK.class)

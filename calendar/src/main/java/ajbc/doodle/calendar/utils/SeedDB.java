@@ -56,12 +56,16 @@ public class SeedDB {
 	public void createTables() {
 		String query = "CREATE TABLE Users(\r\n"
 				+ "userId int not null identity(1,1),\r\n"
-				+ "firstName nvarchar(40),\r\n"
-				+ "lastName nvarchar(40),\r\n"
-				+ "email nvarchar(40) unique,\r\n"
+				+ "firstName nvarchar(64),\r\n"
+				+ "lastName nvarchar(64),\r\n"
+				+ "email nvarchar(64) unique,\r\n"
 				+ "birthdate date,\r\n"
 				+ "joinDate date,\r\n"
 				+ "discontinued int,\r\n"
+				+ "endpoint nvarchar(256),\r\n"
+				+ "expirationTime bigint,\r\n"
+				+ "p256dh nvarchar(128),\r\n"
+				+ "auth nvarchar(128),\r\n"
 				+ "primary key(userId)\r\n"
 				+ ") ";
 		jdbc.execute(query);

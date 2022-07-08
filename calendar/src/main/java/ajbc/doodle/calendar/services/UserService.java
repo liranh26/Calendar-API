@@ -1,21 +1,51 @@
 package ajbc.doodle.calendar.services;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpRequest.Builder;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.stereotype.Service;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import ajbc.doodle.calendar.Application;
+import ajbc.doodle.calendar.ServerKeys;
 import ajbc.doodle.calendar.daos.DaoException;
-import ajbc.doodle.calendar.daos.interfaces.EventDao;
 import ajbc.doodle.calendar.daos.interfaces.EventUserDao;
 import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.EventUser;
 import ajbc.doodle.calendar.entities.User;
+import ajbc.doodle.calendar.entities.webpush.Subscription;
+import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
 
 @Service
 public class UserService {
@@ -25,27 +55,21 @@ public class UserService {
 	UserDao userDao;
 	
 	@Autowired
-	@Qualifier("htEventDao")
-	EventDao eventDao;
-	
-	@Autowired
 	private EventService eventService;
-	
-
 	
 	@Autowired
 	private EventUserService eventUserService;
 
-	
 
 	public void addUser(User user) throws DaoException {
 		userDao.addUser(user);
 	}
 
 	public void addUserToEvent(Integer eventId, Integer userId) throws DaoException {
-		User user = userDao.getUser(userId);
-		Event event = eventDao.getEvent(eventId);
-		eventUserService.addUserToEvent(new EventUser(eventId, userId, user, event));
+		
+//		Event event = eventDao.getEvent(eventId);
+//		eventUserService.addUserToEvent(new EventUser(eventId, userId, user, event));
+		eventUserService.addUserToEvent(new EventUser(eventId, userId));
 	}
 
 	public User getUserById(Integer userId) throws DaoException {
@@ -93,6 +117,25 @@ public class UserService {
 	public void deleteUser(Integer id) throws DaoException {
 		userDao.deleteUser(id);
 		
+	}
+
+	public void addUserSubscription(User user, Subscription subscription) throws DaoException {
+		//set subscription keys
+		user.setEndpoint(subscription.getEndpoint());
+		user.setExpirationTime(subscription.getExpirationTime());
+		user.setP256dh(subscription.getKeys().getP256dh());
+		user.setAuth(subscription.getKeys().getAuth());
+
+		userDao.updateUser(user);
+	}
+
+	public void unsubscribeUser(User user, SubscriptionEndpoint subscription) throws DaoException {
+		user.setEndpoint(null);
+		user.setExpirationTime(null);
+		user.setP256dh(null);
+		user.setAuth(null);
+		
+		userDao.updateUser(user);
 	}
 
 

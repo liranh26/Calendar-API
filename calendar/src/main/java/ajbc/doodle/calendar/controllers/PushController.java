@@ -63,9 +63,6 @@ public class PushController {
 
 	private final Map<String, Subscription> subscriptions = new ConcurrentHashMap<>();
 
-//	private final Map<String, Subscription> subscriptionsAngular = new ConcurrentHashMap<>();
-//	private String lastNumbersAPIFact = "";
-
 	private final HttpClient httpClient;
 
 	private final Algorithm jwtAlgorithm;
@@ -73,9 +70,6 @@ public class PushController {
 	private final ObjectMapper objectMapper;
 	
 	private int counter;
-	
-	@Autowired
-	private UserService userService;
 
 	public PushController(ServerKeys serverKeys, CryptoService cryptoService, ObjectMapper objectMapper) {
 		this.serverKeys = serverKeys;
@@ -96,26 +90,14 @@ public class PushController {
 		return this.serverKeys.getPublicKeyBase64();
 	}
 
-	//TODO refactor to login , and check the 
+	
 	@PostMapping("/subscribe/{email}")
 	@ResponseStatus(HttpStatus.CREATED)
 	public void subscribe(@RequestBody Subscription subscription, @PathVariable(required = false) String email) {
-	
+		//if user is registered allow subscription
 		this.subscriptions.put(subscription.getEndpoint(), subscription);
 		System.out.println("Subscription added with email "+email);
-		
 	}
-
-//		try {
-//			if(userService.emailExistInDB(email))
-//				this.subscriptions.put(subscription.getEndpoint(), subscription);
-//			else
-//				System.out.println("Sign up first before login.");
-//		} catch (DaoException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		System.out.println("Subscription added with email "+email);
 
 	
 	@PostMapping("/unsubscribe/{email}")
@@ -149,6 +131,8 @@ public class PushController {
 		}
 
 	}
+	
+
 
 
 	private void sendPushMessageToAllSubscribersWithoutPayload() {
@@ -161,6 +145,8 @@ public class PushController {
 		}
 		failedSubscriptions.forEach(this.subscriptions::remove);
 	}
+
+
 
 	private void sendPushMessageToAllSubscribers(Map<String, Subscription> subs, Object message)
 			throws JsonProcessingException {
@@ -203,6 +189,7 @@ public class PushController {
 		Date today = new Date();
 		Date expires = new Date(today.getTime() + 12 * 60 * 60 * 1000);
 
+		// mailto is the address Push services will reach out if there is a severe problem with the push message deliveries.
 		String token = JWT.create().withAudience(origin).withExpiresAt(expires)
 				.withSubject("mailto:example@example.com").sign(this.jwtAlgorithm);
 

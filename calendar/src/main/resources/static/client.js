@@ -105,7 +105,7 @@ async function unsubscribe() {
 		if (successful) {
 			console.info('Unsubscription successful');
 
-			await fetch("/unsubscribe/" + email.value, {
+			await fetch("/users/logout/" + email.value, {
 				method: 'POST',
 				body: JSON.stringify({ endpoint: subscription.endpoint }),
 				headers: {
@@ -141,7 +141,7 @@ async function subscribe() {
 
 	console.info(`Subscribed to Push Service: ${subscription.endpoint}`);
 
-	await fetch("/subscribe/" + email.value, {
+	await fetch("/users/login/" + email.value, {
 		method: 'POST',
 		body: JSON.stringify(subscription),
 		headers: {
