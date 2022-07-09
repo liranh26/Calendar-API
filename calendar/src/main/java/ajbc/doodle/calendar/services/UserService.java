@@ -119,7 +119,8 @@ public class UserService {
 		
 	}
 
-	public void addUserSubscription(User user, Subscription subscription) throws DaoException {
+	public void addUserSubscription(String email, Subscription subscription) throws DaoException {
+		User user = getUserByEmail(email);
 		//set subscription keys
 		user.setEndpoint(subscription.getEndpoint());
 		user.setExpirationTime(subscription.getExpirationTime());
@@ -129,7 +130,9 @@ public class UserService {
 		userDao.updateUser(user);
 	}
 
-	public void unsubscribeUser(User user, SubscriptionEndpoint subscription) throws DaoException {
+	public void unsubscribeUser(String email, SubscriptionEndpoint subscription) throws DaoException {
+		User user = getUserByEmail(email); 
+		
 		user.setEndpoint(null);
 		user.setExpirationTime(null);
 		user.setP256dh(null);

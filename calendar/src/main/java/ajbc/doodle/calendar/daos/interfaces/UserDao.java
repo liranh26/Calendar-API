@@ -67,4 +67,9 @@ public interface UserDao {
 	public default  List<User> getUsersByEventId(String eventId) throws DaoException {
 		throw new DaoException("Method not implemented");
 	}
+	
+	public default boolean checkEndPointRegistration(String endpoint)throws DaoException {
+		throw new DaoException("Method not implemented");
+	}
+	
 }

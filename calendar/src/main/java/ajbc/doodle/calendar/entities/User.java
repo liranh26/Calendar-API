@@ -2,6 +2,7 @@ package ajbc.doodle.calendar.entities;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,6 +19,10 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import ajbc.doodle.calendar.entities.webpush.SubscriptionKeys;
 import lombok.Getter;
@@ -31,6 +36,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "users")
+@JsonInclude(Include.NON_NULL)
 public class User {
 
 	@Id
@@ -44,20 +50,23 @@ public class User {
 	private LocalDate joinDate;
 	private Integer discontinued;
 
+	@JsonProperty(access = Access.WRITE_ONLY)
 	private Long expirationTime;
+	@JsonProperty(access = Access.WRITE_ONLY)
 	private String endpoint;
+	@JsonProperty(access = Access.WRITE_ONLY)
 	private String p256dh;
+	@JsonProperty(access = Access.WRITE_ONLY)
 	private String auth;
 
-//	@OneToMany(mappedBy = "users", cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
-////	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
-//	Set<EventUser> events;
 
 	@ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
 	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
 	@JsonIgnore
 	Set<Event> events;
 
+	
+	
 	public User(String firstName, String lastName, String email, LocalDate birthDate, LocalDate joinDate,
 			Integer discontinued) {
 		this.firstName = firstName;
@@ -67,4 +76,6 @@ public class User {
 		this.joinDate = joinDate;
 		this.discontinued = discontinued;
 	}
+
+	
 }

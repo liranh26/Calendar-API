@@ -28,6 +28,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
@@ -43,6 +45,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "events")
+@JsonInclude(Include.NON_NULL)
 public class Event {
 
 	@Id
@@ -63,22 +66,18 @@ public class Event {
 	@Enumerated(EnumType.STRING)
 	private EventRepeating repeating;
 
-	private Integer discontinued;  // TODO change to inactive and bit in db
+	private Integer discontinued; // TODO change to inactive and bit in db
 
-//	@JsonIgnore
-//	@ManyToMany(mappedBy = "events")
-//	private Set<User> guests = new HashSet<>();
-	
+
 	@ManyToMany
 	@JoinTable(name = "event_users", joinColumns = @JoinColumn(name = "eventId"), inverseJoinColumns = @JoinColumn(name = "userId"))
 	@JsonIgnore
 	private Set<User> guests = new HashSet<>();
 
 	
-	@OneToMany( cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
+	@OneToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
 	@JoinColumn(name = "eventId")
-	private Set<Notification> notifications = new HashSet<>();   
-
+	private Set<Notification> notifications = new HashSet<>();
 
 	
 	public Event(Integer eventOwnerId, String title, Integer isAllDay, LocalDate startDate, LocalDate endDate,
@@ -98,6 +97,4 @@ public class Event {
 
 	}
 
-
-	
 }

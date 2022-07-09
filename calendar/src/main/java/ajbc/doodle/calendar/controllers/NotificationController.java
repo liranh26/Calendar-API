@@ -1,15 +1,19 @@
 package ajbc.doodle.calendar.controllers;
 
+import java.net.http.HttpClient;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,11 +24,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import ajbc.doodle.calendar.ServerKeys;
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.ErrorMessage;
 import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.User;
+import ajbc.doodle.calendar.entities.not;
+import ajbc.doodle.calendar.entities.webpush.PushMessage;
+import ajbc.doodle.calendar.entities.webpush.Subscription;
+import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
+import ajbc.doodle.calendar.services.CryptoService;
 import ajbc.doodle.calendar.services.EventService;
 import ajbc.doodle.calendar.services.NotificationService;
 
@@ -38,6 +52,53 @@ public class NotificationController {
 	@Autowired
 	private EventService eventService;
 
+	
+	//when opening the site
+	//To pass the public key from the server to the JavaScript application, the Spring Boot application provides a GET endpoint that returns the public key.
+	@GetMapping(path = "/publicSigningKey", produces = "application/octet-stream")
+	public byte[] publicSigningKey() {
+		return notificationService.publicSigningKey();
+	}
+	
+	@PostMapping("/isSubscribed")
+	public boolean isSubscribed(@RequestBody SubscriptionEndpoint subscription) {
+		try {
+			return notificationService.isSubscribed(subscription);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to check subscription in the DB.");
+			return false; //TODO chage return value (client need to receive something else..?)
+		}
+	}
+	
+	
+	/*//TODO - trigger a push message at time
+	//trigers send message every 3 sec
+		@Scheduled(fixedDelay = 3_000)
+		public void testNotification() {
+			if (this.subscriptions.isEmpty()) {
+				return;
+			}
+			counter++;
+			try {
+				
+				not notification = new not(counter, LocalDateTime.now(), "Test notification", "Test message");
+				sendPushMessageToAllSubscribers(this.subscriptions, new PushMessage("message: " + counter, notification.toString()));
+				System.out.println(notification);
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	*/
+	
+	
+	
+	
+	
+	
 	@PostMapping(path = "/{eventId}")
 	public ResponseEntity<?> addNotification(@RequestBody Notification notification, @PathVariable Integer eventId)
 			throws DaoException {

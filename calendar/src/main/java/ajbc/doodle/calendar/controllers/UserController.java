@@ -189,14 +189,13 @@ public class UserController {
 	public ResponseEntity<?> subscribe(@RequestBody Subscription subscription, @PathVariable(required = false) String email) {
 		
 		try {
-			User user = userService.getUserByEmail(email); //throws exception if null
-			userService.addUserSubscription(user, subscription);
+			userService.addUserSubscription(email, subscription);
 			
-			return ResponseEntity.status(HttpStatus.OK).body(user);
+			return ResponseEntity.status(HttpStatus.OK).body(email);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
-			errMsg.setMessage("failed to delete user from DB.");
+			errMsg.setMessage("failed to subscribe user with email: "+email);
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 	
@@ -209,14 +208,14 @@ public class UserController {
 	public ResponseEntity<?> unsubscribe(@RequestBody SubscriptionEndpoint subscription, @PathVariable(required = false) String email) {
 		
 		try {
-			User user = userService.getUserByEmail(email); //throws exception if null
-			userService.unsubscribeUser(user, subscription);
+			//throws exception if null
+			userService.unsubscribeUser(email, subscription);
 			
-			return ResponseEntity.status(HttpStatus.OK).body(user);
+			return ResponseEntity.status(HttpStatus.OK).body(email);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
-			errMsg.setMessage("failed to delete user from DB.");
+			errMsg.setMessage("failed to unsubscribe user with email: "+email);
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 		

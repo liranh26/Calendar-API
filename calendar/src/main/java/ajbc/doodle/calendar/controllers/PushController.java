@@ -52,8 +52,6 @@ import ajbc.doodle.calendar.services.CryptoService;
 import ajbc.doodle.calendar.services.UserService;
 
 
-
-
 @RestController
 public class PushController {
 
@@ -80,30 +78,17 @@ public class PushController {
 		this.jwtAlgorithm = Algorithm.ECDSA256(this.serverKeys.getPublicKey(), this.serverKeys.getPrivateKey());
 	}
 
+	//when opening the site
+	//To pass the public key from the server to the JavaScript application, the Spring Boot application provides a GET endpoint that returns the public key.
 	@GetMapping(path = "/publicSigningKey", produces = "application/octet-stream")
 	public byte[] publicSigningKey() {
 		return this.serverKeys.getPublicKeyUncompressed();
 	}
 
+	 
 	@GetMapping(path = "/publicSigningKeyBase64")
 	public String publicSigningKeyBase64() {
 		return this.serverKeys.getPublicKeyBase64();
-	}
-
-	
-	@PostMapping("/subscribe/{email}")
-	@ResponseStatus(HttpStatus.CREATED)
-	public void subscribe(@RequestBody Subscription subscription, @PathVariable(required = false) String email) {
-		//if user is registered allow subscription
-		this.subscriptions.put(subscription.getEndpoint(), subscription);
-		System.out.println("Subscription added with email "+email);
-	}
-
-	
-	@PostMapping("/unsubscribe/{email}")
-	public void unsubscribe(@RequestBody SubscriptionEndpoint subscription, @PathVariable(required = false) String email) {
-		this.subscriptions.remove(subscription.getEndpoint());
-		System.out.println("Subscription with email "+email+" got removed!");
 	}
 
 
@@ -113,7 +98,7 @@ public class PushController {
 	}
 
 
-	
+	//trigers send message every 3 sec
 	@Scheduled(fixedDelay = 3_000)
 	public void testNotification() {
 		if (this.subscriptions.isEmpty()) {
@@ -197,15 +182,16 @@ public class PushController {
 
 		Builder httpRequestBuilder = HttpRequest.newBuilder();
 		if (body != null) {
-			httpRequestBuilder.POST(BodyPublishers.ofByteArray(body)).header("Content-Type", "application/octet-stream")
-					.header("Content-Encoding", "aes128gcm");
+			httpRequestBuilder.POST(BodyPublishers.ofByteArray(body))
+					.header("Content-Type", "application/octet-stream") //describes the content of the body. an encrypted stream of bytes.
+					.header("Content-Encoding", "aes128gcm"); //describes how the encrypted payload is formatted.
 		} else {
 			httpRequestBuilder.POST(BodyPublishers.ofString(""));
 			// httpRequestBuilder.header("Content-Length", "0");
 		}
 
 		HttpRequest request = httpRequestBuilder.uri(endpointURI).header("TTL", "180")
-				.header("Authorization", "vapid t=" + token + ", k=" + this.serverKeys.getPublicKeyBase64()).build();
+				.header("Authorization", "vapid t=" + token + ", k=" + this.serverKeys.getPublicKeyBase64()).build(); //Payload encryption, message bit less than the 4096 bytes.
 		try {
 			HttpResponse<Void> response = this.httpClient.send(request, BodyHandlers.discarding());
 
@@ -232,6 +218,7 @@ public class PushController {
 			}
 		} catch (IOException | InterruptedException e) {
 			Application.logger.error("send push message", e);
+			// --- here roll back!!! After the application has sent the request to the push service, it needs to check the response's status code.
 		}
 
 		return false;

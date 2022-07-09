@@ -81,5 +81,14 @@ public class HTUserDao implements UserDao {
 		return user.get(0);
 	}
 
+	@Override
+	public boolean checkEndPointRegistration(String endpoint) throws DaoException {
+		DetachedCriteria criteria = DetachedCriteria.forClass(User.class);
+		criteria.add(Restrictions.eq("endpoint", endpoint));
+		return !((List<User>)template.findByCriteria(criteria)).isEmpty();
+	}
 
+
+	
+	
 }

@@ -35,7 +35,7 @@ async function checkSubscription() {
 	const subscription = await registration.pushManager.getSubscription();
 	if (subscription) {
 
-		const response = await fetch("/isSubscribed", {
+		const response = await fetch("/notifications/isSubscribed", {
 			method: 'POST',
 			body: JSON.stringify({ endpoint: subscription.endpoint }),
 			headers: {
@@ -57,10 +57,12 @@ async function checkSubscription() {
 	return false;
 }
 
+
+// get the publickey from spring app and sign to service worker 
 async function init() {
-	fetch('/publicSigningKey')
+	fetch('/notifications/publicSigningKey')
 		.then(response => response.arrayBuffer())
-		.then(key => this.publicSigningKey = key)
+		.then(key => this.publicSigningKey = key) //saves the public signing key from the server
 		.finally(() => console.info('Application Server Public Key fetched from the server'));
 
 	await navigator.serviceWorker.register("/sw.js", {
@@ -126,6 +128,7 @@ async function unsubscribe() {
 	}
 }
 
+//subscribe to the push service --> triggers a permission dialog.
 async function subscribe() {
 	if (email.value === "") {
 		alert.style.display = "block";
