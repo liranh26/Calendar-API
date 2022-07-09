@@ -29,7 +29,7 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+//@ToString
 @Entity
 @Table(name = "notifications")
 public class Notification {
@@ -68,7 +68,14 @@ public class Notification {
 		this.units = units;
 		this.discontinued = discontinued;
 	}
-	
-	
+
+
+	@Override
+	public String toString() {
+		return "Notification [notificationId=" + notificationId + ", userId=" + userId + ", eventId=" + eventId
+				+ ", title=" + title + ", timeToAlertBefore=" + timeToAlertBefore + ", units=" + units
+				+ ", discontinued=" + discontinued + "]";
+	}
+
 	
 }
