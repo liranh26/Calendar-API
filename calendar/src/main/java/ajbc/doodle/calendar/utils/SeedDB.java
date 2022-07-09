@@ -21,6 +21,7 @@ import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.enums.EventRepeating;
 import ajbc.doodle.calendar.services.EventService;
 import ajbc.doodle.calendar.services.EventUserService;
+import ajbc.doodle.calendar.services.NotificationManager;
 import ajbc.doodle.calendar.services.NotificationService;
 import ajbc.doodle.calendar.services.UserService;
 
@@ -29,15 +30,20 @@ public class SeedDB {
 
 	@Autowired
 	private UserService userService;
+	
 	@Autowired
 	private EventService eventService;
+	
 	@Autowired
 	private NotificationService notificationService;
+	
 	@Autowired
 	private EventUserService eventUserService;
+	
 	@Autowired
 	private JdbcTemplate jdbc;
 
+	
 	@EventListener
 	public void seedDB(ContextRefreshedEvent event) {
 		try {
@@ -175,8 +181,6 @@ public class SeedDB {
 		not.setEvent(events.get(1));
 		notificationService.addNotificationToDB(not, events.get(1));
 
-//		notificationService.addNotificationToDB(
-//				new Notification(users.get(1).getUserId(), events.get(1).getEventId(), "Wash the car after", 30, ChronoUnit.MINUTES, 0));
 
 	}
 

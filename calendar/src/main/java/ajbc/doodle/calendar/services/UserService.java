@@ -55,9 +55,6 @@ public class UserService {
 	UserDao userDao;
 	
 	@Autowired
-	private EventService eventService;
-	
-	@Autowired
 	private EventUserService eventUserService;
 
 
