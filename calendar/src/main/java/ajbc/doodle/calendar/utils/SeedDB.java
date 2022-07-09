@@ -1,6 +1,7 @@
 package ajbc.doodle.calendar.utils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -75,10 +76,8 @@ public class SeedDB {
 				+ "eventOwnerId int not null,"
 				+ "title nvarchar(40),"
 				+ "isAllDay BIT,"
-				+ "startDate date,"
-				+ "endDate date,"
-				+ "startTime time,"
-				+ "endTime time,"
+				+ "startTime datetime,"
+				+ "endTime datetime,"
 				+ "address nvarchar(100),"
 				+ "description nvarchar(100),"
 				+ "repeating nvarchar(40),"
@@ -146,15 +145,15 @@ public class SeedDB {
 
 		List<User> users = userService.getAllUsers();
 
-		Event event = new Event(users.get(1).getUserId(), "wedding", 0, LocalDate.of(2022, 8, 7),
-				LocalDate.of(2022, 8, 7), LocalTime.of(20, 0), LocalTime.of(23, 30), "Troya", "Tomer getting married",
+		Event event = new Event(users.get(1).getUserId(), "wedding", 0, LocalDateTime.of(2022, 8, 7, 20, 0),
+				LocalDateTime.of(2022, 8, 7, 23, 30), "Troya", "Tomer getting married",
 				EventRepeating.NONE, 0);
 
 		eventService.addEventToDB(event);
 		eventService.addGuestToEvent(event, users.get(0).getUserId());
 
-		event = new Event(users.get(2).getUserId(), "shopping", 0, LocalDate.of(2022, 7, 7),
-				LocalDate.of(2022, 7, 7), LocalTime.of(16, 0), LocalTime.of(18, 30), "Tel-Aviv", "buying equipment",
+		event = new Event(users.get(2).getUserId(), "shopping", 0, LocalDateTime.of(2022, 7, 7, 16, 0),
+				LocalDateTime.of(2022, 7, 7, 18, 30), "Tel-Aviv", "buying equipment",
 				EventRepeating.WEEKLY, 0);
 		
 //		eventService.addEventToDB(event);

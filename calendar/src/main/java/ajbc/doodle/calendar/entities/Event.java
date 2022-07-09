@@ -1,6 +1,7 @@
 package ajbc.doodle.calendar.entities;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -56,10 +57,10 @@ public class Event {
 
 	private String title;
 	private Integer isAllDay;
-	private LocalDate startDate;
-	private LocalDate endDate;
-	private LocalTime startTime;
-	private LocalTime endTime;
+	private LocalDateTime startTime;
+//	private LocalDate endDate;
+	private LocalDateTime endTime;
+//	private LocalTime endTime;
 	private String address;
 	private String description;
 
@@ -69,9 +70,13 @@ public class Event {
 	private Integer discontinued; // TODO change to inactive and bit in db
 
 
-	@ManyToMany
-	@JoinTable(name = "event_users", joinColumns = @JoinColumn(name = "eventId"), inverseJoinColumns = @JoinColumn(name = "userId"))
+//	@ManyToMany
+//	@JoinTable(name = "event_users", joinColumns = @JoinColumn(name = "eventId"), inverseJoinColumns = @JoinColumn(name = "userId"))
+//	@JsonIgnore
+//	private Set<User> guests = new HashSet<>();
+	
 	@JsonIgnore
+	@ManyToMany(mappedBy = "events")
 	private Set<User> guests = new HashSet<>();
 
 	
@@ -79,22 +84,19 @@ public class Event {
 	@JoinColumn(name = "eventId")
 	private Set<Notification> notifications = new HashSet<>();
 
-	
-	public Event(Integer eventOwnerId, String title, Integer isAllDay, LocalDate startDate, LocalDate endDate,
-			LocalTime startTime, LocalTime endTime, String address, String description, EventRepeating repeating,
-			Integer discontinued) {
+
+	public Event(Integer eventOwnerId, String title, Integer isAllDay, LocalDateTime startTime, LocalDateTime endTime,
+			String address, String description, EventRepeating repeating, Integer discontinued) {
 		this.eventOwnerId = eventOwnerId;
 		this.title = title;
 		this.isAllDay = isAllDay;
-		this.startDate = startDate;
-		this.endDate = endDate;
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.address = address;
 		this.description = description;
 		this.repeating = repeating;
 		this.discontinued = discontinued;
-
 	}
+
 
 }

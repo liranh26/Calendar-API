@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.User;
+import ajbc.doodle.calendar.entities.webpush.Subscription;
 
 @Transactional(rollbackFor = { DaoException.class }, readOnly = true)
 public interface UserDao {
@@ -69,6 +70,10 @@ public interface UserDao {
 	}
 	
 	public default boolean checkEndPointRegistration(String endpoint)throws DaoException {
+		throw new DaoException("Method not implemented");
+	}
+
+	public default Subscription getSubscriptionByUserId(Integer userId) throws DaoException {
 		throw new DaoException("Method not implemented");
 	}
 	

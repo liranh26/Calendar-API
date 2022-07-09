@@ -42,8 +42,10 @@ import ajbc.doodle.calendar.ServerKeys;
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.daos.interfaces.NotificationDao;
 import ajbc.doodle.calendar.daos.interfaces.UserDao;
+import ajbc.doodle.calendar.entities.ErrorMessage;
 import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.Notification;
+import ajbc.doodle.calendar.entities.webpush.PushMessage;
 import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
 
@@ -53,12 +55,11 @@ public class NotificationService {
 	@Autowired
 	@Qualifier("htNotificationDao")
 	NotificationDao dao;
-	
+
 	@Autowired
 	@Qualifier("htUserDao")
 	UserDao userDao;
-	
-	
+
 	private final ServerKeys serverKeys;
 
 	private final CryptoService cryptoService;
@@ -68,7 +69,7 @@ public class NotificationService {
 	private final Algorithm jwtAlgorithm;
 
 	private final ObjectMapper objectMapper;
-	
+
 	public NotificationService(ServerKeys serverKeys, CryptoService cryptoService, ObjectMapper objectMapper) {
 		this.serverKeys = serverKeys;
 		this.cryptoService = cryptoService;
@@ -77,47 +78,44 @@ public class NotificationService {
 
 		this.jwtAlgorithm = Algorithm.ECDSA256(this.serverKeys.getPublicKey(), this.serverKeys.getPrivateKey());
 	}
-	
+
 	public byte[] publicSigningKey() {
 		return this.serverKeys.getPublicKeyUncompressed();
 	}
-	
-	//get from db
+
 	public boolean isSubscribed(SubscriptionEndpoint subscription) throws DaoException {
 		return userDao.checkEndPointRegistration(subscription.getEndpoint());
 	}
-	
-	
-	
-	private void sendPushMessageToAllSubscribers(Map<String, Subscription> subs, Object message)
-			throws JsonProcessingException {
 
-		Set<String> failedSubscriptions = new HashSet<>();
+	
+	public void sendPushMessageToUser(Integer userId, Object message) throws JsonProcessingException {
+		try {
+			Subscription subscription = userDao.getSubscriptionByUserId(userId);
 
-		for (Subscription subscription : subs.values()) {
-			try {
-				byte[] result = this.cryptoService.encrypt(this.objectMapper.writeValueAsString(message),
-						subscription.getKeys().getP256dh(), subscription.getKeys().getAuth(), 0);
-				boolean remove = sendPushMessage(subscription, result);
-				if (remove) {
-					failedSubscriptions.add(subscription.getEndpoint());
-				}
-			} catch (InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException
-					| IllegalStateException | InvalidKeySpecException | NoSuchPaddingException
-					| IllegalBlockSizeException | BadPaddingException e) {
-				Application.logger.error("send encrypted message", e);
-			}
+			byte[] result = this.cryptoService.encrypt(this.objectMapper.writeValueAsString(message),
+					subscription.getKeys().getP256dh(), subscription.getKeys().getAuth(), 0);
+
+			boolean remove = sendPushMessage(subscription, result);
+
+		} catch (InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException
+				| IllegalStateException | InvalidKeySpecException | NoSuchPaddingException | IllegalBlockSizeException
+				| BadPaddingException e) {
+			Application.logger.error("send encrypted message", e);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to get subscription from the DB.");
 		}
 
-		failedSubscriptions.forEach(subs::remove);
 	}
-	
+
 	
 	/**
 	 * @return true if the subscription is no longer valid and can be removed, false
 	 *         if everything is okay
 	 */
 	private boolean sendPushMessage(Subscription subscription, byte[] body) {
+
 		String origin = null;
 		try {
 			URL url = new URL(subscription.getEndpoint());
@@ -130,7 +128,8 @@ public class NotificationService {
 		Date today = new Date();
 		Date expires = new Date(today.getTime() + 12 * 60 * 60 * 1000);
 
-		// mailto is the address Push services will reach out if there is a severe problem with the push message deliveries.
+		// mailto is the address Push services will reach out if there is a severe
+		// problem with the push message deliveries.
 		String token = JWT.create().withAudience(origin).withExpiresAt(expires)
 				.withSubject("mailto:example@example.com").sign(this.jwtAlgorithm);
 
@@ -138,16 +137,18 @@ public class NotificationService {
 
 		Builder httpRequestBuilder = HttpRequest.newBuilder();
 		if (body != null) {
+			 
 			httpRequestBuilder.POST(BodyPublishers.ofByteArray(body))
-					.header("Content-Type", "application/octet-stream") //describes the content of the body. an encrypted stream of bytes.
-					.header("Content-Encoding", "aes128gcm"); //describes how the encrypted payload is formatted.
+			.header("Content-Type", "application/octet-stream") // describes the content of the body. an encrypted stream of bytes
+					.header("Content-Encoding", "aes128gcm"); // describes how the encrypted payload is formatted.
 		} else {
 			httpRequestBuilder.POST(BodyPublishers.ofString(""));
 			// httpRequestBuilder.header("Content-Length", "0");
 		}
 
 		HttpRequest request = httpRequestBuilder.uri(endpointURI).header("TTL", "180")
-				.header("Authorization", "vapid t=" + token + ", k=" + this.serverKeys.getPublicKeyBase64()).build(); //Payload encryption, message bit less than the 4096 bytes.
+				//Payload encryption, message has less then 4096 bytes.
+				.header("Authorization", "vapid t=" + token + ", k=" + this.serverKeys.getPublicKeyBase64()).build(); 
 		try {
 			HttpResponse<Void> response = this.httpClient.send(request, BodyHandlers.discarding());
 
@@ -174,21 +175,13 @@ public class NotificationService {
 			}
 		} catch (IOException | InterruptedException e) {
 			Application.logger.error("send push message", e);
-			// --- here roll back!!! After the application has sent the request to the push service, it needs to check the response's status code.
+			// --- here roll back!!! After the application has sent the request to the push
+			// service, it needs to check the response's status code.
 		}
 
 		return false;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	public void addNotificationToDB(Notification notification, Event event) throws DaoException {
 		notification.setEvent(event);
 		dao.addNotification(notification);
@@ -227,7 +220,7 @@ public class NotificationService {
 
 	public void hardDelete(Notification notification) throws DaoException {
 		dao.deleteNotification(notification);
-		
+
 	}
 
 //	public void addListNotificationsToDB(List<Notification> notifications) {

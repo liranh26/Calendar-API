@@ -40,6 +40,7 @@ import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
 import ajbc.doodle.calendar.services.CryptoService;
 import ajbc.doodle.calendar.services.EventService;
+import ajbc.doodle.calendar.services.NotificationManager;
 import ajbc.doodle.calendar.services.NotificationService;
 
 @RestController
@@ -51,6 +52,9 @@ public class NotificationController {
 
 	@Autowired
 	private EventService eventService;
+	
+	@Autowired
+	private NotificationManager manager;
 
 	
 	//when opening the site
@@ -60,6 +64,7 @@ public class NotificationController {
 		return notificationService.publicSigningKey();
 	}
 	
+	
 	@PostMapping("/isSubscribed")
 	public boolean isSubscribed(@RequestBody SubscriptionEndpoint subscription) {
 		try {
@@ -68,9 +73,10 @@ public class NotificationController {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
 			errMsg.setMessage("Failed to check subscription in the DB.");
-			return false; //TODO chage return value (client need to receive something else..?)
+			return false; //TODO change return value (client need to receive something else..?)
 		}
 	}
+	
 	
 	
 	/*//TODO - trigger a push message at time
@@ -93,10 +99,7 @@ public class NotificationController {
 
 		}
 	*/
-	
-	
-	
-	
+
 	
 	
 	@PostMapping(path = "/{eventId}")
@@ -104,8 +107,10 @@ public class NotificationController {
 			throws DaoException {
 		try {
 			notification.setEventId(eventId);
-
 			notificationService.addNotificationToDB(notification, eventService.getEventById(eventId));
+			
+			manager.addNotification(notification);
+			
 			return ResponseEntity.status(HttpStatus.CREATED).body(notification);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();

@@ -60,11 +60,15 @@ public class User {
 	private String auth;
 
 
-	@ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
-	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
-	@JsonIgnore
-	Set<Event> events;
+//	@ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
+//	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
+//	@JsonIgnore
+//	Set<Event> events;
 
+	
+	@ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
+	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
+	Set<Event> events;
 	
 	
 	public User(String firstName, String lastName, String email, LocalDate birthDate, LocalDate joinDate,

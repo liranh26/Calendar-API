@@ -15,6 +15,8 @@ import org.springframework.stereotype.Repository;
 import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.User;
+import ajbc.doodle.calendar.entities.webpush.Subscription;
+import ajbc.doodle.calendar.entities.webpush.SubscriptionKeys;
 
 @SuppressWarnings("unchecked")
 @Repository("htUserDao")
@@ -88,7 +90,12 @@ public class HTUserDao implements UserDao {
 		return !((List<User>)template.findByCriteria(criteria)).isEmpty();
 	}
 
+	@Override
+	public Subscription getSubscriptionByUserId(Integer userId) throws DaoException {
+		User user = getUser(userId);
+		
+		return new Subscription(user.getEndpoint(), user.getExpirationTime(), new SubscriptionKeys(user.getP256dh(), user.getAuth()));
+	}
 
-	
 	
 }
