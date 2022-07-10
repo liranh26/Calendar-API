@@ -20,16 +20,27 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.webpush.PushMessage;
+import ajbc.doodle.calendar.entities.webpush.PushMessageConfig;
+import ajbc.doodle.calendar.entities.webpush.Subscription;
+import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
 import ajbc.doodle.calendar.services.threads.NotificationTask;
 
 @Service
 public class NotificationManager {
 
-//	@Autowired
-//	private NotificationService notificationService;
+	@Autowired
+	private NotificationService notificationService;
 
+	@Autowired
+	PushMessageConfig msgConfig;
+	
+	public byte[] publicSigningKey() {
+		return msgConfig.getServerKeys().getPublicKeyUncompressed();
+	}
+	
 	Comparator<Notification> timeComparator = new Comparator<Notification>() {
 		@Override
 		public int compare(Notification not1, Notification not2) {
@@ -43,7 +54,8 @@ public class NotificationManager {
 
 	private PriorityQueue<Notification> notifications = new PriorityQueue<Notification>(timeComparator);
 
-	public void addNotification(Notification notification) {
+	
+	public void addNotification(Notification notification) throws DaoException {
 		notification.getEvent().setGuests(null); // to avoid exception for now..
 
 		List<Notification> notsToRun = new ArrayList<Notification>();
@@ -86,8 +98,9 @@ public class NotificationManager {
 	private final int NUM_THREADS = 1;
 	private ScheduledExecutorService scheduledService = Executors.newScheduledThreadPool(NUM_THREADS);;
 	private ScheduledFuture<?> scheduledFuture;
+	
 
-	public void run(Notification notification) {// TODO list of notifications or multiple calls?
+	public void run(Notification notification) throws DaoException {// TODO list of notifications or multiple calls?
 
 		LocalDateTime nextRun = notification.getEvent().getStartTime().minus(notification.getTimeToAlertBefore(),
 				notification.getUnits());
@@ -103,8 +116,8 @@ public class NotificationManager {
 //		if (scheduledFuture != null && !scheduledFuture.isDone()) {
 //			scheduledFuture.cancel(false);
 //		}
-
-		Callable<Notification> task = new NotificationTask(notification);
+		Subscription subscription = notificationService.getSubscriptionForUser(notification.getUserId());
+		Callable<Notification> task = new NotificationTask(notification, subscription, msgConfig);
 
 //		scheduledFuture = scheduledService.schedule( myCallable , delay, TimeUnit.SECONDS); // in real usage 
 		scheduledFuture = scheduledService.schedule(task, 3, TimeUnit.SECONDS); // for testing
@@ -115,6 +128,32 @@ public class NotificationManager {
 
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/* simple runnable to test using executor service */
 //	Runnable myRunnable = new Runnable() {
 //

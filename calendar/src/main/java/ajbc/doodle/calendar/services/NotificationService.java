@@ -60,127 +60,16 @@ public class NotificationService {
 	@Qualifier("htUserDao")
 	UserDao userDao;
 
-	private final ServerKeys serverKeys;
-
-	private final CryptoService cryptoService;
-
-	private final HttpClient httpClient;
-
-	private final Algorithm jwtAlgorithm;
-
-	private final ObjectMapper objectMapper;
-
-	public NotificationService(ServerKeys serverKeys, CryptoService cryptoService, ObjectMapper objectMapper) {
-		this.serverKeys = serverKeys;
-		this.cryptoService = cryptoService;
-		this.httpClient = HttpClient.newHttpClient();
-		this.objectMapper = objectMapper;
-
-		this.jwtAlgorithm = Algorithm.ECDSA256(this.serverKeys.getPublicKey(), this.serverKeys.getPrivateKey());
-	}
-
-	public byte[] publicSigningKey() {
-		return this.serverKeys.getPublicKeyUncompressed();
-	}
 
 	public boolean isSubscribed(SubscriptionEndpoint subscription) throws DaoException {
 		return userDao.checkEndPointRegistration(subscription.getEndpoint());
 	}
 
-	
-	public void sendPushMessageToUser(Integer userId, Object message) throws JsonProcessingException {
-		try {
-			Subscription subscription = userDao.getSubscriptionByUserId(userId);
-
-			byte[] result = this.cryptoService.encrypt(this.objectMapper.writeValueAsString(message),
-					subscription.getKeys().getP256dh(), subscription.getKeys().getAuth(), 0);
-
-			boolean remove = sendPushMessage(subscription, result);
-
-		} catch (InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException
-				| IllegalStateException | InvalidKeySpecException | NoSuchPaddingException | IllegalBlockSizeException
-				| BadPaddingException e) {
-			Application.logger.error("send encrypted message", e);
-		} catch (DaoException e) {
-			ErrorMessage errMsg = new ErrorMessage();
-			errMsg.setData(e.getMessage());
-			errMsg.setMessage("Failed to get subscription from the DB.");
-		}
-
+	public Subscription getSubscriptionForUser(Integer userId) throws DaoException {
+		return userDao.getSubscriptionByUserId(userId);
 	}
-
 	
-	/**
-	 * @return true if the subscription is no longer valid and can be removed, false
-	 *         if everything is okay
-	 */
-	private boolean sendPushMessage(Subscription subscription, byte[] body) {
 
-		String origin = null;
-		try {
-			URL url = new URL(subscription.getEndpoint());
-			origin = url.getProtocol() + "://" + url.getHost();
-		} catch (MalformedURLException e) {
-			Application.logger.error("create origin", e);
-			return true;
-		}
-
-		Date today = new Date();
-		Date expires = new Date(today.getTime() + 12 * 60 * 60 * 1000);
-
-		// mailto is the address Push services will reach out if there is a severe
-		// problem with the push message deliveries.
-		String token = JWT.create().withAudience(origin).withExpiresAt(expires)
-				.withSubject("mailto:example@example.com").sign(this.jwtAlgorithm);
-
-		URI endpointURI = URI.create(subscription.getEndpoint());
-
-		Builder httpRequestBuilder = HttpRequest.newBuilder();
-		if (body != null) {
-			 
-			httpRequestBuilder.POST(BodyPublishers.ofByteArray(body))
-			.header("Content-Type", "application/octet-stream") // describes the content of the body. an encrypted stream of bytes
-					.header("Content-Encoding", "aes128gcm"); // describes how the encrypted payload is formatted.
-		} else {
-			httpRequestBuilder.POST(BodyPublishers.ofString(""));
-			// httpRequestBuilder.header("Content-Length", "0");
-		}
-
-		HttpRequest request = httpRequestBuilder.uri(endpointURI).header("TTL", "180")
-				//Payload encryption, message has less then 4096 bytes.
-				.header("Authorization", "vapid t=" + token + ", k=" + this.serverKeys.getPublicKeyBase64()).build(); 
-		try {
-			HttpResponse<Void> response = this.httpClient.send(request, BodyHandlers.discarding());
-
-			switch (response.statusCode()) {
-			case 201:
-				Application.logger.info("Push message successfully sent: {}", subscription.getEndpoint());
-				break;
-			case 404:
-			case 410:
-				Application.logger.warn("Subscription not found or gone: {}", subscription.getEndpoint());
-				// remove subscription from our collection of subscriptions
-				return true;
-			case 429:
-				Application.logger.error("Too many requests: {}", request);
-				break;
-			case 400:
-				Application.logger.error("Invalid request: {}", request);
-				break;
-			case 413:
-				Application.logger.error("Payload size too large: {}", request);
-				break;
-			default:
-				Application.logger.error("Unhandled status code: {} / {}", response.statusCode(), request);
-			}
-		} catch (IOException | InterruptedException e) {
-			Application.logger.error("send push message", e);
-			// --- here roll back!!! After the application has sent the request to the push
-			// service, it needs to check the response's status code.
-		}
-
-		return false;
-	}
 
 	public void addNotificationToDB(Notification notification, Event event) throws DaoException {
 		notification.setEvent(event);

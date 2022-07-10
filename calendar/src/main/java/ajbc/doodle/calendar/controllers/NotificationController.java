@@ -61,7 +61,7 @@ public class NotificationController {
 	//To pass the public key from the server to the JavaScript application, the Spring Boot application provides a GET endpoint that returns the public key.
 	@GetMapping(path = "/publicSigningKey", produces = "application/octet-stream")
 	public byte[] publicSigningKey() {
-		return notificationService.publicSigningKey();
+		return manager.publicSigningKey();
 	}
 	
 	
@@ -78,27 +78,6 @@ public class NotificationController {
 	}
 	
 	
-	
-	/*//TODO - trigger a push message at time
-	//trigers send message every 3 sec
-		@Scheduled(fixedDelay = 3_000)
-		public void testNotification() {
-			if (this.subscriptions.isEmpty()) {
-				return;
-			}
-			counter++;
-			try {
-				
-				not notification = new not(counter, LocalDateTime.now(), "Test notification", "Test message");
-				sendPushMessageToAllSubscribers(this.subscriptions, new PushMessage("message: " + counter, notification.toString()));
-				System.out.println(notification);
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
-	*/
 
 	
 	
