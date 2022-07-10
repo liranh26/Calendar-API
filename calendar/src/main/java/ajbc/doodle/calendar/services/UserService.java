@@ -52,7 +52,7 @@ public class UserService {
 
 	@Autowired
 	@Qualifier("htUserDao")
-	UserDao userDao;
+	private UserDao userDao;
 	
 	@Autowired
 	private EventUserService eventUserService;
@@ -66,7 +66,7 @@ public class UserService {
 		
 //		Event event = eventDao.getEvent(eventId);
 //		eventUserService.addUserToEvent(new EventUser(eventId, userId, user, event));
-		eventUserService.addUserToEvent(new EventUser(eventId, userId));
+//		eventUserService.addUserToEvent(new EventUser(eventId, userId));
 	}
 
 	public User getUserById(Integer userId) throws DaoException {

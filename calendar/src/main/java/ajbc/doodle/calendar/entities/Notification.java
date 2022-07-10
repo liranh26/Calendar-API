@@ -12,7 +12,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -39,6 +41,7 @@ public class Notification {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer notificationId;
 	
+	@Column(insertable = false, updatable = false)
 	private Integer userId;
 	
 	@Column(insertable = false, updatable = false)
@@ -52,11 +55,11 @@ public class Notification {
 	
 	private Integer discontinued;
 
-//	@JsonProperty(access = Access.WRITE_ONLY)
+
 	@JsonIgnore
-	@ManyToOne(cascade = {CascadeType.MERGE})
-	@JoinColumn(name = "eventId")
-	private Event event;
+	@ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
+	@JoinColumns({@JoinColumn(name="eventId"), @JoinColumn(name="userId")})
+	private EventUser eventUser;
 	
 
 	public Notification(Integer userId, Integer eventId, String title, Integer timeToAlertBefore, ChronoUnit units,
@@ -69,6 +72,14 @@ public class Notification {
 		this.discontinued = discontinued;
 	}
 
+
+	public void setEventUser(EventUser eventUser) {
+		this.eventUser = eventUser;
+		this.userId = eventUser.getUserId();
+		this.eventId = eventUser.getEventId();
+	}
+	
+	
 
 	@Override
 	public String toString() {

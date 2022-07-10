@@ -72,7 +72,7 @@ public class NotificationService {
 
 
 	public void addNotificationToDB(Notification notification, Event event) throws DaoException {
-		notification.setEvent(event);
+//		notification.setEvent(event);
 		dao.addNotification(notification);
 	}
 

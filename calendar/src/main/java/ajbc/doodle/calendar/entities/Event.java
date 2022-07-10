@@ -53,8 +53,13 @@ public class Event {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer eventId;
 
+	@Column(insertable = false, updatable = false)
 	private Integer eventOwnerId;
-
+	
+	@OneToOne
+	@JoinColumn(name="eventOwnerId")
+	private User owner;
+	
 	private String title;
 	private Integer isAllDay;
 	private LocalDateTime startTime;
@@ -70,19 +75,11 @@ public class Event {
 	private Integer discontinued; // TODO change to inactive and bit in db
 
 
-//	@ManyToMany
-//	@JoinTable(name = "event_users", joinColumns = @JoinColumn(name = "eventId"), inverseJoinColumns = @JoinColumn(name = "userId"))
-//	@JsonIgnore
-//	private Set<User> guests = new HashSet<>();
-	
-	@JsonIgnore
 	@ManyToMany(mappedBy = "events")
 	private Set<User> guests = new HashSet<>();
-
+//	private List<User> guests = new ArrayList<>();
 	
-	@OneToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
-	@JoinColumn(name = "eventId")
-	private Set<Notification> notifications = new HashSet<>();
+
 
 
 	public Event(Integer eventOwnerId, String title, Integer isAllDay, LocalDateTime startTime, LocalDateTime endTime,
@@ -99,4 +96,23 @@ public class Event {
 	}
 
 
+	public Event( String title, Integer isAllDay, LocalDateTime startTime, LocalDateTime endTime,
+			String address, String description, EventRepeating repeating, Integer discontinued) {
+		this.title = title;
+		this.isAllDay = isAllDay;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.address = address;
+		this.description = description;
+		this.repeating = repeating;
+		this.discontinued = discontinued;
+	}
+	
+	
+	public void addGuests(User... users) {
+		for (User user : users) {
+			user.addEvent(this);
+			guests.add(user);
+		}
+	}
 }

@@ -10,6 +10,7 @@ import java.util.PriorityQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -41,95 +42,107 @@ public class NotificationManager {
 		return msgConfig.getServerKeys().getPublicKeyUncompressed();
 	}
 	
-	Comparator<Notification> timeComparator = new Comparator<Notification>() {
-		@Override
-		public int compare(Notification not1, Notification not2) {
-			LocalDateTime alertTime1 = not1.getEvent().getStartTime().minus(not1.getTimeToAlertBefore(),
-					not1.getUnits());
-			LocalDateTime alertTime2 = not2.getEvent().getStartTime().minus(not2.getTimeToAlertBefore(),
-					not2.getUnits());
-			return alertTime1.compareTo(alertTime2);
-		}
-	};
+//	Comparator<Notification> timeComparator = new Comparator<Notification>() {
+//		@Override
+//		public int compare(Notification not1, Notification not2) {
+//			LocalDateTime alertTime1 = not1.getEvent().getStartTime().minus(not1.getTimeToAlertBefore(),
+//					not1.getUnits());
+//			LocalDateTime alertTime2 = not2.getEvent().getStartTime().minus(not2.getTimeToAlertBefore(),
+//					not2.getUnits());
+//			return alertTime1.compareTo(alertTime2);
+//		}
+//	};
 
-	private PriorityQueue<Notification> notifications = new PriorityQueue<Notification>(timeComparator);
+//	private PriorityBlockingQueue<Notification> notifications = new PriorityBlockingQueue<Notification>(10, timeComparator);
 
 	
-	public void addNotification(Notification notification) throws DaoException {
-		notification.getEvent().setGuests(null); // to avoid exception for now..
-
-		List<Notification> notsToRun = new ArrayList<Notification>();
-
-		// need to take in care the time before
-		LocalDateTime alertTime = notification.getEvent().getStartTime().minus(notification.getTimeToAlertBefore(),
-				notification.getUnits());
-
-		// 3 options for new notification: smaller , equal, bigger
-		// smaller update thread
-		// equal add to poll thread
-		// bigger add to queue
-
-		Notification curr = notifications.peek();
-		if (curr != null) {
-			
-			LocalDateTime currAlertTime = curr.getEvent().getStartTime().minus(curr.getTimeToAlertBefore(),
-					curr.getUnits());
-
-			Duration diffTime = Duration.between(alertTime, currAlertTime);
-			long difference = diffTime.getSeconds();
-			if (difference > 0) {
-				// nothing to change
-				notifications.add(notification);
-			} else {
-				// update - reschedule the thread
-
-				run(notification);
-			}
-
-		}else { 
-			notifications.add(notification);
-			run(notification);
-		}
-		
-		System.out.println("Number of notification in the list: " + notifications.size());
-
-	}
+//	public void addNotification(Notification notification) throws DaoException {
+//		notification.getEvent().setGuests(null); // to avoid exception for now..
+//
+//		// need to take in care the time before
+//		LocalDateTime alertTime = notification.getEvent().getStartTime().minus(notification.getTimeToAlertBefore(),
+//				notification.getUnits());
+//
+//		// 3 options for new notification: smaller , equal, bigger
+//		// smaller update thread
+//		// equal add to poll thread
+//		// bigger add to queue
+//
+//		Notification curr = notifications.peek();
+//		if (curr != null) {
+//			
+//			LocalDateTime currAlertTime = curr.getEvent().getStartTime().minus(curr.getTimeToAlertBefore(),
+//					curr.getUnits());
+//
+//			Duration diffTime = Duration.between(currAlertTime, alertTime);
+//			long difference = diffTime.getSeconds();
+//			
+//			if (difference > 0) {
+//				// nothing to change
+//				notifications.add(notification);
+//			} else {
+//				// update - reschedule the thread
+//
+//				run(notification);
+//			}
+//
+//		}else { 
+//			notifications.add(notification);
+//			run(notification);
+//		}
+//		
+//		System.out.println("Number of notification in the list: " + notifications.size());
+//
+//	}
 
 	private final int NUM_THREADS = 1;
 	private ScheduledExecutorService scheduledService = Executors.newScheduledThreadPool(NUM_THREADS);;
-	private ScheduledFuture<?> scheduledFuture;
+	private ScheduledFuture<Notification> scheduledFuture;
 	
-
-	public void run(Notification notification) throws DaoException {// TODO list of notifications or multiple calls?
-
-		LocalDateTime nextRun = notification.getEvent().getStartTime().minus(notification.getTimeToAlertBefore(),
-				notification.getUnits());
-		System.out.println(nextRun);
-
-		Duration duration = Duration.between(LocalDateTime.now(), nextRun);
-		long delay = duration.getSeconds();
-
-		// In case something went wrong and the event already occurred.
-		if (delay < 0)
-			delay = 0;
-
+//
+//	public void run(Notification notification) throws DaoException {// TODO list of notifications or multiple calls?
+//
+//		long delay = getDelayForNotification(notification);
+//
+//		// In case something went wrong and the event already occurred.
+//		if (delay < 0)
+//			delay = 0;
+//
+//		System.out.println("List before" + notifications);
+//		
 //		if (scheduledFuture != null && !scheduledFuture.isDone()) {
 //			scheduledFuture.cancel(false);
+//			notifications.add(notification);
 //		}
-		Subscription subscription = notificationService.getSubscriptionForUser(notification.getUserId());
-		Callable<Notification> task = new NotificationTask(notification, subscription, msgConfig);
-
-//		scheduledFuture = scheduledService.schedule( myCallable , delay, TimeUnit.SECONDS); // in real usage 
-		scheduledFuture = scheduledService.schedule(task, 3, TimeUnit.SECONDS); // for testing
-
-		if (scheduledFuture.isDone()) {
-			System.out.println("Task done ! : " + scheduledFuture);
-		}
-
-	}
+//		
+//		if (scheduledFuture != null && scheduledFuture.isDone()) {
+//			System.out.println("Task done ! : " + scheduledFuture);
+//			notifications.add(notification);
+//			notification = notifications.poll();
+//			System.out.println("Size is: " +notifications.size() + " ,not polled is :"+notification);
+//		}
+//		
+//		System.out.println("List after" + notifications);
+//		
+//		Subscription subscription = notificationService.getSubscriptionForUser(notification.getUserId());
+//		Callable<Notification> task = new NotificationTask(notification, subscription, msgConfig);
+//
+//		scheduledFuture = scheduledService.schedule(task, delay, TimeUnit.SECONDS); 
+//
+//	}
 
 	
 	
+//	private long getDelayForNotification(Notification notification) {
+//		LocalDateTime nextRun = notification.getEvent().getStartTime().minus(notification.getTimeToAlertBefore(),
+//				notification.getUnits());
+//		System.out.println(nextRun);
+//
+//		Duration duration = Duration.between(LocalDateTime.now(), nextRun);
+//		long delay = duration.getSeconds();
+//		
+//		return delay;
+//	}
 	
 	
 	

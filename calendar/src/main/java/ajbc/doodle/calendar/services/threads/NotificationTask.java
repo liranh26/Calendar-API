@@ -52,28 +52,30 @@ public class NotificationTask implements Callable<Notification> {
 	@Override
 	public Notification call() throws Exception {
 		
-		System.out.println("entered!");
-		
 		PushMessage msg = new PushMessage("message: ", notification.toString());
 		
-		sendPushMessageToUser(subscription, msg);
+		boolean ans = sendPushMessageToUser(subscription, msg);
 
-		return notification;
+		if(ans)
+			return notification;
+		else
+			return null;
 	}
 
 	
-	public void sendPushMessageToUser(Subscription subscription, PushMessage message) throws JsonProcessingException {
+	private boolean sendPushMessageToUser(Subscription subscription, PushMessage message) throws JsonProcessingException {
 		try {
 
 			byte[] result = config.getCryptoService().encrypt(config.getObjectMapper().writeValueAsString(message),
 					subscription.getKeys().getP256dh(), subscription.getKeys().getAuth(), 0);
 
-			boolean remove = sendPushMessage(subscription, result);
+			return sendPushMessage(subscription, result);
 
 		} catch (InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException
 				| IllegalStateException | InvalidKeySpecException | NoSuchPaddingException | IllegalBlockSizeException
 				| BadPaddingException e) {
 			Application.logger.error("send encrypted message", e);
+			return false;
 		}
 
 	}
@@ -124,12 +126,12 @@ public class NotificationTask implements Callable<Notification> {
 			switch (response.statusCode()) {
 			case 201:
 				Application.logger.info("Push message successfully sent: {}", subscription.getEndpoint());
-				break;
+				return true;
 			case 404:
 			case 410:
 				Application.logger.warn("Subscription not found or gone: {}", subscription.getEndpoint());
 				// remove subscription from our collection of subscriptions
-				return true;
+				return false;
 			case 429:
 				Application.logger.error("Too many requests: {}", request);
 				break;

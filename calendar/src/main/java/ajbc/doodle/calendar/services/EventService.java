@@ -47,20 +47,23 @@ public class EventService {
 
 		eventDao.addEvent(event);
 
-		event.getNotifications().add(notificationService.createDefaultNotification(event));
+//		event.getNotifications().add(notificationService.createDefaultNotification(event));
 
-		EventUser eventUser = new EventUser(event.getEventId(), event.getEventOwnerId());
-		eventUserDao.addEventToUser(eventUser);
+//		EventUser eventUser = new EventUser(event.getEventId(), event.getEventOwnerId());
+//		eventUserDao.addEventToUser(eventUser);
 	}
 
+	
 	public List<Event> getAllEvents() throws DaoException {
 		return eventDao.getAllEvents();
 	}
 
+	
 	public void deleteAllEvents() throws DaoException {
 		eventDao.deleteAllEvents();
 	}
 
+	
 	public Event getEventById(Integer eventId) throws DaoException {
 		return eventDao.getEvent(eventId);
 	}
@@ -85,24 +88,24 @@ public class EventService {
 		return events.stream().filter(e -> eventUser.contains(e.getEventId())).toList();
 	}
 
-	public void addGuestToEvent(Event event, Integer userId) throws DaoException {
-		event.getGuests().add(userDao.getUser(userId));
-		eventUserService.addUserToEvent(new EventUser(event.getEventId(), userId));
-		
-	}
+//	public void addGuestToEvent(Event event, Integer userId) throws DaoException {
+//		event.getGuests().add(userDao.getUser(userId));
+//		eventUserService.addUserToEvent(new EventUser(event.getEventId(), userId));
+//		
+//	}
 
-	public void updateEvent(Event event, Integer userId) throws DaoException {
-		
-		Event oldEvent = getEventById(event.getEventId());
-		
-		if(!userId.equals(oldEvent.getEventOwnerId()))
-			throw new DaoException("The user is not the owner of the event!");
-		
-		
-		event.setNotifications(oldEvent.getNotifications());
-		
-		eventDao.updateEvent(event);
-	}
+//	public void updateEvent(Event event, Integer userId) throws DaoException {
+//		
+//		Event oldEvent = getEventById(event.getEventId());
+//		
+//		if(!userId.equals(oldEvent.getEventOwnerId()))
+//			throw new DaoException("The user is not the owner of the event!");
+//		
+//		
+//		event.setNotifications(oldEvent.getNotifications());
+//		
+//		eventDao.updateEvent(event);
+//	}
 
 
 

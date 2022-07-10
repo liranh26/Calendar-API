@@ -1,14 +1,19 @@
 package ajbc.doodle.calendar.entities;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -38,15 +43,16 @@ public class EventUser implements Serializable {
 	
 	@Id
 	private Integer userId;
-
 	
-//	@ManyToOne
-//	@JoinColumn(name = "userId")
-//	private User user;
-//	
-//	@ManyToOne
-//	@JoinColumn(name = "eventId")
-//	private Event event;
+	
+	@OneToMany(mappedBy = "eventUser", cascade = { CascadeType.MERGE })
+	private Set<Notification> notifications = new HashSet<>();
+	
+	public void addNotifications(Notification... notifications) {
+		for (Notification notification : notifications) {
+			this.notifications.add(notification);
+		}
+	}
 	
 }
 

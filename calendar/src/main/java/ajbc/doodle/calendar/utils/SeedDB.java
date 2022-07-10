@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import ajbc.doodle.calendar.daos.DaoException;
+import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.EventUser;
 import ajbc.doodle.calendar.entities.Notification;
@@ -30,6 +31,10 @@ public class SeedDB {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	UserDao userDao;
+	
 	
 	@Autowired
 	private EventService eventService;
@@ -53,7 +58,7 @@ public class SeedDB {
 			
 			seedUsers();
 			seedEvents();
-			seedNotifications();
+//			seedNotifications();
 //			seedEventUsers();
 		} catch (DaoException e) {
 			e.printStackTrace();
@@ -93,6 +98,15 @@ public class SeedDB {
 				+ ") ";
 		jdbc.execute(query);
 		
+		query = "CREATE TABLE Event_Users(\r\n"
+				+ "userId int,\r\n"
+				+ "eventId int, \r\n"
+				+ "primary key(userId, eventId),"
+				+ "foreign key(userId) references users(userId),\r\n"
+				+ "foreign key(eventId) references events(eventId)\r\n"
+				+ ")";
+		jdbc.execute(query);
+		
 		query = "CREATE TABLE Notifications(\r\n"
 				+ "notificationId int not null identity(1,1),\r\n"
 				+ "userId int not null, \r\n"
@@ -101,28 +115,21 @@ public class SeedDB {
 				+ "timeToAlertBefore int,\r\n"
 				+ "units nvarchar(40),\r\n"
 				+ "discontinued int,\r\n"
-				+ "foreign key(userId) references users(userId),\r\n"
-				+ "foreign key(eventId) references events(eventId),\r\n"
+				+ "foreign key(userId, eventId) references event_users(userId, eventId),\r\n"
 				+ "primary key(notificationId)\r\n"
 				+ ") ";
 		jdbc.execute(query);
 		
-		query = "CREATE TABLE Event_Users(\r\n"
-				+ "eventId int not null, \r\n"
-				+ "userId int not null,\r\n"
-				+ "foreign key(eventId) references events(eventId),\r\n"
-				+ "foreign key(userId) references users(userId)\r\n"
-				+ ")";
-		jdbc.execute(query);
+
 		
 	}
 	
 	public void dropTables() {
 		
-		String query = "drop table Event_Users";
+		String query = "drop table Notifications";
 		jdbc.execute(query);
 		
-		query = "drop table Notifications";
+		 query = "drop table Event_Users";
 		jdbc.execute(query);
 		
 		query = "drop table Events";
@@ -136,12 +143,15 @@ public class SeedDB {
 	
 	public void seedUsers() throws DaoException {
 
-		userService.addUser(
-				new User("Liran", "Hadad", "test@test.com", LocalDate.of(1990, 2, 26), LocalDate.of(2022, 1, 1), 0));
-		userService.addUser(
-				new User("Snir", "Hadad", "test2@test.com", LocalDate.of(1993, 7, 8), LocalDate.of(2022, 5, 5), 0));
-		userService.addUser(
-				new User("Sapir", "Hadad", "test3@test.com", LocalDate.of(1990, 7, 23), LocalDate.of(2022, 6, 6), 0));
+		userDao.addUser(new User("Liran", "Hadad", "test@test.com", LocalDate.of(1990, 2, 26), LocalDate.of(2022, 1, 1), 0));
+		userDao.addUser(new User("Snir", "Hadad", "test2@test.com", LocalDate.of(1993, 7, 8), LocalDate.of(2022, 5, 5), 0));
+		userDao.addUser(new User("Sapir", "Hadad", "test3@test.com", LocalDate.of(1990, 7, 23), LocalDate.of(2022, 6, 6), 0));
+//		userService.addUser(
+//				new User("Liran", "Hadad", "test@test.com", LocalDate.of(1990, 2, 26), LocalDate.of(2022, 1, 1), 0));
+//		userService.addUser(
+//				new User("Snir", "Hadad", "test2@test.com", LocalDate.of(1993, 7, 8), LocalDate.of(2022, 5, 5), 0));
+//		userService.addUser(
+//				new User("Sapir", "Hadad", "test3@test.com", LocalDate.of(1990, 7, 23), LocalDate.of(2022, 6, 6), 0));
 
 //		userService.getAllUsers().stream().forEach(System.out::println);
 
@@ -151,21 +161,30 @@ public class SeedDB {
 
 		List<User> users = userService.getAllUsers();
 
-		Event event = new Event(users.get(1).getUserId(), "wedding", 0, LocalDateTime.of(2022, 8, 7, 20, 0),
+		Event event = new Event("wedding", 0, LocalDateTime.of(2022, 8, 7, 20, 0),
 				LocalDateTime.of(2022, 8, 7, 23, 30), "Troya", "Tomer getting married",
 				EventRepeating.NONE, 0);
 
-		eventService.addEventToDB(event);
-		eventService.addGuestToEvent(event, users.get(0).getUserId());
-
-		event = new Event(users.get(2).getUserId(), "shopping", 0, LocalDateTime.of(2022, 7, 7, 16, 0),
+		event.addGuests(users.get(0), users.get(1));
+		event.setOwner(users.get(0));
+		event.setEventOwnerId(users.get(0).getUserId());
+		
+		userService.updateUser(users.get(0));
+		
+//		eventService.addEventToDB(event);
+		
+		Event event2 = new Event("shopping", 0, LocalDateTime.of(2022, 7, 7, 16, 0),
 				LocalDateTime.of(2022, 7, 7, 18, 30), "Tel-Aviv", "buying equipment",
 				EventRepeating.WEEKLY, 0);
 		
+		event2.addGuests(users.get(1), users.get(2));
+		event2.setOwner(users.get(1));
+		event2.setEventId(users.get(2).getUserId());
+
+		userService.updateUser(users.get(1));
+
 //		eventService.addEventToDB(event);
-//		eventService.addGuestToEvent(event, users.get(0).getUserId());
 		
-		eventService.addEventToDB(event);
 
 	}
 
@@ -174,11 +193,12 @@ public class SeedDB {
 		List<Event> events = eventService.getAllEvents();
 		
 		Notification not = new Notification(users.get(1).getUserId(), events.get(0).getEventId(), "Remember take the check", 90, ChronoUnit.MINUTES, 0);
-		not.setEvent(events.get(0));
+		
+//		not.setEvent(events.get(0));
 		notificationService.addNotificationToDB(not, events.get(0));
 		
 		not = new Notification(users.get(2).getUserId(), events.get(1).getEventId(), "Remember your wallet!", 15, ChronoUnit.MINUTES, 0);
-		not.setEvent(events.get(1));
+//		not.setEvent(events.get(1));
 		notificationService.addNotificationToDB(not, events.get(1));
 
 

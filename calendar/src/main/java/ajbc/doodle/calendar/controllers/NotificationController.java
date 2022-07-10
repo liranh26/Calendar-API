@@ -88,7 +88,7 @@ public class NotificationController {
 			notification.setEventId(eventId);
 			notificationService.addNotificationToDB(notification, eventService.getEventById(eventId));
 			
-			manager.addNotification(notification);
+//			manager.addNotification(notification);
 			
 			return ResponseEntity.status(HttpStatus.CREATED).body(notification);
 		} catch (DaoException e) {
@@ -133,42 +133,42 @@ public class NotificationController {
 
 	}
 
-	@GetMapping(path = "/event/{eventId}")
-	public ResponseEntity<?> getNotificationByEvent(@PathVariable Integer eventId) {
-		Set<Notification> notifications;
-		try {
-			notifications = eventService.getEventById(eventId).getNotifications();
-			return ResponseEntity.ok(notifications);
-		} catch (DaoException e) {
-			ErrorMessage errMsg = new ErrorMessage();
-			errMsg.setData(e.getMessage());
-			errMsg.setMessage("Failed to get notifications for event with id: " + eventId);
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
+//	@GetMapping(path = "/event/{eventId}")
+//	public ResponseEntity<?> getNotificationByEvent(@PathVariable Integer eventId) {
+//		Set<Notification> notifications;
+//		try {
+////			notifications = eventService.getEventById(eventId).getNotifications();
+//			return ResponseEntity.ok(notifications);
+//		} catch (DaoException e) {
+//			ErrorMessage errMsg = new ErrorMessage();
+//			errMsg.setData(e.getMessage());
+//			errMsg.setMessage("Failed to get notifications for event with id: " + eventId);
+//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
+//
+//		}
+//
+//	}
 
-		}
-
-	}
-
-	@PutMapping(path = "/{id}/{userId}")
-	public ResponseEntity<?> updateNotification(@RequestBody Notification notification, @PathVariable Integer id,
-			@PathVariable Integer userId) {
-
-		try {
-			if (notification.getUserId() != userId)
-				throw new DaoException("User not authorized!");
-
-			notification.setNotificationId(id);
-			notification.setEvent(eventService.getEventById(notification.getEventId()));
-			notificationService.updateNotification(notification);
-			notification = notificationService.getNotificationById(notification.getNotificationId());
-			return ResponseEntity.status(HttpStatus.OK).body(notification);
-		} catch (DaoException e) {
-			ErrorMessage errMsg = new ErrorMessage();
-			errMsg.setData(e.getMessage());
-			errMsg.setMessage("failed to update user in DB.");
-			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
-		}
-	}
+//	@PutMapping(path = "/{id}/{userId}")
+//	public ResponseEntity<?> updateNotification(@RequestBody Notification notification, @PathVariable Integer id,
+//			@PathVariable Integer userId) {
+//
+//		try {
+//			if (notification.getUserId() != userId)
+//				throw new DaoException("User not authorized!");
+//
+//			notification.setNotificationId(id);
+//			notification.setEvent(eventService.getEventById(notification.getEventId()));
+//			notificationService.updateNotification(notification);
+//			notification = notificationService.getNotificationById(notification.getNotificationId());
+//			return ResponseEntity.status(HttpStatus.OK).body(notification);
+//		} catch (DaoException e) {
+//			ErrorMessage errMsg = new ErrorMessage();
+//			errMsg.setData(e.getMessage());
+//			errMsg.setMessage("failed to update user in DB.");
+//			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
+//		}
+//	}
 
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> updateProduct(@RequestParam Map<String, String> map, @PathVariable Integer id) {
