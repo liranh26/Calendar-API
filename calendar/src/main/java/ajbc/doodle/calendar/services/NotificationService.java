@@ -50,6 +50,7 @@ import ajbc.doodle.calendar.entities.EventUser;
 import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.entities.webpush.PushMessage;
+import ajbc.doodle.calendar.entities.webpush.PushMessageConfig;
 import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
 

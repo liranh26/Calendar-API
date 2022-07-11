@@ -83,10 +83,15 @@ public class NotificationManager implements Runnable {
 			delay = 0;
 
 		Subscription sub;
+		
 		try {
+			
 			sub = userDao.getSubscriptionByUserId(notification.getUserId());
-			Runnable task = new NotificationTask(notification, sub, msgConfig);
-			executorService.execute(task);
+			
+
+			executorService.execute(new NotificationTask(notification, sub, msgConfig));
+			
+			
 		} catch (DaoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
