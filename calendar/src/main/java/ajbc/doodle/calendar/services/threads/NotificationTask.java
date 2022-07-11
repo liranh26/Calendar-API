@@ -34,10 +34,8 @@ import ajbc.doodle.calendar.entities.webpush.PushMessageConfig;
 import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.services.NotificationService;
 
-public class NotificationTask implements Callable<Notification> {
+public class NotificationTask implements Runnable {
 	
-//	@Autowired
-//	private NotificationService notificationService;
 	
 	private Notification notification;
 	private Subscription subscription;
@@ -50,16 +48,17 @@ public class NotificationTask implements Callable<Notification> {
 	}
 	
 	@Override
-	public Notification call() throws Exception {
+	public void run() {
 		
 		PushMessage msg = new PushMessage("message: ", notification.toString());
 		
-		boolean ans = sendPushMessageToUser(subscription, msg);
+		try {
+			boolean ans = sendPushMessageToUser(subscription, msg);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-		if(ans)
-			return notification;
-		else
-			return null;
 	}
 
 	
