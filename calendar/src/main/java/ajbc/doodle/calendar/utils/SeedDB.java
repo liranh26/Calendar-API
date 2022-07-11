@@ -106,16 +106,17 @@ public class SeedDB {
 				+ ")";
 		jdbc.execute(query);
 		
-		query = "CREATE TABLE Notifications(\r\n"
-				+ "notificationId int not null identity(1,1),\r\n"
-				+ "userId int not null, \r\n"
-				+ "eventId int not null, \r\n"
-				+ "title nvarchar(40),\r\n"
-				+ "timeToAlertBefore int,\r\n"
-				+ "units nvarchar(40),\r\n"
-				+ "discontinued int,\r\n"
-				+ "foreign key(userId, eventId) references event_users(userId, eventId),\r\n"
-				+ "primary key(notificationId)\r\n"
+		query = "CREATE TABLE Notifications("
+				+ "notificationId int not null identity(1,1),"
+				+ "userId int not null,"
+				+ "eventId int not null,"
+				+ "title nvarchar(40),"
+				+ "timeToAlertBefore int,"
+				+ "units nvarchar(40),"
+				+ "alertTime datetime,"
+				+ "discontinued int,"
+				+ "foreign key(userId, eventId) references event_users(userId, eventId),"
+				+ "primary key(notificationId)"
 				+ ") ";
 		jdbc.execute(query);
 		
@@ -168,8 +169,8 @@ public class SeedDB {
 		event = eventService.getEventById(event.getEventId());
 		event.addGuests(users.get(0), users.get(1));
 
-		userService.updateUser(users.get(0));
-		userService.updateUser(users.get(1));
+		userDao.updateUser(users.get(0));
+		userDao.updateUser(users.get(1));
 
 		
 		Event event2 = new Event(users.get(1).getUserId(), "shopping", 0, LocalDateTime.of(2022, 8, 8, 16, 0),
@@ -187,8 +188,8 @@ public class SeedDB {
 		event2.addGuests(users.get(1), users.get(2));
 
 		
-		userService.updateUser(users.get(1));
-		userService.updateUser(users.get(2));
+		userDao.updateUser(users.get(1));
+		userDao.updateUser(users.get(2));
 	
 
 	}
@@ -204,6 +205,7 @@ public class SeedDB {
 		Notification not = new Notification("Remember take the check", 90, ChronoUnit.MINUTES, 0);
 	
 		not.setEventUser(eventUser);
+		not.setAlertTime(event.getStartTime().minus(not.getTimeToAlertBefore(),not.getUnits()));
 		
 		notificationService.addNotificationToDB(not);
 		
@@ -222,6 +224,7 @@ public class SeedDB {
 		not = new Notification("Remember your wallet!", 15, ChronoUnit.MINUTES, 0);
 
 		not.setEventUser(eventUser);
+		not.setAlertTime(event.getStartTime().minus(not.getTimeToAlertBefore(),not.getUnits()));
 		
 		notificationService.addNotificationToDB(not);
 		

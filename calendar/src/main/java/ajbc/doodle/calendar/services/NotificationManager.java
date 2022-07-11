@@ -17,11 +17,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import ajbc.doodle.calendar.daos.DaoException;
+import ajbc.doodle.calendar.daos.interfaces.EventDao;
+import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.webpush.PushMessage;
 import ajbc.doodle.calendar.entities.webpush.PushMessageConfig;
@@ -32,8 +35,12 @@ import ajbc.doodle.calendar.services.threads.NotificationTask;
 @Service
 public class NotificationManager {
 
+
 	@Autowired
-	private NotificationService notificationService;
+	@Qualifier("htEventDao")
+	EventDao eventDao;
+	
+	
 
 	@Autowired
 	PushMessageConfig msgConfig;
@@ -42,64 +49,25 @@ public class NotificationManager {
 		return msgConfig.getServerKeys().getPublicKeyUncompressed();
 	}
 	
-//	Comparator<Notification> timeComparator = new Comparator<Notification>() {
-//		@Override
-//		public int compare(Notification not1, Notification not2) {
-//			LocalDateTime alertTime1 = not1.getEvent().getStartTime().minus(not1.getTimeToAlertBefore(),
-//					not1.getUnits());
-//			LocalDateTime alertTime2 = not2.getEvent().getStartTime().minus(not2.getTimeToAlertBefore(),
-//					not2.getUnits());
-//			return alertTime1.compareTo(alertTime2);
-//		}
-//	};
-
-//	private PriorityBlockingQueue<Notification> notifications = new PriorityBlockingQueue<Notification>(10, timeComparator);
+	
+	Comparator<Notification> timeComparator = new Comparator<Notification>() {
+		@Override
+		public int compare(Notification not1, Notification not2) {
+			return not1.getAlertTime().compareTo(not2.getAlertTime());
+		}
+	};
 
 	
-//	public void addNotification(Notification notification) throws DaoException {
-//		notification.getEvent().setGuests(null); // to avoid exception for now..
-//
-//		// need to take in care the time before
-//		LocalDateTime alertTime = notification.getEvent().getStartTime().minus(notification.getTimeToAlertBefore(),
-//				notification.getUnits());
-//
-//		// 3 options for new notification: smaller , equal, bigger
-//		// smaller update thread
-//		// equal add to poll thread
-//		// bigger add to queue
-//
-//		Notification curr = notifications.peek();
-//		if (curr != null) {
-//			
-//			LocalDateTime currAlertTime = curr.getEvent().getStartTime().minus(curr.getTimeToAlertBefore(),
-//					curr.getUnits());
-//
-//			Duration diffTime = Duration.between(currAlertTime, alertTime);
-//			long difference = diffTime.getSeconds();
-//			
-//			if (difference > 0) {
-//				// nothing to change
-//				notifications.add(notification);
-//			} else {
-//				// update - reschedule the thread
-//
-//				run(notification);
-//			}
-//
-//		}else { 
-//			notifications.add(notification);
-//			run(notification);
-//		}
-//		
-//		System.out.println("Number of notification in the list: " + notifications.size());
-//
-//	}
+	private PriorityBlockingQueue<Notification> notifications = new PriorityBlockingQueue<Notification>(10, timeComparator);
 
-	private final int NUM_THREADS = 1;
-	private ScheduledExecutorService scheduledService = Executors.newScheduledThreadPool(NUM_THREADS);;
-	private ScheduledFuture<Notification> scheduledFuture;
 	
-//
+	public void addNotification(Notification notification) throws DaoException {
+
+
+	}
+
+	
+
 //	public void run(Notification notification) throws DaoException {// TODO list of notifications or multiple calls?
 //
 //		long delay = getDelayForNotification(notification);
@@ -108,32 +76,14 @@ public class NotificationManager {
 //		if (delay < 0)
 //			delay = 0;
 //
-//		System.out.println("List before" + notifications);
-//		
-//		if (scheduledFuture != null && !scheduledFuture.isDone()) {
-//			scheduledFuture.cancel(false);
-//			notifications.add(notification);
-//		}
-//		
-//		if (scheduledFuture != null && scheduledFuture.isDone()) {
-//			System.out.println("Task done ! : " + scheduledFuture);
-//			notifications.add(notification);
-//			notification = notifications.poll();
-//			System.out.println("Size is: " +notifications.size() + " ,not polled is :"+notification);
-//		}
-//		
-//		System.out.println("List after" + notifications);
-//		
-//		Subscription subscription = notificationService.getSubscriptionForUser(notification.getUserId());
-//		Callable<Notification> task = new NotificationTask(notification, subscription, msgConfig);
 //
-//		scheduledFuture = scheduledService.schedule(task, delay, TimeUnit.SECONDS); 
 //
 //	}
 
 	
 	
 //	private long getDelayForNotification(Notification notification) {
+//		
 //		LocalDateTime nextRun = notification.getEvent().getStartTime().minus(notification.getTimeToAlertBefore(),
 //				notification.getUnits());
 //		System.out.println(nextRun);
@@ -152,19 +102,13 @@ public class NotificationManager {
 	
 	
 	
+
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+//	private final int NUM_THREADS = 1;
+//	private ScheduledExecutorService scheduledService = Executors.newScheduledThreadPool(NUM_THREADS);;
+//	private ScheduledFuture<Notification> scheduledFuture;
 	
 	
 	/* simple runnable to test using executor service */
@@ -188,28 +132,24 @@ public class NotificationManager {
 //		}
 //	};
 
-	public void stop() {
-		scheduledService.shutdown();
-		try {
-			scheduledService.awaitTermination(5, TimeUnit.SECONDS);
-		} catch (InterruptedException ex) {
-//	            Logger.getLogger(MyTaskExecutor.class.getName()).log(Level.SEVERE, null, ex);
-		}
-	}
-
-//	/* simple test to see connection to PushMessage api */
-//	public void run() {
-//
-//		Notification notification = notifications.peek();
-//
-//		PushMessage msg = new PushMessage("message: ", notification.toString());
-//
+	
+	
+	
+	
+	
+	
+	
+	
+	
+//	public void stop() {
+//		scheduledService.shutdown();
 //		try {
-//			notificationService.sendPushMessageToUser(notification.getUserId(), msg);
-//		} catch (JsonProcessingException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
+//			scheduledService.awaitTermination(5, TimeUnit.SECONDS);
+//		} catch (InterruptedException ex) {
+////	            Logger.getLogger(MyTaskExecutor.class.getName()).log(Level.SEVERE, null, ex);
 //		}
 //	}
+
+	
 
 }

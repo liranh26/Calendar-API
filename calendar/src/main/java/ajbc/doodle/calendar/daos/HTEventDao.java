@@ -53,6 +53,9 @@ public class HTEventDao implements EventDao {
 		template.deleteAll(getAllEvents());
 	}
 
+	
+	
+	
 //	@Override
 //	public List<Event> getEventsOfUserInRange(LocalDate startDate, LocalDate endDate, LocalTime startTime,
 //			LocalTime endTime) throws DaoException {

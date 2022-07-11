@@ -77,6 +77,7 @@ public class Event {
 	private List<User> guests = new ArrayList<>();
 
 	
+	
 	public Event(Integer eventOwnerId, String title, Integer isAllDay, LocalDateTime startTime, LocalDateTime endTime,
 			String address, String description, EventRepeating repeating, Integer discontinued) {
 		this.eventOwnerId = eventOwnerId;

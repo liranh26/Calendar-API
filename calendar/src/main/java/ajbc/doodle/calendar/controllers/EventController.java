@@ -118,22 +118,21 @@ public class EventController {
 	}
 	
 	
-//	@PutMapping(path = "/{eventId}/{userId}")
-//	public ResponseEntity<?> updateProduct(@RequestBody Event event, @PathVariable Integer eventId, @PathVariable Integer userId){
-//		
-//		try {
-//			event.setEventId(eventId);
-//			event.setGuests(null);
-//			
-//			eventService.updateEvent(event, userId);
-//			event = eventService.getEventById(event.getEventId());
-//			return ResponseEntity.status(HttpStatus.OK).body(event);
-//		} catch (DaoException e) {
-//			ErrorMessage errMsg = new ErrorMessage();
-//			errMsg.setData(e.getMessage());
-//			errMsg.setMessage("failed to update user in DB.");
-//			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg) ;
-//		}
-//	}
+	@PutMapping(path = "/{eventId}")
+	public ResponseEntity<?> updateProduct(@RequestBody Event event, @PathVariable Integer eventId){
+		
+		try {
+			event.setEventId(eventId);
+			eventService.updateEvent(event);
+			
+			event = eventService.getEventById(event.getEventId());
+			return ResponseEntity.status(HttpStatus.OK).body(event);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("failed to update user in DB.");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg) ;
+		}
+	}
 	
 }

@@ -40,6 +40,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ajbc.doodle.calendar.Application;
 import ajbc.doodle.calendar.ServerKeys;
 import ajbc.doodle.calendar.daos.DaoException;
+import ajbc.doodle.calendar.daos.interfaces.EventDao;
 import ajbc.doodle.calendar.daos.interfaces.EventUserDao;
 import ajbc.doodle.calendar.daos.interfaces.NotificationDao;
 import ajbc.doodle.calendar.daos.interfaces.UserDao;
@@ -67,7 +68,9 @@ public class NotificationService {
 	@Qualifier("htEventUserDao")
 	EventUserDao eventUserDao;
 
-
+	@Autowired
+	@Qualifier("htEventDao")
+	EventDao eventDao;
 
 	public boolean isSubscribed(SubscriptionEndpoint subscription) throws DaoException {
 		return userDao.checkEndPointRegistration(subscription.getEndpoint());
@@ -77,16 +80,24 @@ public class NotificationService {
 		return userDao.getSubscriptionByUserId(userId);
 	}
 	
+	public void updateNotification(Notification notification) throws DaoException {
+		EventUser eventUser = new EventUser(notification.getUserId() , notification.getEventId());
+		eventUser = eventUserDao.getEventForUser(eventUser);
+		notification.setEventUser(eventUser);
+		dao.updateNotification(notification);
+	}
+	
 	public Notification createNotification(Notification notification, Integer eventId, Integer userId) throws DaoException {
-
 
 		EventUser eventUser = new EventUser(userId , eventId);
 		eventUser = eventUserDao.getEventForUser(eventUser);
+		Event event = eventDao.getEvent(eventId);
 		
 		Notification not = new Notification("Remember take the check", 90, ChronoUnit.MINUTES, 0);
 	
 		not.setEventUser(eventUser);
-		
+		not.setAlertTime(event.getStartTime().minus(not.getTimeToAlertBefore(),not.getUnits()));
+
 		addNotificationToDB(not);
 		
 		eventUser.addNotifications(not);
@@ -121,9 +132,7 @@ public class NotificationService {
 		return dao.getNotification(id);
 	}
 
-	public void updateNotification(Notification notification) throws DaoException {
-		dao.updateNotification(notification);
-	}
+
 
 	public void softDelete(Notification notification) throws DaoException {
 		notification.setDiscontinued(1);

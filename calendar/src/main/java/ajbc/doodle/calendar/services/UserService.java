@@ -39,8 +39,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ajbc.doodle.calendar.Application;
 import ajbc.doodle.calendar.ServerKeys;
 import ajbc.doodle.calendar.daos.DaoException;
+import ajbc.doodle.calendar.daos.interfaces.EventDao;
+import ajbc.doodle.calendar.daos.interfaces.EventUserDao;
 import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.Event;
+import ajbc.doodle.calendar.entities.EventUser;
 import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
@@ -52,8 +55,26 @@ public class UserService {
 	@Qualifier("htUserDao")
 	private UserDao userDao;
 	
+	@Autowired
+	@Qualifier("htEventDao")
+	EventDao eventDao;
+	
+	@Autowired
+	@Qualifier("htEventUserDao")
+	EventUserDao eventUserdao;
 
-
+	public void updateUser(User user) throws DaoException {
+		List<EventUser> eventUsers = eventUserdao.getEventsByUserId(user.getUserId());
+		
+		Set<Event> events = new HashSet<Event>();
+		for (EventUser eventUser : eventUsers) {
+			events.add(eventDao.getEvent(eventUser.getEventId()));
+		}
+		
+		user.setEvents(events);
+		userDao.updateUser(user);
+	}
+	
 	public void addUser(User user) throws DaoException {
 		userDao.addUser(user);
 	}
@@ -96,10 +117,7 @@ public class UserService {
 //		return users;
 //	}
 
-	public void updateUser(User user) throws DaoException {
-		
-		userDao.updateUser(user);
-	}
+
 
 	public void deleteUser(Integer id) throws DaoException {
 		userDao.deleteUser(id);

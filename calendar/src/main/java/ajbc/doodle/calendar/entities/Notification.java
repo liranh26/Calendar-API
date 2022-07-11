@@ -1,5 +1,6 @@
 package ajbc.doodle.calendar.entities;
 
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 
@@ -54,6 +55,7 @@ public class Notification {
 	
 	@Enumerated(EnumType.STRING)
 	private ChronoUnit units;
+	private LocalDateTime alertTime;
 	
 	private Integer discontinued;
 
@@ -63,8 +65,7 @@ public class Notification {
 	@JoinColumns({@JoinColumn(name="userId") , @JoinColumn(name="eventId")})
 	private EventUser eventUser;
 	
-	
-	
+
 
 	public Notification(String title, Integer timeToAlertBefore, ChronoUnit units,
 			Integer discontinued) {
@@ -81,7 +82,11 @@ public class Notification {
 		this.eventId = eventUser.getEventId();
 	}
 	
-	
+	public void updateAlertTime(Integer timeToAlertBefore, ChronoUnit units, LocalDateTime alertTime) {
+		this.timeToAlertBefore = timeToAlertBefore;
+		this.units = units;
+		this.alertTime = alertTime;
+	}
 	
 }
 

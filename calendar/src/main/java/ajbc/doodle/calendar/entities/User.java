@@ -65,7 +65,8 @@ public class User {
 	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
 	Set<Event> events = new HashSet<Event>();
 
-
+	
+	
 	public void addEvent(Event event) {
 		events.add(event);
 	}
