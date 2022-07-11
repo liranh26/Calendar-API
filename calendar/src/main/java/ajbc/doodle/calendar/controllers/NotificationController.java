@@ -57,15 +57,6 @@ public class NotificationController {
 	private NotificationManager manager;
 
 	
-	//when opening the site
-	//To pass the public key from the server to the JavaScript application, the Spring Boot application provides a GET endpoint that returns the public key.
-	@GetMapping(path = "/publicSigningKey", produces = "application/octet-stream")
-	public byte[] publicSigningKey() {
-		return notificationService.publicSigningKey();
-	}
-	
-	
-	
 	@PostMapping("/isSubscribed")
 	public boolean isSubscribed(@RequestBody SubscriptionEndpoint subscription) {
 		try {
@@ -79,7 +70,6 @@ public class NotificationController {
 	}
 	
 
-	
 	@PostMapping(path = "/{userId}/{eventId}")
 	public ResponseEntity<?> addNotification(@RequestBody Notification notification, @PathVariable Integer eventId, @PathVariable Integer userId)
 			throws DaoException {
@@ -100,25 +90,50 @@ public class NotificationController {
 
 	
 	
-//	@PostMapping(path = "/{eventId}") //TODO -finish the api call*************************
-//	public ResponseEntity<?> addListOfNotifications(@RequestBody List<Notification> notifications, @PathVariable Integer eventId)
-//			throws DaoException {
-//		try {
-//			Event event = eventService.getEventById(eventId);
-//			notifications.stream().forEach(n -> {n.setEventId(eventId); n.setEvent(event);});
-//
-//			notificationService.addListNotificationsToDB(notifications);
-//			return ResponseEntity.status(HttpStatus.CREATED).body(notifications);
-//		} catch (DaoException e) {
-//			ErrorMessage errMsg = new ErrorMessage();
-//			errMsg.setData(e.getMessage());
-//			errMsg.setMessage("Failed to add event to DB.");
-//			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
+	@PostMapping
+	public ResponseEntity<?> addListOfNotifications(@RequestBody List<Notification> notifications)
+			throws DaoException {
+		try {
+	
+			notifications = notificationService.addListNotificationsToDB(notifications);
+			
+			//TODO add to manager list.
+			
+			return ResponseEntity.status(HttpStatus.CREATED).body(notifications);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to add event to DB.");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 //			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorMessage("No notification found" , e.getMessage()));	
 
-//		}
-//	}
+		}
+	}
 	
+	
+	//when opening the site
+	//To pass the public key from the server to the JavaScript application, the Spring Boot application provides a GET endpoint that returns the public key.
+	@GetMapping(path = "/publicSigningKey", produces = "application/octet-stream")
+	public byte[] publicSigningKey() {
+		return notificationService.publicSigningKey();
+	}
+	
+	
+	@GetMapping
+	public ResponseEntity<?> getAllNotifications() {
+		List<Notification> notifications;
+		try {
+			notifications = notificationService.getAllNotifications();
+			return ResponseEntity.ok(notifications);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to get notifications from DB");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
+
+		}
+
+	}
 	
 	@GetMapping(path = "/{id}")
 	public ResponseEntity<?> getNotificationById(@PathVariable Integer id) {
@@ -158,12 +173,28 @@ public class NotificationController {
 		try {
 
 			notification.setNotificationId(id);
-//			notification.setEvent(eventService.getEventById(notification.getEventId()));
 			
 			notificationService.updateNotification(notification);
-//			notification = notificationService.getNotificationById(notification.getNotificationId());
 			
 			return ResponseEntity.status(HttpStatus.OK).body(notification);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("failed to update user in DB.");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
+		}
+	}
+	
+	
+	
+	@PutMapping
+	public ResponseEntity<?> updateNotifications(@RequestBody List<Notification> notifications) {
+
+		try {
+	
+			notificationService.updateListNotifications(notifications);
+			
+			return ResponseEntity.status(HttpStatus.OK).body(notifications);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
@@ -175,7 +206,7 @@ public class NotificationController {
 	
 	
 	@DeleteMapping(path = "/{id}")
-	public ResponseEntity<?> updateProduct(@RequestParam Map<String, String> map, @PathVariable Integer id) {
+	public ResponseEntity<?> deleteNotification(@RequestParam Map<String, String> map, @PathVariable Integer id) {
 		Collection<String> values = map.values();
 
 		Notification notification;
@@ -196,6 +227,24 @@ public class NotificationController {
 		}
 	}
 
+	
+	//TODO FIX - how to get notification id before delete.
+	@DeleteMapping 
+	public ResponseEntity<?> deleteListNotificatioins(@RequestParam Map<String, String> map, @RequestBody List<Notification> notifications, @RequestBody List<Integer> ids) {
+
+		try {
+			
+			notificationService.deleteListNotificatioins(map, notifications, ids);
+
+			return ResponseEntity.ok(notifications);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("failed to update user in DB.");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
+		}
+	}
+	
 	
 	
 }

@@ -15,6 +15,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
@@ -99,6 +101,13 @@ public class NotificationService {
 		dao.updateNotification(notification);
 	}
 	
+	public void updateListNotifications(List<Notification> notifications) throws DaoException {
+		for (Notification notification : notifications) 
+			updateNotification(notification);
+		
+	}
+	
+	
 	public Notification createNotification(Notification notification, Integer eventId, Integer userId) throws DaoException {
 
 		EventUser eventUser = new EventUser(userId , eventId);
@@ -144,8 +153,6 @@ public class NotificationService {
 		return dao.getNotification(id);
 	}
 
-
-
 	public void softDelete(Notification notification) throws DaoException {
 		notification.setDiscontinued(1);
 		dao.updateNotification(notification);
@@ -160,6 +167,27 @@ public class NotificationService {
 		
 		return dao.getNotificationsByEvent(eventId);
 	}
+
+	public List<Notification> addListNotificationsToDB(List<Notification> notifications) throws DaoException {
+
+		for (Notification notification : notifications) 
+			createNotification(notification, notification.getEventId(), notification.getUserId());
+		
+		return notifications;
+	}
+
+	public void deleteListNotificatioins(Map<String, String> map, List<Notification> notifications, List<Integer> ids) throws DaoException {
+		Collection<String> values = map.values();
+		for (int i=0; i < ids.size(); i++) {
+			notifications.get(i).setNotificationId(ids.get(i));
+			if (values.contains("soft"))
+				softDelete(notifications.get(i));
+			else
+				hardDelete(notifications.get(i));
+		}		
+	}
+
+
 
 
 
