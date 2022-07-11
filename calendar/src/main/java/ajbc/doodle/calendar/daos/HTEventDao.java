@@ -53,6 +53,11 @@ public class HTEventDao implements EventDao {
 		template.deleteAll(getAllEvents());
 	}
 
+	@Override
+	public void deleteEvent(Event event) throws DaoException {
+		template.delete(event);
+	}
+
 	
 	
 	

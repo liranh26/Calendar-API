@@ -27,7 +27,7 @@ public interface EventUserDao {
 	}
 
 	@Transactional(readOnly = false)
-	public default void deleteUserFromEvent(EventUser eventUser) throws DaoException {
+	public default void deleteUserEvent(EventUser eventUser) throws DaoException {
 		throw new DaoException("Method not implemented");
 	}
 

@@ -132,14 +132,14 @@ public class NotificationService {
 	}
 
 	
-//	public Notification createDefaultNotification(Event event) throws DaoException {
-//
-//		Notification not = new Notification(event.getEventOwnerId(), event.getEventId(), event.getTitle(), 0,
-//				ChronoUnit.SECONDS, 0);
-//
-//		addNotificationToDB(not, event);
-//		return not;
-//	}
+	public Notification createDefaultNotification(Event event) throws DaoException {
+
+		Notification not = new Notification(event.getTitle(), 0, ChronoUnit.SECONDS, 0);
+
+		createNotification(not, event.getEventId(), event.getEventOwnerId());
+		
+		return not;
+	}
 
 	public List<Notification> getAllNotifications() throws DaoException {
 		return dao.getAllNotifications();

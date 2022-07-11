@@ -31,7 +31,7 @@ public interface EventDao {
 	}
 
 	@Transactional(readOnly = false)
-	public default void deleteEvent(Integer eventId) throws DaoException {
+	public default void deleteEvent(Event event) throws DaoException {
 		throw new DaoException("Method not implemented");
 	}
 

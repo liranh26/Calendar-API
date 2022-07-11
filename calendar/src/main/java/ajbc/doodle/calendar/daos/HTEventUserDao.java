@@ -50,7 +50,7 @@ public class HTEventUserDao implements EventUserDao {
 	}
 
 	@Override
-	public void deleteUserFromEvent(EventUser eventUser) throws DaoException {
+	public void deleteUserEvent(EventUser eventUser) throws DaoException {
 		template.delete(eventUser);
 	}
 
