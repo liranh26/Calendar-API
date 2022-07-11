@@ -49,7 +49,7 @@ public interface EventUserDao {
 		throw new DaoException("Method not implemented");
 	}
 	
-	public default List<EventUser> getEventsForUser(Integer eventId) throws DaoException {
+	public default List<EventUser> getUsersByEventId(Integer eventId) throws DaoException {
 		throw new DaoException("Method not implemented");
 	}
 

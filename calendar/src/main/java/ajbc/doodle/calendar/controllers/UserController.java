@@ -69,28 +69,45 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
-//	@GetMapping(path = "/event/{eventId}")
-//	public ResponseEntity<?> getUsersForEvent(@PathVariable Integer eventId) {
-//		List<User> users;
-//		try {
-//			users = userService.getUsersForEvent(eventId);
-//			return ResponseEntity.ok(users);
-//		} catch (DaoException e) {
-//			ErrorMessage errMsg = new ErrorMessage();
-//			errMsg.setData(e.getMessage());
-//			errMsg.setMessage("Failed to get users with event id: " + eventId);
-//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
-//
-//		}
-//
-//	}
+	
+	/*** GET ***/
+	
+	@GetMapping(path = "/event/{eventId}")
+	public ResponseEntity<?> getUsersForEvent(@PathVariable Integer eventId) {
+		List<User> users;
+		try {
+			users = userService.getUsersByEventId(eventId);
+			return ResponseEntity.ok(users);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to get users with event id: " + eventId);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
 
+		}
+
+	}
+
+	@GetMapping(path = "/allUsers")
+	public ResponseEntity<?> getAllUser() {
+		List<User> users;
+		try {
+			users = userService.getAllUsers();
+			return ResponseEntity.ok(users);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("failed to get users");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
+		}
+	}
+	
 	@GetMapping(path = "/email/{email}")
 	public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
 		User user;
 		try {
 			user = userService.getUserByEmail(email);
-			return ResponseEntity.ok(user.getUserId());
+			return ResponseEntity.ok(user);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
@@ -117,21 +134,8 @@ public class UserController {
 
 	}
 
-	@GetMapping(path = "/allUsers")
-	public ResponseEntity<?> getAllUser() {
-		List<User> users;
-		try {
-			users = userService.getAllUsers();
-			return ResponseEntity.ok(users);
-		} catch (DaoException e) {
-			ErrorMessage errMsg = new ErrorMessage();
-			errMsg.setData(e.getMessage());
-			errMsg.setMessage("failed to get users");
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
 
-		}
-
-	}
+	/*** CREATE ***/
 
 	@PostMapping
 	public ResponseEntity<?> addUser(@RequestBody User user) throws DaoException {
@@ -145,7 +149,24 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 	}
+	
+	
+	@PostMapping(path = "/list")
+	public ResponseEntity<?> addListUsers(@RequestBody List<User> users) throws DaoException {
+		try {
+			userService.addListOfUsers(users);
+			return ResponseEntity.status(HttpStatus.CREATED).body(users);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to add user to DB.");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
+		}
+	}
+	
 
+	/*** UPDATE ***/
+	
 	@PutMapping(path = "/{id}")
 	public ResponseEntity<?> updateProduct(@RequestBody User user, @PathVariable Integer id) {
 
@@ -190,6 +211,7 @@ public class UserController {
 		try {
 			userService.addUserSubscription(email, subscription);
 			
+			System.out.println("Subscription added with email "+email);
 			return ResponseEntity.status(HttpStatus.OK).body(email);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
@@ -198,9 +220,7 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 	
-//		this.subscriptions.put(subscription.getEndpoint(), subscription);
-//		System.out.println(subscription);
-//		System.out.println("Subscription added with email "+email);
+
 	}
 	
 	@PostMapping("/logout/{email}")
@@ -210,6 +230,8 @@ public class UserController {
 			//throws exception if null
 			userService.unsubscribeUser(email, subscription);
 			
+			System.out.println("Subscription with email "+email+" got removed!");
+			
 			return ResponseEntity.status(HttpStatus.OK).body(email);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
@@ -218,72 +240,13 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 		
-//		this.subscriptions.remove(subscription.getEndpoint());
-//		
-//		System.out.println("Subscription with email "+email+" got removed!");
+
+	
 	}
 	
 	
 	
 	
-	
-	
-//
-//	private final Map<String, Subscription> subscriptions = new ConcurrentHashMap<String, Subscription>();
-//	private int counter;
-//
-//
-//
-//
-//
-//	@GetMapping(path = "/publicSigningKey", produces = "application/octet-stream")
-//	public byte[] publicSigningKey() {
-//		return userService.publicSigningKey();
-//	}
-//
-//	@GetMapping(path = "/publicSigningKeyBase64")
-//	public String publicSigningKeyBase64() {
-//		return userService.publicSigningKeyBase64();
-//	}
-//
-//	@PostMapping("/subscribe/{email}")
-//	@ResponseStatus(HttpStatus.CREATED)
-//	public void subscribe(@RequestBody Subscription subscription, @PathVariable(required = false) String email) {
-//		// if user is registered allow subscription
-//		this.subscriptions.put(subscription.getEndpoint(), subscription);
-//		System.out.println("Subscription added with email " + email);
-//	}
-//
-//	@PostMapping("/unsubscribe/{email}")
-//	public void unsubscribe(@RequestBody SubscriptionEndpoint subscription,
-//			@PathVariable(required = false) String email) {
-//		this.subscriptions.remove(subscription.getEndpoint());
-//		System.out.println("Subscription with email " + email + " got removed!");
-//	}
-//
-//	@PostMapping("/isSubscribed")
-//	public boolean isSubscribed(@RequestBody SubscriptionEndpoint subscription) {
-//		return this.subscriptions.containsKey(subscription.getEndpoint());
-//	}
-//
-//	@Scheduled(fixedDelay = 3_000)
-//	public void testNotification() {
-//		if (this.subscriptions.isEmpty()) {
-//			return;
-//		}
-//		counter++;
-//		try {
-//
-//			not notification = new not(counter, LocalDateTime.now(), "Test notification", "Test message");
-//			userService.sendPushMessageToAllSubscribers(this.subscriptions,
-//					new PushMessage("message: " + counter, notification.toString()));
-//			System.out.println(notification);
-//		} catch (JsonProcessingException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-//	}
 
 
 

@@ -100,23 +100,17 @@ public class UserService {
 		return userDao.getUserByEmail(email);
 	}
 
-	//TODO refactor code
-//	public List<User> getUsersForEvent(Integer eventId) throws DaoException {
-//		List<User> users = new ArrayList<User>();
-//		List<EventUser> eventsForUser = eventUserService.getEventsForUser(eventId);
-//
-//		eventsForUser.stream().forEach(e -> {
-//			try {
-//				users.add(getUserById(e.getUserId()));
-//
-//			} catch (DaoException e1) {
-//				e1.printStackTrace();
-//			}
-//		});
-//
-//		return users;
-//	}
 
+	public List<User> getUsersByEventId(Integer eventId) throws DaoException {
+		List<User> users = new ArrayList<User>();
+		List<EventUser> eventsForUser = eventUserdao.getUsersByEventId(eventId);
+		for (EventUser eventUser : eventsForUser) 
+			users.add(getUserById(eventUser.getUserId()));
+
+		return users;
+	}
+
+	
 
 
 	public void deleteUser(Integer id) throws DaoException {
@@ -144,6 +138,11 @@ public class UserService {
 		user.setAuth(null);
 		
 		userDao.updateUser(user);
+	}
+
+	public void addListOfUsers(List<User> users) throws DaoException {
+		for (User user : users) 
+			addUser(user);	
 	}
 
 

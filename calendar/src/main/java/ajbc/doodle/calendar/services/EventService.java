@@ -100,7 +100,7 @@ public class EventService {
 			LocalTime endTime, Integer id) throws DaoException {
 
 		List<Event> events = eventDao.getEventsOfUserInRange(startDate, endDate, startTime, endTime);
-		List<EventUser> eventUser = eventUserDao.getEventsForUser(id);
+		List<EventUser> eventUser = eventUserDao.getUsersByEventId(id);
 
 		return events.stream().filter(e -> eventUser.contains(e.getEventId())).toList();
 	}
