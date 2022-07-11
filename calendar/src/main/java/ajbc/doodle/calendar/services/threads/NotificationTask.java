@@ -14,7 +14,10 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -35,34 +38,32 @@ import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.services.NotificationService;
 
 public class NotificationTask implements Runnable {
-	
-	
-	private Notification notification;
-	private Subscription subscription;
+
+	private List<Notification> notifications;
+	private List<Subscription> subscriptions;
 	private PushMessageConfig config;
-	
-	public NotificationTask(Notification notification, Subscription subscription, PushMessageConfig config){
-		this.notification = notification;
-		this.subscription = subscription;
+	private final int NUM_OF_THREADS = 10;
+
+	ExecutorService executorService = Executors.newFixedThreadPool(NUM_OF_THREADS);
+
+	public NotificationTask(List<Notification> nots, List<Subscription> subs, PushMessageConfig config) {
+		this.notifications = nots;
+		this.subscriptions = subs;
 		this.config = config;
 	}
-	
+
 	@Override
 	public void run() {
-		
-		PushMessage msg = new PushMessage("message: ", notification.toString());
-		
-		try {
-			boolean ans = sendPushMessageToUser(subscription, msg);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+		for (int i = 0; i < notifications.size(); i++) {
+			PushMessage msg = new PushMessage("message: ", notifications.get(i).toString());
+			Subscription sub = subscriptions.get(i);
+			executorService.execute(() -> sendPushMessageToUser(sub, msg));
 		}
 
 	}
 
-	
-	private boolean sendPushMessageToUser(Subscription subscription, PushMessage message) throws JsonProcessingException {
+	private boolean sendPushMessageToUser(Subscription subscription, PushMessage message) {
 		try {
 
 			byte[] result = config.getCryptoService().encrypt(config.getObjectMapper().writeValueAsString(message),
@@ -72,14 +73,13 @@ public class NotificationTask implements Runnable {
 
 		} catch (InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException
 				| IllegalStateException | InvalidKeySpecException | NoSuchPaddingException | IllegalBlockSizeException
-				| BadPaddingException e) {
+				| BadPaddingException | JsonProcessingException e) {
 			Application.logger.error("send encrypted message", e);
 			return false;
 		}
 
 	}
-	
-	
+
 	/**
 	 * @return true if the subscription is no longer valid and can be removed, false
 	 *         if everything is okay
@@ -107,9 +107,18 @@ public class NotificationTask implements Runnable {
 
 		Builder httpRequestBuilder = HttpRequest.newBuilder();
 		if (body != null) {
-			 
-			httpRequestBuilder.POST(BodyPublishers.ofByteArray(body))
-			.header("Content-Type", "application/octet-stream") // describes the content of the body. an encrypted stream of bytes
+
+			httpRequestBuilder.POST(BodyPublishers.ofByteArray(body)).header("Content-Type", "application/octet-stream") // describes
+																															// the
+																															// content
+																															// of
+																															// the
+																															// body.
+																															// an
+																															// encrypted
+																															// stream
+																															// of
+																															// bytes
 					.header("Content-Encoding", "aes128gcm"); // describes how the encrypted payload is formatted.
 		} else {
 			httpRequestBuilder.POST(BodyPublishers.ofString(""));
@@ -117,8 +126,9 @@ public class NotificationTask implements Runnable {
 		}
 
 		HttpRequest request = httpRequestBuilder.uri(endpointURI).header("TTL", "180")
-				//Payload encryption, message has less then 4096 bytes.
-				.header("Authorization", "vapid t=" + token + ", k=" + config.getServerKeys().getPublicKeyBase64()).build(); 
+				// Payload encryption, message has less then 4096 bytes.
+				.header("Authorization", "vapid t=" + token + ", k=" + config.getServerKeys().getPublicKeyBase64())
+				.build();
 		try {
 			HttpResponse<Void> response = config.getHttpClient().send(request, BodyHandlers.discarding());
 
@@ -151,6 +161,5 @@ public class NotificationTask implements Runnable {
 
 		return false;
 	}
-	
-	
+
 }

@@ -50,8 +50,8 @@ public class NotificationController {
 	@Autowired
 	private NotificationService notificationService;
 
-	@Autowired
-	private EventService eventService;
+//	@Autowired
+//	private EventService eventService;
 	
 	@Autowired
 	private NotificationManager manager;
@@ -61,7 +61,7 @@ public class NotificationController {
 	//To pass the public key from the server to the JavaScript application, the Spring Boot application provides a GET endpoint that returns the public key.
 	@GetMapping(path = "/publicSigningKey", produces = "application/octet-stream")
 	public byte[] publicSigningKey() {
-		return manager.publicSigningKey();
+		return notificationService.publicSigningKey();
 	}
 	
 	

@@ -15,12 +15,14 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -72,7 +74,16 @@ public class NotificationService {
 	@Autowired
 	@Qualifier("htEventDao")
 	EventDao eventDao;
+	
+	@Autowired
+	PushMessageConfig msgConfig;
 
+
+
+	public byte[] publicSigningKey() {
+		return msgConfig.getServerKeys().getPublicKeyUncompressed();
+	}
+	
 	public boolean isSubscribed(SubscriptionEndpoint subscription) throws DaoException {
 		return userDao.checkEndPointRegistration(subscription.getEndpoint());
 	}
@@ -93,25 +104,25 @@ public class NotificationService {
 		EventUser eventUser = new EventUser(userId , eventId);
 		eventUser = eventUserDao.getEventForUser(eventUser);
 		Event event = eventDao.getEvent(eventId);
-		
-		Notification not = new Notification("Remember take the check", 90, ChronoUnit.MINUTES, 0);
-	
-		not.setEventUser(eventUser);
-		not.setAlertTime(event.getStartTime().minus(not.getTimeToAlertBefore(),not.getUnits()));
+			
+		notification.setEventUser(eventUser);
+		notification.setAlertTime(event.getStartTime().minus(notification.getTimeToAlertBefore(),notification.getUnits()));
 
-		addNotificationToDB(not);
+		addNotificationToDB(notification);
 		
-		eventUser.addNotifications(not);
+		eventUser.addNotifications(notification);
 
 		eventUserDao.updateUserEvent(eventUser);
 		
-		return not;
+		return notification;
 	}
 
+	
 	public void addNotificationToDB(Notification notification) throws DaoException {
 		dao.addNotification(notification);
 	}
 
+	
 //	public Notification createDefaultNotification(Event event) throws DaoException {
 //
 //		Notification not = new Notification(event.getEventOwnerId(), event.getEventId(), event.getTitle(), 0,
@@ -149,7 +160,6 @@ public class NotificationService {
 		
 		return dao.getNotificationsByEvent(eventId);
 	}
-
 
 
 
