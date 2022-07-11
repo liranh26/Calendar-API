@@ -33,6 +33,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @Entity
+@EqualsAndHashCode
 @Table(name = "Event_Users")
 public class EventUser implements Serializable {
 	

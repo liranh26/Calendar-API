@@ -58,7 +58,7 @@ public class Notification {
 	private Integer discontinued;
 
 
-	
+	@JsonIgnore
 	@ManyToOne( fetch = FetchType.EAGER)
 	@JoinColumns({@JoinColumn(name="userId") , @JoinColumn(name="eventId")})
 	private EventUser eventUser;

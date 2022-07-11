@@ -3,12 +3,14 @@ package ajbc.doodle.calendar.daos;
 import java.util.List;
 
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.stereotype.Repository;
 
 import ajbc.doodle.calendar.daos.interfaces.NotificationDao;
+import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.User;
 
@@ -60,5 +62,14 @@ public class HTNotificationDao implements NotificationDao {
 		template.deleteAll(getAllNotifications());
 	}
 
+
+	@Override
+	public List<Notification> getNotificationsByEvent(Integer eventId) throws DaoException {
+		DetachedCriteria criteria = DetachedCriteria.forClass(Notification.class);
+		criteria.add(Restrictions.eq("eventId", eventId));
+		return (List<Notification>) template.findByCriteria(criteria);
+	}
+
+	
 
 }

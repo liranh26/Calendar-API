@@ -58,15 +58,8 @@ public class UserService {
 		userDao.addUser(user);
 	}
 
-//	public void addUserToEvent(Integer eventId, Integer userId) throws DaoException {
-//		
-////		Event event = eventDao.getEvent(eventId);
-////		eventUserService.addUserToEvent(new EventUser(eventId, userId, user, event));
-////		eventUserService.addUserToEvent(new EventUser(eventId, userId));
-//	}
-
 	public User getUserById(Integer userId) throws DaoException {
-		return userDao.getUser(userId);
+		return userDao.getUser(userId);	
 	}
 
 	public List<User> getAllUsers() throws DaoException {
@@ -104,6 +97,7 @@ public class UserService {
 //	}
 
 	public void updateUser(User user) throws DaoException {
+		
 		userDao.updateUser(user);
 	}
 

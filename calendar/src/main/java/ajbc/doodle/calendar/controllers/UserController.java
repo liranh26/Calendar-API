@@ -90,7 +90,7 @@ public class UserController {
 		User user;
 		try {
 			user = userService.getUserByEmail(email);
-			return ResponseEntity.ok(user);
+			return ResponseEntity.ok(user.getUserId());
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
@@ -137,7 +137,6 @@ public class UserController {
 	public ResponseEntity<?> addUser(@RequestBody User user) throws DaoException {
 		try {
 			userService.addUser(user);
-
 			return ResponseEntity.status(HttpStatus.CREATED).body(user);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();

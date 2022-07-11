@@ -40,11 +40,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ajbc.doodle.calendar.Application;
 import ajbc.doodle.calendar.ServerKeys;
 import ajbc.doodle.calendar.daos.DaoException;
+import ajbc.doodle.calendar.daos.interfaces.EventUserDao;
 import ajbc.doodle.calendar.daos.interfaces.NotificationDao;
 import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.ErrorMessage;
 import ajbc.doodle.calendar.entities.Event;
+import ajbc.doodle.calendar.entities.EventUser;
 import ajbc.doodle.calendar.entities.Notification;
+import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.entities.webpush.PushMessage;
 import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
@@ -59,6 +62,11 @@ public class NotificationService {
 	@Autowired
 	@Qualifier("htUserDao")
 	UserDao userDao;
+	
+	@Autowired
+	@Qualifier("htEventUserDao")
+	EventUserDao eventUserDao;
+
 
 
 	public boolean isSubscribed(SubscriptionEndpoint subscription) throws DaoException {
@@ -69,10 +77,26 @@ public class NotificationService {
 		return userDao.getSubscriptionByUserId(userId);
 	}
 	
+	public Notification createNotification(Notification notification, Integer eventId, Integer userId) throws DaoException {
 
+
+		EventUser eventUser = new EventUser(userId , eventId);
+		eventUser = eventUserDao.getEventForUser(eventUser);
+		
+		Notification not = new Notification("Remember take the check", 90, ChronoUnit.MINUTES, 0);
+	
+		not.setEventUser(eventUser);
+		
+		addNotificationToDB(not);
+		
+		eventUser.addNotifications(not);
+
+		eventUserDao.updateUserEvent(eventUser);
+		
+		return not;
+	}
 
 	public void addNotificationToDB(Notification notification) throws DaoException {
-//		notification.setEvent(event);
 		dao.addNotification(notification);
 	}
 
@@ -99,7 +123,6 @@ public class NotificationService {
 
 	public void updateNotification(Notification notification) throws DaoException {
 		dao.updateNotification(notification);
-
 	}
 
 	public void softDelete(Notification notification) throws DaoException {
@@ -112,8 +135,12 @@ public class NotificationService {
 
 	}
 
-//	public void addListNotificationsToDB(List<Notification> notifications) {
-//		// TODO Auto-generated method stub
-//	}
+	public List<Notification> getNotificationsByEvent(Integer eventId) throws DaoException {
+		
+		return dao.getNotificationsByEvent(eventId);
+	}
+
+
+
 
 }

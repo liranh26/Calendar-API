@@ -31,27 +31,12 @@ public class EventController {
 	@Autowired
 	private EventService eventService;
 
-	@PostMapping
-	public ResponseEntity<?> addEvent(@RequestBody Event event) throws DaoException {
+	@PostMapping(path = "/{userId}")
+	public ResponseEntity<?> addGuestToEvent(@RequestBody Event event , @PathVariable Integer userId) throws DaoException {
+
 		try {
-
-			eventService.addEventToDB(event);
-
-			return ResponseEntity.status(HttpStatus.CREATED).body(event);
-		} catch (DaoException e) {
-			ErrorMessage errMsg = new ErrorMessage();
-			errMsg.setData(e.getMessage());
-			errMsg.setMessage("Failed to add event to DB.");
-			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
-		}
-	}
-
-	@PostMapping(path = "/{eventId}/{userId}")
-	public ResponseEntity<?> addGuestToEvent(@PathVariable Integer eventId, @PathVariable Integer userId) throws DaoException {
-		Event event;
-		try {
-			event = eventService.getEventById(eventId);
-//			eventService.addGuestToEvent(event, userId);
+			event = eventService.createEvnetForUser(userId, event);
+			
 			return ResponseEntity.status(HttpStatus.CREATED).body(event);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
@@ -74,7 +59,6 @@ public class EventController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
 
 		}
-
 	}
 
 	@GetMapping

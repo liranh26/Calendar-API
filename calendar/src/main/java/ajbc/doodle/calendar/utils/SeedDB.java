@@ -59,7 +59,6 @@ public class SeedDB {
 			seedUsers();
 			seedEvents();
 			seedNotifications();
-//			seedEventUsers();
 		} catch (DaoException e) {
 			e.printStackTrace();
 		}
@@ -146,12 +145,6 @@ public class SeedDB {
 		userDao.addUser(new User("Liran", "Hadad", "test@test.com", LocalDate.of(1990, 2, 26), LocalDate.of(2022, 1, 1), 0));
 		userDao.addUser(new User("Snir", "Hadad", "test2@test.com", LocalDate.of(1993, 7, 8), LocalDate.of(2022, 5, 5), 0));
 		userDao.addUser(new User("Sapir", "Hadad", "test3@test.com", LocalDate.of(1990, 7, 23), LocalDate.of(2022, 6, 6), 0));
-//		userService.addUser(
-//				new User("Liran", "Hadad", "test@test.com", LocalDate.of(1990, 2, 26), LocalDate.of(2022, 1, 1), 0));
-//		userService.addUser(
-//				new User("Snir", "Hadad", "test2@test.com", LocalDate.of(1993, 7, 8), LocalDate.of(2022, 5, 5), 0));
-//		userService.addUser(
-//				new User("Sapir", "Hadad", "test3@test.com", LocalDate.of(1990, 7, 23), LocalDate.of(2022, 6, 6), 0));
 
 //		userService.getAllUsers().stream().forEach(System.out::println);
 
@@ -193,7 +186,6 @@ public class SeedDB {
 		event2 =eventService.getEventById(event2.getEventId());
 		event2.addGuests(users.get(1), users.get(2));
 
-//		eventService.updateEvent(event2, event2.getEventId());
 		
 		userService.updateUser(users.get(1));
 		userService.updateUser(users.get(2));
@@ -202,9 +194,6 @@ public class SeedDB {
 	}
 
 	public void seedNotifications() throws DaoException {
-//		List<User> users = userService.getAllUsers();
-//		List<Event> events = eventService.getAllEvents();
-		
 		
 		User user = userService.getUserById(1);
 		Event event = eventService.getEventById(1000);
@@ -243,17 +232,5 @@ public class SeedDB {
 
 	}
 
-//	public void seedEventUsers() throws DaoException {
-//		List<Event> events = eventService.getAllEvents();
-//		List<User> users = userService.getAllUsers();
-//
-//		userService.addUserToEvent(events.get(0).getEventId(), users.get(0).getUserId());
-//		userService.addUserToEvent(events.get(0).getEventId(), users.get(1).getUserId());
-//		userService.addUserToEvent(events.get(0).getEventId(), users.get(2).getUserId());
-//		userService.addUserToEvent(events.get(1).getEventId(), users.get(1).getUserId());
-//		userService.addUserToEvent(events.get(1).getEventId(), users.get(2).getUserId());
-//	
-//
-//	}
 
 }

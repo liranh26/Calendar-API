@@ -60,7 +60,7 @@ public class User {
 	private String auth;
 
 
-	
+	@JsonIgnore
 	@ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
 	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
 	Set<Event> events = new HashSet<Event>();
@@ -79,29 +79,5 @@ public class User {
 		this.joinDate = joinDate;
 		this.discontinued = discontinued;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 }

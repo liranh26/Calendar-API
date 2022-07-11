@@ -1,6 +1,7 @@
 package ajbc.doodle.calendar.services;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,6 +22,7 @@ import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.EventUser;
 import ajbc.doodle.calendar.entities.User;
+import ajbc.doodle.calendar.enums.EventRepeating;
 
 @Service
 public class EventService {
@@ -43,6 +45,20 @@ public class EventService {
 	@Qualifier("htUserDao")
 	UserDao userDao;
 
+	
+	public Event createEvnetForUser(Integer userId, Event event) throws DaoException {
+		
+		User user = userDao.getUser(userId);
+
+		event.setEventOwnerId(user.getUserId());
+		event.setOwner(user);
+
+		addEventToDB(event);
+		
+		return event;
+	}
+	
+	
 	public void addEventToDB(Event event) throws DaoException {
 
 		eventDao.addEvent(event);
@@ -106,6 +122,9 @@ public class EventService {
 		
 		eventDao.updateEvent(event);
 	}
+
+
+
 
 
 

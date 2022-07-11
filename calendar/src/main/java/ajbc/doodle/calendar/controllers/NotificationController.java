@@ -65,6 +65,7 @@ public class NotificationController {
 	}
 	
 	
+	
 	@PostMapping("/isSubscribed")
 	public boolean isSubscribed(@RequestBody SubscriptionEndpoint subscription) {
 		try {
@@ -77,16 +78,14 @@ public class NotificationController {
 		}
 	}
 	
-	
 
 	
-	
-	@PostMapping(path = "/{eventId}")
-	public ResponseEntity<?> addNotification(@RequestBody Notification notification, @PathVariable Integer eventId)
+	@PostMapping(path = "/{userId}/{eventId}")
+	public ResponseEntity<?> addNotification(@RequestBody Notification notification, @PathVariable Integer eventId, @PathVariable Integer userId)
 			throws DaoException {
 		try {
-			notification.setEventId(eventId);
-			notificationService.addNotificationToDB(notification);
+		
+			notification = notificationService.createNotification(notification, eventId, userId);
 			
 //			manager.addNotification(notification);
 			
@@ -99,6 +98,8 @@ public class NotificationController {
 		}
 	}
 
+	
+	
 //	@PostMapping(path = "/{eventId}") //TODO -finish the api call*************************
 //	public ResponseEntity<?> addListOfNotifications(@RequestBody List<Notification> notifications, @PathVariable Integer eventId)
 //			throws DaoException {
@@ -133,21 +134,21 @@ public class NotificationController {
 
 	}
 
-//	@GetMapping(path = "/event/{eventId}")
-//	public ResponseEntity<?> getNotificationByEvent(@PathVariable Integer eventId) {
-//		Set<Notification> notifications;
-//		try {
-////			notifications = eventService.getEventById(eventId).getNotifications();
-//			return ResponseEntity.ok(notifications);
-//		} catch (DaoException e) {
-//			ErrorMessage errMsg = new ErrorMessage();
-//			errMsg.setData(e.getMessage());
-//			errMsg.setMessage("Failed to get notifications for event with id: " + eventId);
-//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
-//
-//		}
-//
-//	}
+	@GetMapping(path = "/event/{eventId}")
+	public ResponseEntity<?> getNotificationByEvent(@PathVariable Integer eventId) {
+		List<Notification> notifications;
+		try {
+			notifications = notificationService.getNotificationsByEvent(eventId);
+			return ResponseEntity.ok(notifications);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to get notifications for event with id: " + eventId);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
+
+		}
+
+	}
 
 //	@PutMapping(path = "/{id}/{userId}")
 //	public ResponseEntity<?> updateNotification(@RequestBody Notification notification, @PathVariable Integer id,
