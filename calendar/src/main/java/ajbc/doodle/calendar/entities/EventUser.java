@@ -14,6 +14,7 @@ import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -32,27 +33,35 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @Entity
-@EqualsAndHashCode
 @Table(name = "Event_Users")
 public class EventUser implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	private Integer eventId;
-	
-	@Id
 	private Integer userId;
 	
+	@Id
+	private Integer eventId;
 	
-	@OneToMany(mappedBy = "eventUser", cascade = { CascadeType.MERGE })
+	
+	@OneToMany(mappedBy = "eventUser", fetch = FetchType.EAGER)
 	private Set<Notification> notifications = new HashSet<>();
+	
 	
 	public void addNotifications(Notification... notifications) {
 		for (Notification notification : notifications) {
 			this.notifications.add(notification);
 		}
 	}
+
+
+	public EventUser(Integer userId , Integer eventId) {
+		this.eventId = eventId;
+		this.userId = userId;
+	}
+	
+	
 	
 }
 

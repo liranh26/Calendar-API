@@ -86,7 +86,7 @@ public class NotificationController {
 			throws DaoException {
 		try {
 			notification.setEventId(eventId);
-			notificationService.addNotificationToDB(notification, eventService.getEventById(eventId));
+			notificationService.addNotificationToDB(notification);
 			
 //			manager.addNotification(notification);
 			

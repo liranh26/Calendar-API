@@ -39,10 +39,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ajbc.doodle.calendar.Application;
 import ajbc.doodle.calendar.ServerKeys;
 import ajbc.doodle.calendar.daos.DaoException;
-import ajbc.doodle.calendar.daos.interfaces.EventUserDao;
 import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.Event;
-import ajbc.doodle.calendar.entities.EventUser;
 import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
@@ -54,20 +52,18 @@ public class UserService {
 	@Qualifier("htUserDao")
 	private UserDao userDao;
 	
-	@Autowired
-	private EventUserService eventUserService;
 
 
 	public void addUser(User user) throws DaoException {
 		userDao.addUser(user);
 	}
 
-	public void addUserToEvent(Integer eventId, Integer userId) throws DaoException {
-		
-//		Event event = eventDao.getEvent(eventId);
-//		eventUserService.addUserToEvent(new EventUser(eventId, userId, user, event));
-//		eventUserService.addUserToEvent(new EventUser(eventId, userId));
-	}
+//	public void addUserToEvent(Integer eventId, Integer userId) throws DaoException {
+//		
+////		Event event = eventDao.getEvent(eventId);
+////		eventUserService.addUserToEvent(new EventUser(eventId, userId, user, event));
+////		eventUserService.addUserToEvent(new EventUser(eventId, userId));
+//	}
 
 	public User getUserById(Integer userId) throws DaoException {
 		return userDao.getUser(userId);
@@ -91,21 +87,21 @@ public class UserService {
 	}
 
 	//TODO refactor code
-	public List<User> getUsersForEvent(Integer eventId) throws DaoException {
-		List<User> users = new ArrayList<User>();
-		List<EventUser> eventsForUser = eventUserService.getEventsForUser(eventId);
-
-		eventsForUser.stream().forEach(e -> {
-			try {
-				users.add(getUserById(e.getUserId()));
-
-			} catch (DaoException e1) {
-				e1.printStackTrace();
-			}
-		});
-
-		return users;
-	}
+//	public List<User> getUsersForEvent(Integer eventId) throws DaoException {
+//		List<User> users = new ArrayList<User>();
+//		List<EventUser> eventsForUser = eventUserService.getEventsForUser(eventId);
+//
+//		eventsForUser.stream().forEach(e -> {
+//			try {
+//				users.add(getUserById(e.getUserId()));
+//
+//			} catch (DaoException e1) {
+//				e1.printStackTrace();
+//			}
+//		});
+//
+//		return users;
+//	}
 
 	public void updateUser(User user) throws DaoException {
 		userDao.updateUser(user);

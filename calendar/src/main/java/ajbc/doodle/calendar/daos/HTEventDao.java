@@ -24,7 +24,6 @@ public class HTEventDao implements EventDao {
 	@Override
 	public void addEvent(Event event) throws DaoException {
 		template.persist(event);
-		System.out.println("HOLAAAAAAA");
 	}
 
 	@Override

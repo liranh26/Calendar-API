@@ -69,21 +69,21 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
-	@GetMapping(path = "/event/{eventId}")
-	public ResponseEntity<?> getUsersForEvent(@PathVariable Integer eventId) {
-		List<User> users;
-		try {
-			users = userService.getUsersForEvent(eventId);
-			return ResponseEntity.ok(users);
-		} catch (DaoException e) {
-			ErrorMessage errMsg = new ErrorMessage();
-			errMsg.setData(e.getMessage());
-			errMsg.setMessage("Failed to get users with event id: " + eventId);
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
-
-		}
-
-	}
+//	@GetMapping(path = "/event/{eventId}")
+//	public ResponseEntity<?> getUsersForEvent(@PathVariable Integer eventId) {
+//		List<User> users;
+//		try {
+//			users = userService.getUsersForEvent(eventId);
+//			return ResponseEntity.ok(users);
+//		} catch (DaoException e) {
+//			ErrorMessage errMsg = new ErrorMessage();
+//			errMsg.setData(e.getMessage());
+//			errMsg.setMessage("Failed to get users with event id: " + eventId);
+//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
+//
+//		}
+//
+//	}
 
 	@GetMapping(path = "/email/{email}")
 	public ResponseEntity<?> getUserByEmail(@PathVariable String email) {

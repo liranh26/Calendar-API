@@ -29,10 +29,25 @@ public class HTEventUserDao implements EventUserDao {
 	}
 
 	@Override
-	public void updateUserInEvent(EventUser eventUser, Integer updatedId) throws DaoException {
+	public void updateUserEvent(EventUser eventUser) throws DaoException {
 		template.merge(eventUser);
 	}
 
+
+	@Override
+	public EventUser getEventForUser(EventUser eventUser) throws DaoException {
+		DetachedCriteria criteria = DetachedCriteria.forClass(EventUser.class);
+		criteria.add(Restrictions.eq("eventId", eventUser.getEventId()));
+		criteria.add(Restrictions.eq("userId", eventUser.getUserId()));
+		
+//		return template.findByExample(eventUser).get(0);
+		
+		List<EventUser> res = (List<EventUser>) template.findByCriteria(criteria);
+		if (res.isEmpty())
+			throw new DaoException("No such event in the DB");
+
+		return res.get(0);
+	}
 
 	@Override
 	public void deleteUserFromEvent(EventUser eventUser) throws DaoException {

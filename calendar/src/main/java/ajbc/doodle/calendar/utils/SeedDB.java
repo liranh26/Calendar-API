@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,6 @@ import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.enums.EventRepeating;
 import ajbc.doodle.calendar.services.EventService;
 import ajbc.doodle.calendar.services.EventUserService;
-import ajbc.doodle.calendar.services.NotificationManager;
 import ajbc.doodle.calendar.services.NotificationService;
 import ajbc.doodle.calendar.services.UserService;
 
@@ -58,7 +58,7 @@ public class SeedDB {
 			
 			seedUsers();
 			seedEvents();
-//			seedNotifications();
+			seedNotifications();
 //			seedEventUsers();
 		} catch (DaoException e) {
 			e.printStackTrace();
@@ -159,62 +159,101 @@ public class SeedDB {
 
 	public void seedEvents() throws DaoException {
 
-		List<User> users = userService.getAllUsers();
-
-		Event event = new Event("wedding", 0, LocalDateTime.of(2022, 8, 7, 20, 0),
+		List<User> users;
+		users = userService.getAllUsers();
+		
+		Event event = new Event(users.get(0).getUserId(), "wedding", 0, LocalDateTime.of(2022, 8, 7, 20, 0),
 				LocalDateTime.of(2022, 8, 7, 23, 30), "Troya", "Tomer getting married",
 				EventRepeating.NONE, 0);
 
-		event.addGuests(users.get(0), users.get(1));
-		event.setOwner(users.get(0));
+		
 		event.setEventOwnerId(users.get(0).getUserId());
-		
-		userService.updateUser(users.get(0));
-		
-//		eventService.addEventToDB(event);
-		
-		Event event2 = new Event("shopping", 0, LocalDateTime.of(2022, 7, 7, 16, 0),
-				LocalDateTime.of(2022, 7, 7, 18, 30), "Tel-Aviv", "buying equipment",
-				EventRepeating.WEEKLY, 0);
-		
-		event2.addGuests(users.get(1), users.get(2));
-		event2.setOwner(users.get(1));
-		event2.setEventId(users.get(2).getUserId());
+		event.setOwner(users.get(0));
 
+		eventService.addEventToDB(event);
+		
+		event = eventService.getEventById(event.getEventId());
+		event.addGuests(users.get(0), users.get(1));
+
+		userService.updateUser(users.get(0));
 		userService.updateUser(users.get(1));
 
-//		eventService.addEventToDB(event);
 		
+		Event event2 = new Event(users.get(1).getUserId(), "shopping", 0, LocalDateTime.of(2022, 8, 8, 16, 0),
+				LocalDateTime.of(2022, 8, 8, 18, 30), "Tel-Aviv", "buying equipment",
+				EventRepeating.WEEKLY, 0);
+		
+		users = userService.getAllUsers();
+		
+		event2.setEventOwnerId(users.get(1).getUserId());
+		event2.setOwner(users.get(1));
+
+		eventService.addEventToDB(event2);
+		
+		event2 =eventService.getEventById(event2.getEventId());
+		event2.addGuests(users.get(1), users.get(2));
+
+//		eventService.updateEvent(event2, event2.getEventId());
+		
+		userService.updateUser(users.get(1));
+		userService.updateUser(users.get(2));
+	
 
 	}
 
 	public void seedNotifications() throws DaoException {
-		List<User> users = userService.getAllUsers();
-		List<Event> events = eventService.getAllEvents();
+//		List<User> users = userService.getAllUsers();
+//		List<Event> events = eventService.getAllEvents();
 		
-		Notification not = new Notification(users.get(1).getUserId(), events.get(0).getEventId(), "Remember take the check", 90, ChronoUnit.MINUTES, 0);
 		
-//		not.setEvent(events.get(0));
-		notificationService.addNotificationToDB(not, events.get(0));
+		User user = userService.getUserById(1);
+		Event event = eventService.getEventById(1000);
+
+		EventUser eventUser = new EventUser(user.getUserId() , event.getEventId());
+		eventUser = eventUserService.getEventUser(eventUser);
 		
-		not = new Notification(users.get(2).getUserId(), events.get(1).getEventId(), "Remember your wallet!", 15, ChronoUnit.MINUTES, 0);
-//		not.setEvent(events.get(1));
-		notificationService.addNotificationToDB(not, events.get(1));
-
-
-	}
-
-	public void seedEventUsers() throws DaoException {
-		List<Event> events = eventService.getAllEvents();
-		List<User> users = userService.getAllUsers();
-
-		userService.addUserToEvent(events.get(0).getEventId(), users.get(0).getUserId());
-		userService.addUserToEvent(events.get(0).getEventId(), users.get(1).getUserId());
-		userService.addUserToEvent(events.get(0).getEventId(), users.get(2).getUserId());
-		userService.addUserToEvent(events.get(1).getEventId(), users.get(1).getUserId());
-		userService.addUserToEvent(events.get(1).getEventId(), users.get(2).getUserId());
+		Notification not = new Notification("Remember take the check", 90, ChronoUnit.MINUTES, 0);
 	
+		not.setEventUser(eventUser);
+		
+		notificationService.addNotificationToDB(not);
+		
+		eventUser.addNotifications(not);
+
+		eventUserService.updateEventUser(eventUser);
+
+		
+		
+		user = userService.getUserById(3);
+		event = eventService.getEventById(1001);
+		
+		eventUser = new EventUser(user.getUserId() , event.getEventId());
+		eventUser = eventUserService.getEventUser(eventUser);
+		
+		not = new Notification("Remember your wallet!", 15, ChronoUnit.MINUTES, 0);
+
+		not.setEventUser(eventUser);
+		
+		notificationService.addNotificationToDB(not);
+		
+		eventUser.addNotifications(not);
+
+		eventUserService.updateEventUser(eventUser);
+
 
 	}
+
+//	public void seedEventUsers() throws DaoException {
+//		List<Event> events = eventService.getAllEvents();
+//		List<User> users = userService.getAllUsers();
+//
+//		userService.addUserToEvent(events.get(0).getEventId(), users.get(0).getUserId());
+//		userService.addUserToEvent(events.get(0).getEventId(), users.get(1).getUserId());
+//		userService.addUserToEvent(events.get(0).getEventId(), users.get(2).getUserId());
+//		userService.addUserToEvent(events.get(1).getEventId(), users.get(1).getUserId());
+//		userService.addUserToEvent(events.get(1).getEventId(), users.get(2).getUserId());
+//	
+//
+//	}
 
 }

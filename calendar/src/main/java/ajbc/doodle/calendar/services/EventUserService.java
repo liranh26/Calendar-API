@@ -40,5 +40,14 @@ public class EventUserService {
 		return dao.getEventsByUserId(id);
 		
 	}
+	
+	public EventUser getEventUser(EventUser eventUser) throws DaoException {
+		return dao.getEventForUser(eventUser);
+	}
+	
+	public void updateEventUser(EventUser eventUser)  throws DaoException {
+		dao.updateUserEvent(eventUser);
+	}
+	
 
 }

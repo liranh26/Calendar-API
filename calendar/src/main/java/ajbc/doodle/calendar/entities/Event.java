@@ -63,9 +63,7 @@ public class Event {
 	private String title;
 	private Integer isAllDay;
 	private LocalDateTime startTime;
-//	private LocalDate endDate;
 	private LocalDateTime endTime;
-//	private LocalTime endTime;
 	private String address;
 	private String description;
 
@@ -76,9 +74,7 @@ public class Event {
 
 
 	@ManyToMany(mappedBy = "events")
-	private Set<User> guests = new HashSet<>();
-//	private List<User> guests = new ArrayList<>();
-	
+	private List<User> guests = new ArrayList<>();
 
 
 
@@ -94,25 +90,24 @@ public class Event {
 		this.repeating = repeating;
 		this.discontinued = discontinued;
 	}
-
-
-	public Event( String title, Integer isAllDay, LocalDateTime startTime, LocalDateTime endTime,
-			String address, String description, EventRepeating repeating, Integer discontinued) {
-		this.title = title;
-		this.isAllDay = isAllDay;
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.address = address;
-		this.description = description;
-		this.repeating = repeating;
-		this.discontinued = discontinued;
-	}
 	
 	
 	public void addGuests(User... users) {
 		for (User user : users) {
 			user.addEvent(this);
-			guests.add(user);
+//			guests.add(user);
 		}
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+

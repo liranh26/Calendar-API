@@ -1,6 +1,7 @@
 package ajbc.doodle.calendar.entities;
 
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,7 +33,7 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@ToString
+@ToString
 @Entity
 @Table(name = "notifications")
 public class Notification {
@@ -56,16 +58,16 @@ public class Notification {
 	private Integer discontinued;
 
 
-	@JsonIgnore
-	@ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
-	@JoinColumns({@JoinColumn(name="eventId"), @JoinColumn(name="userId")})
+	
+	@ManyToOne( fetch = FetchType.EAGER)
+	@JoinColumns({@JoinColumn(name="userId") , @JoinColumn(name="eventId")})
 	private EventUser eventUser;
 	
+	
+	
 
-	public Notification(Integer userId, Integer eventId, String title, Integer timeToAlertBefore, ChronoUnit units,
+	public Notification(String title, Integer timeToAlertBefore, ChronoUnit units,
 			Integer discontinued) {
-		this.userId = userId;
-		this.eventId = eventId;
 		this.title = title;
 		this.timeToAlertBefore = timeToAlertBefore;
 		this.units = units;
@@ -80,13 +82,12 @@ public class Notification {
 	}
 	
 	
-
-	@Override
-	public String toString() {
-		return "Notification [notificationId=" + notificationId + ", userId=" + userId + ", eventId=" + eventId
-				+ ", title=" + title + ", timeToAlertBefore=" + timeToAlertBefore + ", units=" + units
-				+ ", discontinued=" + discontinued + "]";
-	}
-
 	
 }
+
+
+
+
+
+
+

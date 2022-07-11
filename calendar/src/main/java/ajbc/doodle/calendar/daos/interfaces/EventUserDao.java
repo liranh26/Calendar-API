@@ -18,7 +18,7 @@ public interface EventUserDao {
 	}
 
 	@Transactional(readOnly = false)
-	public default void updateUserInEvent(EventUser eventUser, Integer updatedId) throws DaoException {
+	public default void updateUserEvent(EventUser eventUser) throws DaoException {
 		throw new DaoException("Method not implemented");
 	}
 

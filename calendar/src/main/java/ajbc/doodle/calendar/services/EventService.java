@@ -94,18 +94,18 @@ public class EventService {
 //		
 //	}
 
-//	public void updateEvent(Event event, Integer userId) throws DaoException {
-//		
+	public void updateEvent(Event event, Integer userId) throws DaoException {
+		
 //		Event oldEvent = getEventById(event.getEventId());
 //		
 //		if(!userId.equals(oldEvent.getEventOwnerId()))
 //			throw new DaoException("The user is not the owner of the event!");
-//		
-//		
+		
+		
 //		event.setNotifications(oldEvent.getNotifications());
-//		
-//		eventDao.updateEvent(event);
-//	}
+		
+		eventDao.updateEvent(event);
+	}
 
 
 

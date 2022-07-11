@@ -71,19 +71,19 @@ public class NotificationService {
 	
 
 
-	public void addNotificationToDB(Notification notification, Event event) throws DaoException {
+	public void addNotificationToDB(Notification notification) throws DaoException {
 //		notification.setEvent(event);
 		dao.addNotification(notification);
 	}
 
-	public Notification createDefaultNotification(Event event) throws DaoException {
-
-		Notification not = new Notification(event.getEventOwnerId(), event.getEventId(), event.getTitle(), 0,
-				ChronoUnit.SECONDS, 0);
-
-		addNotificationToDB(not, event);
-		return not;
-	}
+//	public Notification createDefaultNotification(Event event) throws DaoException {
+//
+//		Notification not = new Notification(event.getEventOwnerId(), event.getEventId(), event.getTitle(), 0,
+//				ChronoUnit.SECONDS, 0);
+//
+//		addNotificationToDB(not, event);
+//		return not;
+//	}
 
 	public List<Notification> getAllNotifications() throws DaoException {
 		return dao.getAllNotifications();

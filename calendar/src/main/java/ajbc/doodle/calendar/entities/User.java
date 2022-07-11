@@ -64,7 +64,7 @@ public class User {
 	@ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
 	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
 	Set<Event> events = new HashSet<Event>();
-	
+
 
 	public void addEvent(Event event) {
 		events.add(event);
@@ -79,4 +79,29 @@ public class User {
 		this.joinDate = joinDate;
 		this.discontinued = discontinued;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
