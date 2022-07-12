@@ -4,6 +4,7 @@ import java.net.http.HttpClient;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +78,7 @@ public class NotificationController {
 		
 			notification = notificationService.createNotification(notification, eventId, userId);
 			
-			manager.addNotification(notification);
+			manager.addNotifications(notificationService.notificationAsList(notification));
 			
 			return ResponseEntity.status(HttpStatus.CREATED).body(notification);
 		} catch (DaoException e) {
@@ -97,8 +98,7 @@ public class NotificationController {
 	
 			notifications = notificationService.addListNotificationsToDB(notifications);
 			
-//			for (Notification notification : notifications) 
-//				manager.addNotification(notification);
+			manager.addNotifications(notifications);
 			
 			return ResponseEntity.status(HttpStatus.CREATED).body(notifications);
 		} catch (DaoException e) {
