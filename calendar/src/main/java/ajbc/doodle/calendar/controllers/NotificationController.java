@@ -71,7 +71,7 @@ public class NotificationController {
 	
 
 	@PostMapping(path = "/{userId}/{eventId}")
-	public ResponseEntity<?> addNotification(@RequestBody Notification notification, @PathVariable Integer eventId, @PathVariable Integer userId)
+	public ResponseEntity<?> addNotification(@RequestBody Notification notification, @PathVariable Integer userId, @PathVariable Integer eventId)
 			throws DaoException {
 		try {
 		
@@ -97,8 +97,8 @@ public class NotificationController {
 	
 			notifications = notificationService.addListNotificationsToDB(notifications);
 			
-			for (Notification notification : notifications) 
-				manager.addNotification(notification);
+//			for (Notification notification : notifications) 
+//				manager.addNotification(notification);
 			
 			return ResponseEntity.status(HttpStatus.CREATED).body(notifications);
 		} catch (DaoException e) {

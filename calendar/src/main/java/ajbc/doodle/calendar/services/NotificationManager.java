@@ -59,6 +59,7 @@ public class NotificationManager {
 
 	public void addNotification(Notification notification) throws DaoException {
 
+		System.out.println("not in :   " + notification);
 		insertNotifications(notification);
 
 		initManager();
@@ -66,25 +67,32 @@ public class NotificationManager {
 	}
 	
 	private void insertNotifications(Notification notification) {
-			if(notification.getDiscontinued() == 0)
-				this.notifications.add(notification);
-			
-			if(notifications.isEmpty())
-				currNotification = notification;
+		if(notifications.isEmpty())
+			currNotification = notification;
+
+		if(notification.getDiscontinued() == 0)
+			this.notifications.add(notification);
+		
+		System.out.println("queue size :  " + notifications.size() + ",   " + this.notifications);
 	}
 
 	public void initManager() {
-
+		System.out.println("curr not : " + currNotification.getAlertTime());
+		System.out.println("queue peek not : " + notifications.peek().getAlertTime());
+		
+		System.out.println("compare:   " + currNotification.getAlertTime().compareTo(notifications.peek().getAlertTime()));
+		
 		if (0 > currNotification.getAlertTime().compareTo(notifications.peek().getAlertTime())) {
 			managerThread.interrupt();
 
-			startThreadManager();
 		}
 
+		startThreadManager();
 	}
 
 	private void startThreadManager() {
 		managerThread = new Thread(() -> {
+			System.out.println("hi");
 			try {
 				buildThread();
 			} catch (DaoException e) {
@@ -110,11 +118,13 @@ public class NotificationManager {
 
 		Runnable task = new NotificationTask(nots, subs, msgConfig);
 
-		task.run();
-		
 		long delay = getDelayTime(currNotification);
 		
+		System.out.println("delay :   " + delay);
+		
 		Thread.sleep(delay*MILLI_SECOND);
+
+		task.run();
 	}
 
 	private List<Integer> getUsersId(List<Notification> nots) throws DaoException {
@@ -136,7 +146,7 @@ public class NotificationManager {
 		Notification tmp = notifications.poll();
 		nots.add(tmp);
 		
-		while (tmp.getAlertTime().equals(notifications.peek().getAlertTime()))
+		while (notifications.size() > 0 && tmp.getAlertTime().equals(notifications.peek().getAlertTime()))
 			nots.add(notifications.poll());
 
 		return nots;
