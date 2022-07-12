@@ -71,7 +71,7 @@ public class Notification {
 		this.title = title;
 		this.timeToAlertBefore = timeToAlertBefore;
 		this.units = units;
-		this.discontinued = discontinued;
+		this.discontinued = 0;
 	}
 
 

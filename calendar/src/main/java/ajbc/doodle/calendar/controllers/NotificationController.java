@@ -78,7 +78,7 @@ public class NotificationController {
 		
 			notification = notificationService.createNotification(notification, eventId, userId);
 			
-			manager.addNotifications(notificationService.notificationAsList(notification));
+			manager.addNotifications(notificationService.getAllNotifications());
 			
 			return ResponseEntity.status(HttpStatus.CREATED).body(notification);
 		} catch (DaoException e) {
@@ -98,7 +98,7 @@ public class NotificationController {
 	
 			notifications = notificationService.addListNotificationsToDB(notifications);
 			
-			manager.addNotifications(notifications);
+			manager.addNotifications(notificationService.getAllNotifications());
 			
 			return ResponseEntity.status(HttpStatus.CREATED).body(notifications);
 		} catch (DaoException e) {

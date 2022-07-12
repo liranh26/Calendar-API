@@ -188,11 +188,4 @@ public class NotificationService {
 	}
 
 
-	public List<Notification> notificationAsList(Notification notification){
-		List<Notification> not = new ArrayList<Notification>();
-		not.add(notification);
-		return not;
-	}
-
-
 }

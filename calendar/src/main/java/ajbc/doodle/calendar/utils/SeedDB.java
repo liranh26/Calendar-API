@@ -73,7 +73,7 @@ public class SeedDB {
 				+ "birthdate date,\r\n"
 				+ "joinDate date,\r\n"
 				+ "discontinued int,\r\n"
-				+ "endpoint nvarchar(256),\r\n"
+				+ "endpoint nvarchar(512),\r\n"
 				+ "expirationTime bigint,\r\n"
 				+ "p256dh nvarchar(128),\r\n"
 				+ "auth nvarchar(128),\r\n"
