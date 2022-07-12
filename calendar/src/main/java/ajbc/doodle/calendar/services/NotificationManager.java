@@ -133,7 +133,6 @@ public class NotificationManager {
 		while (notifications.size() > 0 && tmp.getAlertTime().equals(notifications.peek().getAlertTime())) {
 			Notification not = notifications.poll();
 			nots.add(not);
-//			managerService.setNotificationInactive(not);
 		}
 
 		return nots;
@@ -151,7 +150,31 @@ public class NotificationManager {
 		return delay;
 	}
 	
+	//TODO update, delete
 	
+	public void updateListNotificationInQueue(List<Notification> notsToUpdate) {
+		notsToUpdate.stream().forEach(n -> updateNotificationQueue(n));
+	}
+	
+	public void updateNotificationQueue(Notification notToUpdate) {
+		for (Notification notification : notifications) 
+			if(notification.getNotificationId() == notToUpdate.getNotificationId()) {
+				notifications.remove(notification);
+				notifications.add(notToUpdate);
+			}
+		
+	}
+	
+	public void deleteListNotificationInQueue(List<Notification> notsToUpdate) {
+		notsToUpdate.stream().forEach(n -> deleteNotificationQueue(n));
+	}
+	
+	public void deleteNotificationQueue(Notification notToDelete) {
+		for (Notification notification : notifications) 
+			if(notification.getNotificationId() == notToDelete.getNotificationId())
+				notifications.remove(notToDelete);
+		
+	}
 	
 
 }

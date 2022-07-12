@@ -50,9 +50,6 @@ public class NotificationController {
 
 	@Autowired
 	private NotificationService notificationService;
-
-//	@Autowired
-//	private EventService eventService;
 	
 	@Autowired
 	private NotificationManager manager;
@@ -177,6 +174,8 @@ public class NotificationController {
 			
 			notificationService.updateNotification(notification);
 			
+			manager.updateNotificationQueue(notification);
+			
 			return ResponseEntity.status(HttpStatus.OK).body(notification);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
@@ -194,6 +193,8 @@ public class NotificationController {
 		try {
 	
 			notificationService.updateListNotifications(notifications);
+			
+			manager.updateListNotificationInQueue(notifications);
 			
 			return ResponseEntity.status(HttpStatus.OK).body(notifications);
 		} catch (DaoException e) {
@@ -218,6 +219,8 @@ public class NotificationController {
 				notificationService.softDelete(notification);
 			else
 				notificationService.hardDelete(notification);
+			
+			manager.deleteNotificationQueue(notification);
 
 			return ResponseEntity.ok(notification);
 		} catch (DaoException e) {
@@ -236,6 +239,8 @@ public class NotificationController {
 		try {
 			
 			notificationService.deleteListNotificatioins(map, notifications, ids);
+			
+			manager.deleteListNotificationInQueue(notifications);
 
 			return ResponseEntity.ok(notifications);
 		} catch (DaoException e) {
