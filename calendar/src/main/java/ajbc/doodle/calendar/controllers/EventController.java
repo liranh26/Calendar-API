@@ -130,7 +130,7 @@ public class EventController {
 	/*** UPDATE ***/
 	
 	@PutMapping(path = "/{eventId}")
-	public ResponseEntity<?> updateProduct(@RequestBody Event event, @PathVariable Integer eventId){
+	public ResponseEntity<?> updateEvent(@RequestBody Event event, @PathVariable Integer eventId){
 		
 		try {
 			event.setEventId(eventId);
@@ -138,6 +138,22 @@ public class EventController {
 			
 			event = eventService.getEventById(event.getEventId());
 			return ResponseEntity.status(HttpStatus.OK).body(event);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("failed to update user in DB.");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg) ;
+		}
+	}
+	
+	@PutMapping
+	public ResponseEntity<?> updateListEvents(@RequestBody List<Event> events){
+		
+		try {
+
+			eventService.updateListOfEvents(events);
+			
+			return ResponseEntity.status(HttpStatus.OK).body(events);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
@@ -172,5 +188,24 @@ public class EventController {
 		}
 	}
 	
+	
+	@DeleteMapping 
+	public ResponseEntity<?> deleteListOfEvents(@RequestParam Map<String, String> map, @RequestBody List<Event> events) {
+		Collection<String> values = map.values();
+		
+		try {
+			if (values.contains("soft"))
+				eventService.softDeleteListOfEvents(events);
+			else
+				eventService.hardDeleteListOfEvents(events);
+
+			return ResponseEntity.ok(events);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("failed to update user in DB.");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
+		}
+	}
 	
 }

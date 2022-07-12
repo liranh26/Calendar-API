@@ -31,11 +31,10 @@ public class EventService {
 	@Autowired
 	@Qualifier("htEventDao")
 	EventDao eventDao;
-	
+
 	@Autowired
 	@Qualifier("htEventUserDao")
 	EventUserDao eventUserDao;
-
 
 	@Autowired
 	@Qualifier("htUserDao")
@@ -43,44 +42,40 @@ public class EventService {
 
 	@Autowired
 	private NotificationService notificationService;
-	
+
 	public Event createEventForUser(Integer userId, Event event) throws DaoException {
-		
+
 		User user = userDao.getUser(userId);
 
 		event.setEventOwnerId(user.getUserId());
 		event.setOwner(user);
 
 		addEventToDB(event);
-		
+
 		return event;
 	}
-	
+
 	public List<Event> createEventsToUser(Integer userId, List<Event> events) throws DaoException {
-		for (Event event : events) 
+		for (Event event : events)
 			createEventForUser(userId, event);
-		
+
 		return events;
 	}
-	
-	
-	//TODO fix default notification
+
+	// TODO fix default notification
 	public void addEventToDB(Event event) throws DaoException {
 		eventDao.addEvent(event);
 //		notificationService.createDefaultNotification(event);
 	}
 
-	
 	public List<Event> getAllEvents() throws DaoException {
 		return eventDao.getAllEvents();
 	}
 
-	
 	public void deleteAllEvents() throws DaoException {
 		eventDao.deleteAllEvents();
 	}
 
-	
 	public Event getEventById(Integer eventId) throws DaoException {
 		return eventDao.getEvent(eventId);
 	}
@@ -105,53 +100,75 @@ public class EventService {
 		return events.stream().filter(e -> eventUser.contains(e.getEventId())).toList();
 	}
 
-	//TODO add guests to event
+	// TODO add guests to event
 //	public void addGuestToEvent(Event event, Integer userId) throws DaoException {
 //		event.getGuests().add(userDao.getUser(userId));
 //		eventUserService.addUserToEvent(new EventUser(event.getEventId(), userId));
 //		
 //	}
 
+	
+	public void updateListOfEvents(List<Event> events) throws DaoException {
+		for (Event event : events) 
+			updateEvent(event);
+	
+	}
+	
+	
 	public void updateEvent(Event event) throws DaoException {
-		
+
 		User user = userDao.getUser(event.getEventOwnerId());
 		event.setOwner(user);
-		
+
 		eventDao.updateEvent(event);
+	}
+
+	
+	public void softDeleteListOfEvents(List<Event> events) throws DaoException {
+		for (Event event : events) {
+			User user = userDao.getUser(event.getEventOwnerId());
+			event.setOwner(user);			
+			softDelete(event);
+		}
+			
 	}
 
 	public void softDelete(Event event) throws DaoException {
 
 		event.setDiscontinued(1);
 		eventDao.updateEvent(event);
-		
+
 	}
 
+	public void hardDeleteListOfEvents(List<Event> events) throws DaoException {
+		for (Event event : events)
+			hardDelete(event);
+	}
+	
 	public void hardDelete(Event event) throws DaoException {
 		User user = userDao.getUser(event.getEventOwnerId());
 		event.setOwner(user);
-		
-		deleteEventNotifications(event);
-		
-		deleteUsersFromEvent(event);
-		
-		eventDao.deleteEvent(event);
-		
-	}
 
+		deleteEventNotifications(event);
+
+		deleteUsersFromEvent(event);
+
+		eventDao.deleteEvent(event);
+
+	}
 
 	private void deleteEventNotifications(Event event) throws DaoException {
 		List<Notification> nots = notificationService.getNotificationsByEvent(event.getEventId());
-		for (Notification notification : nots) 
+		for (Notification notification : nots)
 			notificationService.hardDelete(notification);
 	}
 
 	private void deleteUsersFromEvent(Event event) throws DaoException {
-		List<EventUser> users = eventUserDao.getAllUsersForEvent(new EventUser(event.getEventOwnerId(), event.getEventId()));
-		for (EventUser eventUser : users) 
+		List<EventUser> users = eventUserDao
+				.getAllUsersForEvent(new EventUser(event.getEventOwnerId(), event.getEventId()));
+		for (EventUser eventUser : users)
 			eventUserDao.deleteUserEvent(eventUser);
 	}
-
 
 
 

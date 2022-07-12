@@ -235,13 +235,12 @@ public class NotificationController {
 	@DeleteMapping 
 	public ResponseEntity<?> deleteListNotificatioins(@RequestParam Map<String, String> map, @RequestBody List<Notification> notifications) {
 		Collection<String> values = map.values();
-		
 		try {
 			
 			if (values.contains("soft"))
-				notificationService.softDeleteListNotificationInQueue(notifications);
+				notificationService.softDeleteListNotification(notifications);
 			else
-				notificationService.hardDeleteListNotificationInQueue(notifications);
+				notificationService.hardDeleteListNotification(notifications);
 
 			manager.deleteListNotificationInQueue(notifications);
 

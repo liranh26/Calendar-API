@@ -38,7 +38,7 @@ public class NotificationManager {
 	private final int INITIAL_SIZE=10;
 	private final int MILLI_SECOND = 1000;
 	private Thread managerThread = new Thread();
-	private Notification currNotification;
+//	private Notification currNotification;
 	private PriorityBlockingQueue<Notification> notifications = new PriorityBlockingQueue<Notification>(INITIAL_SIZE,
 			timeComparator);
 
@@ -150,7 +150,7 @@ public class NotificationManager {
 		return delay;
 	}
 	
-	//TODO update, delete
+	//TODO update, delete - rethink mybe to add new queue
 	
 	public void updateListNotificationInQueue(List<Notification> notsToUpdate) {
 		notsToUpdate.stream().forEach(n -> updateNotificationQueue(n));

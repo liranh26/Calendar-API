@@ -95,9 +95,11 @@ public class Event {
 	public void addGuests(User... users) {
 		for (User user : users) {
 			user.addEvent(this);
-//			guests.add(user);
 		}
 	}
+
+	
+	
 }
 
 

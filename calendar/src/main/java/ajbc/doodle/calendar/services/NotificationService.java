@@ -176,7 +176,7 @@ public class NotificationService {
 		return notifications;
 	}
 
-	public void softDeleteListNotificationInQueue( List<Notification> notifications) throws DaoException {
+	public void softDeleteListNotification( List<Notification> notifications) throws DaoException {
 
 		for (Notification notification : notifications) {
 			notification = dao.getNotification(notification.getNotificationId());
@@ -184,7 +184,7 @@ public class NotificationService {
 		}
 	}
 
-	public void hardDeleteListNotificationInQueue(List<Notification> notifications) throws DaoException {
+	public void hardDeleteListNotification(List<Notification> notifications) throws DaoException {
 
 		for (Notification notification : notifications) {
 			notification = dao.getNotification(notification.getNotificationId());
