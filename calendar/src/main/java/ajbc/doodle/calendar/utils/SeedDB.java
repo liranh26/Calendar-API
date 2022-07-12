@@ -147,8 +147,6 @@ public class SeedDB {
 		userDao.addUser(new User("Snir", "Hadad", "test2@test.com", LocalDate.of(1993, 7, 8), LocalDate.of(2022, 5, 5), 0));
 		userDao.addUser(new User("Sapir", "Hadad", "test3@test.com", LocalDate.of(1990, 7, 23), LocalDate.of(2022, 6, 6), 0));
 
-//		userService.getAllUsers().stream().forEach(System.out::println);
-
 	}
 
 	public void seedEvents() throws DaoException {

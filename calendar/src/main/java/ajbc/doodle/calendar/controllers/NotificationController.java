@@ -232,14 +232,17 @@ public class NotificationController {
 	}
 
 	
-	//TODO FIX - how to get notification id before delete.
 	@DeleteMapping 
-	public ResponseEntity<?> deleteListNotificatioins(@RequestParam Map<String, String> map, @RequestBody List<Notification> notifications, @RequestBody List<Integer> ids) {
-
+	public ResponseEntity<?> deleteListNotificatioins(@RequestParam Map<String, String> map, @RequestBody List<Notification> notifications) {
+		Collection<String> values = map.values();
+		
 		try {
 			
-			notificationService.deleteListNotificatioins(map, notifications, ids);
-			
+			if (values.contains("soft"))
+				notificationService.softDeleteListNotificationInQueue(notifications);
+			else
+				notificationService.hardDeleteListNotificationInQueue(notifications);
+
 			manager.deleteListNotificationInQueue(notifications);
 
 			return ResponseEntity.ok(notifications);

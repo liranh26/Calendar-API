@@ -176,16 +176,20 @@ public class NotificationService {
 		return notifications;
 	}
 
-	public void deleteListNotificatioins(Map<String, String> map, List<Notification> notifications, List<Integer> ids) throws DaoException {
-		Collection<String> values = map.values();
-		for (int i=0; i < ids.size(); i++) {
-			notifications.get(i).setNotificationId(ids.get(i));
-			if (values.contains("soft"))
-				softDelete(notifications.get(i));
-			else
-				hardDelete(notifications.get(i));
-		}		
+	public void softDeleteListNotificationInQueue( List<Notification> notifications) throws DaoException {
+
+		for (Notification notification : notifications) {
+			notification = dao.getNotification(notification.getNotificationId());
+			softDelete(notification);
+		}
 	}
 
+	public void hardDeleteListNotificationInQueue(List<Notification> notifications) throws DaoException {
+
+		for (Notification notification : notifications) {
+			notification = dao.getNotification(notification.getNotificationId());
+			softDelete(notification);
+		}
+	}
 
 }
