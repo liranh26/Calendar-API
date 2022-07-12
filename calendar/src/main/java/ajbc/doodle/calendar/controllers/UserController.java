@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.auth0.jwt.algorithms.Algorithm;
@@ -41,6 +42,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -164,46 +166,6 @@ public class UserController {
 		}
 	}
 	
-
-	/*** UPDATE ***/
-	
-	@PutMapping(path = "/{id}")
-	public ResponseEntity<?> updateProduct(@RequestBody User user, @PathVariable Integer id) {
-
-		try {
-			user.setUserId(id);
-			userService.updateUser(user);
-			user = userService.getUserById(user.getUserId());
-			return ResponseEntity.status(HttpStatus.OK).body(user);
-		} catch (DaoException e) {
-			ErrorMessage errMsg = new ErrorMessage();
-			errMsg.setData(e.getMessage());
-			errMsg.setMessage("failed to update user in DB.");
-			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
-		}
-	}
-
-	@DeleteMapping(path = "/{id}")
-	public ResponseEntity<?> softDeleteUser(@PathVariable Integer id) {
-
-		try {
-			userService.deleteUser(id);
-
-			User user = userService.getUserById(id);
-			return ResponseEntity.status(HttpStatus.OK).body(user);
-		} catch (DaoException e) {
-			ErrorMessage errMsg = new ErrorMessage();
-			errMsg.setData(e.getMessage());
-			errMsg.setMessage("failed to delete user from DB.");
-			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
-		}
-	}
-	
-	
-	
-	
-	private final Map<String, Subscription> subscriptions = new ConcurrentHashMap<>();
-	
 	@PostMapping("/login/{email}")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<?> subscribe(@RequestBody Subscription subscription, @PathVariable(required = false) String email) {
@@ -219,7 +181,6 @@ public class UserController {
 			errMsg.setMessage("failed to subscribe user with email: "+email);
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
-	
 
 	}
 	
@@ -239,17 +200,68 @@ public class UserController {
 			errMsg.setMessage("failed to unsubscribe user with email: "+email);
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
-		
-
 	
 	}
 	
 	
 	
+
+	/*** UPDATE ***/
 	
+	@PutMapping(path = "/{id}")
+	public ResponseEntity<?> updateUser(@RequestBody User user, @PathVariable Integer id) {
 
+		try {
+			user.setUserId(id);
+			userService.updateUser(user);
+			
+			return ResponseEntity.status(HttpStatus.OK).body(user);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("failed to update user in DB.");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
+		}
+	}
 
+	@PutMapping
+	public ResponseEntity<?> updateListOfUsers(@RequestBody List<User> users) {
 
+		try {
 
+			userService.updateListOfUsers(users);
+
+			return ResponseEntity.status(HttpStatus.OK).body(users);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("failed to update user in DB.");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
+		}
+	}
+	
+	/*** DELETE ***/
+	
+	@DeleteMapping(path = "/{id}")
+	public ResponseEntity<?> softDeleteUser(@RequestParam Map<String, String> map, @PathVariable Integer id) {
+		Collection<String> values = map.values();
+		try {
+			User user = userService.getUserById(id);
+			
+			if (values.contains("soft"))
+				userService.softDeleteUser(user);
+			else
+				userService.hardDeleteUser(user);
+
+			
+			return ResponseEntity.ok(user);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("failed to delete user from DB.");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
+		}
+	}
+	
 
 }

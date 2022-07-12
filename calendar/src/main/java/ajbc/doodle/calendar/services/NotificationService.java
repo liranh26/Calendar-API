@@ -94,6 +94,8 @@ public class NotificationService {
 		return userDao.getSubscriptionByUserId(userId);
 	}
 	
+	/*** UPDATE ***/
+	
 	public void updateNotification(Notification notification) throws DaoException {
 		EventUser eventUser = new EventUser(notification.getUserId() , notification.getEventId());
 		eventUser = eventUserDao.getEventForUser(eventUser);
@@ -145,14 +147,13 @@ public class NotificationService {
 		return dao.getAllNotifications();
 	}
 
-	public void deleteAllNotifications() throws DaoException {
-		dao.deleteAllNotifications();
-	}
 
 	public Notification getNotificationById(Integer id) throws DaoException {
 		return dao.getNotification(id);
 	}
 
+	/*** DELETE ***/
+	
 	public void softDelete(Notification notification) throws DaoException {
 		notification.setDiscontinued(1);
 		dao.updateNotification(notification);

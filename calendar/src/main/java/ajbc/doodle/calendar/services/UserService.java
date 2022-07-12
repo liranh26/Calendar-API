@@ -41,9 +41,11 @@ import ajbc.doodle.calendar.ServerKeys;
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.daos.interfaces.EventDao;
 import ajbc.doodle.calendar.daos.interfaces.EventUserDao;
+import ajbc.doodle.calendar.daos.interfaces.NotificationDao;
 import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.EventUser;
+import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
@@ -58,11 +60,24 @@ public class UserService {
 	@Autowired
 	@Qualifier("htEventDao")
 	EventDao eventDao;
+
+//	@Autowired
+//	private EventService eventService;
 	
 	@Autowired
 	@Qualifier("htEventUserDao")
 	EventUserDao eventUserdao;
 
+	@Autowired
+	@Qualifier("htNotificationDao")
+	NotificationDao notificationDao;
+	
+	public void updateListOfUsers(List<User> users) throws DaoException {
+		for (User user : users) 
+			updateUser(user);
+		
+	}
+	
 	public void updateUser(User user) throws DaoException {
 		List<EventUser> eventUsers = eventUserdao.getEventsByUserId(user.getUserId());
 		
@@ -108,15 +123,9 @@ public class UserService {
 			users.add(getUserById(eventUser.getUserId()));
 
 		return users;
-	}
+	}	
 
 	
-
-
-	public void deleteUser(Integer id) throws DaoException {
-		userDao.deleteUser(id);
-		
-	}
 
 	public void addUserSubscription(String email, Subscription subscription) throws DaoException {
 		User user = getUserByEmail(email);
@@ -144,6 +153,54 @@ public class UserService {
 		for (User user : users) 
 			addUser(user);	
 	}
+
+	
+	/*** DELETE ***/
+	
+	public void softDeleteUser(User user) throws DaoException {
+		user.setDiscontinued(1);
+		updateUser(user);
+	}
+
+	public void hardDeleteUser(User user) throws DaoException {
+		
+		hardDeleteUserNotifications(user);
+		
+		hardDeleteEventUserOfUser(user);
+		
+		hardDeleteEventsOfUser(user);
+		
+		userDao.deleteUser(user);
+	}
+
+	private void hardDeleteEventsOfUser(User user) throws DaoException {
+		List<Event> events = eventDao.getEventsForUser(user.getUserId());
+		
+		for (Event event : events) {
+			event.setOwner(user);
+			List<EventUser> eventUsers = eventUserdao.getUsersByEventId(event.getEventId());
+			for (EventUser eventUser : eventUsers) 
+				eventUserdao.deleteUserEvent(eventUser);
+			eventDao.deleteEvent(event);
+		}
+		
+	}
+
+	private void hardDeleteEventUserOfUser(User user) throws DaoException {
+		List<EventUser> eventUsers = eventUserdao.getEventsByUserId(user.getUserId());
+		
+		for (EventUser eventUser : eventUsers) 
+			eventUserdao.deleteUserEvent(eventUser);
+	}
+
+	private void hardDeleteUserNotifications(User user) throws DaoException {
+		List<Notification> userNotifications = notificationDao.getNotificationsByUser(user.getUserId());
+		for (Notification notification : userNotifications) 
+			notificationDao.deleteNotification(notification);
+		
+	}
+
+
 
 
 }

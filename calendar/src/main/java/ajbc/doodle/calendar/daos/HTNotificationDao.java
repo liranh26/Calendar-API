@@ -70,6 +70,11 @@ public class HTNotificationDao implements NotificationDao {
 		return (List<Notification>) template.findByCriteria(criteria);
 	}
 
-	
+	@Override
+	public List<Notification> getNotificationsByUser(Integer userId) throws DaoException {
+		DetachedCriteria criteria = DetachedCriteria.forClass(Notification.class);
+		criteria.add(Restrictions.eq("userId", userId));
+		return (List<Notification>) template.findByCriteria(criteria);
+	}
 
 }

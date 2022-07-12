@@ -39,9 +39,7 @@ public class HTEventUserDao implements EventUserDao {
 		DetachedCriteria criteria = DetachedCriteria.forClass(EventUser.class);
 		criteria.add(Restrictions.eq("eventId", eventUser.getEventId()));
 		criteria.add(Restrictions.eq("userId", eventUser.getUserId()));
-		
-//		return template.findByExample(eventUser).get(0);
-		
+
 		List<EventUser> res = (List<EventUser>) template.findByCriteria(criteria);
 		if (res.isEmpty())
 			throw new DaoException("No such event in the DB");

@@ -44,10 +44,8 @@ public class HTUserDao implements UserDao {
 	}
 
 	@Override
-	public void deleteUser(Integer userId) throws DaoException {	
-		User user = getUser(userId);
-		user.setDiscontinued(1);
-		updateUser(user);
+	public void deleteUser(User user) throws DaoException {	
+		template.delete(user);
 	}
 
 	

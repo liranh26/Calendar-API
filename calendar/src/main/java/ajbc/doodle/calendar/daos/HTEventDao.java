@@ -34,6 +34,12 @@ public class HTEventDao implements EventDao {
 		return event;
 	}
 	
+	@Override
+	public List<Event> getEventsForUser(Integer userId) throws DaoException {
+		DetachedCriteria criteria = DetachedCriteria.forClass(Event.class);
+		criteria.add(Restrictions.eq("eventOwnerId", userId));
+		return (List<Event>) template.findByCriteria(criteria);
+	}
 	
 
 	@Override

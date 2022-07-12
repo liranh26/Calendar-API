@@ -80,6 +80,7 @@ public class EventService {
 		return eventDao.getEvent(eventId);
 	}
 
+	//TODO check this function! ********
 	public List<Event> getEventsByUserId(Integer id) throws DaoException {
 		List<Event> events = new ArrayList<Event>();
 		List<EventUser> eventUser = eventUserDao.getEventsByUserId(id);
