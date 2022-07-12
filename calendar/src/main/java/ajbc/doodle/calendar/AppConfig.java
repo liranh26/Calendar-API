@@ -6,7 +6,6 @@ import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.EventUser;
 import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.User;
-import ajbc.doodle.calendar.entities.not;
 
 import java.util.Properties;
 
@@ -64,7 +63,7 @@ public class AppConfig {
 	public LocalSessionFactoryBean sessionFactory(DataSource  dataSource) {
 		LocalSessionFactoryBean factory = new LocalSessionFactoryBean();
 		factory.setDataSource(dataSource);
-		factory.setAnnotatedClasses(User.class, Event.class, Notification.class, EventUser.class, not.class);
+		factory.setAnnotatedClasses(User.class, Event.class, Notification.class, EventUser.class);
 		
 		Properties props = new Properties();
 		props.setProperty("hibernate.dialect", "org.hibernate.dialect.SQLServerDialect");

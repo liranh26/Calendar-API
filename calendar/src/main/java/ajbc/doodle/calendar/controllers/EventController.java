@@ -1,7 +1,6 @@
 package ajbc.doodle.calendar.controllers;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.ErrorMessage;
 import ajbc.doodle.calendar.entities.Event;
-import ajbc.doodle.calendar.entities.Notification;
-import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.services.EventService;
 
 @RestController
@@ -109,10 +106,18 @@ public class EventController {
 		Set<String> keys = map.keySet();
 
 		try {
-			if (keys.contains("startDate") && keys.contains("endDate"))
-				events = eventService.getEventsOfUserInRange(LocalDate.parse(map.get("startDate")),
-						LocalDate.parse(map.get("endDate")), LocalTime.parse(map.get("startTime")),
-						LocalTime.parse(map.get("endTime")), id);
+			if (keys.contains("start") && keys.contains("end")) {
+				LocalDateTime start = LocalDateTime.parse(map.get("start"));
+				LocalDateTime end = LocalDateTime.parse(map.get("end"));
+				events = eventService.getEventsOfUserInRange(start, end, id);				
+			}
+			else if(keys.contains("future"))
+				events = eventService.getFutureEventsForUser(id);
+			else if(keys.contains("minutes") && keys.contains("hours")) {
+				Integer hours = Integer.parseInt(map.get("hours"));
+				Integer minutes = Integer.parseInt(map.get("minutes"));
+				events = eventService.getUserEventsByFollowingTime(id, hours, minutes);
+			}
 			else
 				events = eventService.getEventsByUserId(id);
 			return ResponseEntity.ok(events);
@@ -122,10 +127,30 @@ public class EventController {
 			errMsg.setData(e.getMessage());
 			errMsg.setMessage("Failed to get user with id: " + id);
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
-
 		}
-
 	}
+	
+	@GetMapping(path = "/range")
+	public ResponseEntity<?> getEventsByRange(@RequestParam Map<String, String> map) {
+		Set<String> keys = map.keySet();
+
+		List<Event> events;
+		try {
+			if(keys.contains("start") && keys.contains("end")) {
+				LocalDateTime start = LocalDateTime.parse(map.get("start"));
+				LocalDateTime end = LocalDateTime.parse(map.get("end"));
+				events = eventService.getEventsByRange(start, end);				
+				return ResponseEntity.ok(events);
+			}
+			throw new DaoException("keys doesnt match");
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to get events in range.");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
+		}
+	}
+	
 	
 	/*** UPDATE ***/
 	
@@ -207,5 +232,8 @@ public class EventController {
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 	}
+	
+	
+	
 	
 }

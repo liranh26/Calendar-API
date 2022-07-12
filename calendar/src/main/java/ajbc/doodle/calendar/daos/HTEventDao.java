@@ -63,24 +63,6 @@ public class HTEventDao implements EventDao {
 	public void deleteEvent(Event event) throws DaoException {
 		template.delete(event);
 	}
-
-	
-	
-	
-//	@Override
-//	public List<Event> getEventsOfUserInRange(LocalDate startDate, LocalDate endDate, LocalTime startTime,
-//			LocalTime endTime) throws DaoException {
-//		DetachedCriteria criteria = DetachedCriteria.forClass(Event.class);
-//
-//		criteria.add(Restrictions.ge("startDate", startDate));
-//		criteria.add(Restrictions.le("endDate", endDate));
-//		criteria.add(Restrictions.ge("startTime", startTime));
-//		criteria.add(Restrictions.le("endTime", endTime));
-//		
-//		return (List<Event>) template.findByCriteria(criteria);
-//	}
-
-
 	
 	
 }

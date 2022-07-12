@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -80,7 +81,6 @@ public class EventService {
 		return eventDao.getEvent(eventId);
 	}
 
-	//TODO check this function! ********
 	public List<Event> getEventsByUserId(Integer id) throws DaoException {
 		List<Event> events = new ArrayList<Event>();
 		List<EventUser> eventUser = eventUserDao.getEventsByUserId(id);
@@ -91,16 +91,6 @@ public class EventService {
 		return events;
 	}
 
-	// TODO fix dates between in dao
-	public List<Event> getEventsOfUserInRange(LocalDate startDate, LocalDate endDate, LocalTime startTime,
-			LocalTime endTime, Integer id) throws DaoException {
-
-		List<Event> events = eventDao.getEventsOfUserInRange(startDate, endDate, startTime, endTime);
-		List<EventUser> eventUser = eventUserDao.getUsersByEventId(id);
-
-		return events.stream().filter(e -> eventUser.contains(e.getEventId())).toList();
-	}
-
 	// TODO add guests to event
 //	public void addGuestToEvent(Event event, Integer userId) throws DaoException {
 //		event.getGuests().add(userDao.getUser(userId));
@@ -108,14 +98,12 @@ public class EventService {
 //		
 //	}
 
-	
 	public void updateListOfEvents(List<Event> events) throws DaoException {
-		for (Event event : events) 
+		for (Event event : events)
 			updateEvent(event);
-	
+
 	}
-	
-	
+
 	public void updateEvent(Event event) throws DaoException {
 
 		User user = userDao.getUser(event.getEventOwnerId());
@@ -124,14 +112,13 @@ public class EventService {
 		eventDao.updateEvent(event);
 	}
 
-	
 	public void softDeleteListOfEvents(List<Event> events) throws DaoException {
 		for (Event event : events) {
 			User user = userDao.getUser(event.getEventOwnerId());
-			event.setOwner(user);			
+			event.setOwner(user);
 			softDelete(event);
 		}
-			
+
 	}
 
 	public void softDelete(Event event) throws DaoException {
@@ -145,7 +132,7 @@ public class EventService {
 		for (Event event : events)
 			hardDelete(event);
 	}
-	
+
 	public void hardDelete(Event event) throws DaoException {
 		User user = userDao.getUser(event.getEventOwnerId());
 		event.setOwner(user);
@@ -171,6 +158,24 @@ public class EventService {
 			eventUserDao.deleteUserEvent(eventUser);
 	}
 
+	public List<Event> getFutureEventsForUser(Integer id) throws DaoException {
+		List<Event> events = getEventsByUserId(id);
+		return events.stream().filter(e -> e.getStartTime().isAfter(LocalDateTime.now())).toList();
+	}
 
+	public List<Event> getEventsOfUserInRange(LocalDateTime start, LocalDateTime end, Integer id) throws DaoException {
+		List<Event> events = getEventsByUserId(id);
+		return events.stream().filter(e -> e.getStartTime().isAfter(start) && e.getEndTime().isBefore(end)).toList();
+	}
+
+	public List<Event> getUserEventsByFollowingTime(Integer id, Integer hours, Integer minutes) throws DaoException {
+		return getEventsOfUserInRange(LocalDateTime.now(), LocalDateTime.now().plusHours(hours).plusMinutes(minutes),
+				id);
+	}
+
+	public List<Event> getEventsByRange(LocalDateTime start, LocalDateTime end) throws DaoException {
+		List<Event> events = getAllEvents();
+		return events.stream().filter(e -> e.getStartTime().isAfter(start) && e.getEndTime().isBefore(end)).toList();
+	}
 
 }

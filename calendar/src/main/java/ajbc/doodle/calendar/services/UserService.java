@@ -1,43 +1,16 @@
 package ajbc.doodle.calendar.services;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpRequest.Builder;
-import java.net.http.HttpResponse.BodyHandlers;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.stereotype.Service;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import ajbc.doodle.calendar.Application;
-import ajbc.doodle.calendar.ServerKeys;
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.daos.interfaces.EventDao;
 import ajbc.doodle.calendar.daos.interfaces.EventUserDao;
@@ -60,9 +33,6 @@ public class UserService {
 	@Autowired
 	@Qualifier("htEventDao")
 	EventDao eventDao;
-
-//	@Autowired
-//	private EventService eventService;
 	
 	@Autowired
 	@Qualifier("htEventUserDao")
@@ -126,6 +96,27 @@ public class UserService {
 	}	
 
 	
+	public List<User> getUsersWithEventsInRange(LocalDateTime start, LocalDateTime end) throws DaoException {
+		Set<User> users = new HashSet<User>();
+		
+		List<Event> events = eventDao.getAllEvents().stream()
+				.filter(e -> e.getStartTime().isAfter(start) && e.getEndTime().isBefore(end)).toList();
+	
+		
+		events.stream().forEach(e -> users.addAll(e.getGuests()));
+		
+		
+		for (Event event : events) {
+			 List<EventUser> eventUsers = eventUserdao.getUsersByEventId(event.getEventId());
+			 for (EventUser eventUser : eventUsers) {
+				users.add(userDao.getUser(eventUser.getUserId()));
+			}
+		}
+
+		return users.stream().toList();
+	}
+	
+
 
 	public void addUserSubscription(String email, Subscription subscription) throws DaoException {
 		User user = getUserByEmail(email);

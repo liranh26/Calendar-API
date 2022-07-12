@@ -1,10 +1,7 @@
 package ajbc.doodle.calendar.controllers;
 
-import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,54 +12,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.auth0.jwt.algorithms.Algorithm;
-
-import ajbc.doodle.calendar.ServerKeys;
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.ErrorMessage;
-import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.services.UserService;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.http.HttpRequest;
-import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpRequest.Builder;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import com.auth0.jwt.JWT;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import ajbc.doodle.calendar.Application;
-import ajbc.doodle.calendar.entities.Notification;
-import ajbc.doodle.calendar.entities.not;
-import ajbc.doodle.calendar.entities.webpush.PushMessage;
 import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;
-import ajbc.doodle.calendar.services.CryptoService;
 
 @RestController
 @RequestMapping("/users")
@@ -130,6 +92,30 @@ public class UserController {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
 			errMsg.setMessage("Failed to get user with id: " + id);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
+
+		}
+	}
+	
+
+	@GetMapping(path = "/range")
+	public ResponseEntity<?> getUserById(@RequestParam Map<String, String> map) {
+		List<User> users;
+		Collection<String> values = map.values();
+		Collection<String> keys = map.keySet();
+		
+		try {
+			
+			LocalDateTime start = LocalDateTime.parse(map.get("start"));
+			LocalDateTime end = LocalDateTime.parse(map.get("end"));
+			
+			users = userService.getUsersWithEventsInRange(start, end);
+			
+			return ResponseEntity.ok(users);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to get users in dates range." );
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
 
 		}
