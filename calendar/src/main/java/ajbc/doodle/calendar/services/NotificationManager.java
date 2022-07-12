@@ -50,49 +50,71 @@ public class NotificationManager {
 		}
 	};
 
+	private final int MILLI_SECOND=1000;
+	private Thread managerThread;
+	private Notification currNotification;
 	private PriorityBlockingQueue<Notification> notifications = new PriorityBlockingQueue<Notification>(10,
 			timeComparator);
 
+
 	public void addNotification(Notification notification) throws DaoException {
 
+		insertNotifications(notification);
 
-		startManager(notification);
+		initManager();
+
+	}
+	
+	private void insertNotifications(Notification notification) {
+			if(notification.getDiscontinued() == 0)
+				this.notifications.add(notification);
+			
+			if(notifications.isEmpty())
+				currNotification = notification;
+	}
+
+	public void initManager() {
+
+		if (0 > currNotification.getAlertTime().compareTo(notifications.peek().getAlertTime())) {
+			managerThread.interrupt();
+
+			startThreadManager();
+		}
 
 	}
 
-	Thread managerThread;
-
-	public void startManager(Notification notification) {
-		
-		if(!notifications.isEmpty())
-			managerThread.interrupt();
-
-		notifications.add(notification);
-
-		
-		try {
-//			List<Notification> nots = getClosestNotifcations();
-			
-			List<Notification> nots = new ArrayList<Notification>();
-			nots.add(notifications.peek());
-			
-			List<Integer> usersId = getUsersId(nots);
-
-			List<Subscription> subs = getSubscriptionsByUsersId(usersId);
-
-			Runnable task = new NotificationTask(nots, subs, msgConfig);
-			
-
-			managerThread = new Thread(task);
-
-			managerThread.sleep(30);
-			
-		} catch (InterruptedException | DaoException e) {
-			e.printStackTrace();
-		}
-
+	private void startThreadManager() {
+		managerThread = new Thread(() -> {
+			try {
+				buildThread();
+			} catch (DaoException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
 		managerThread.start();
+	}
 
+	private void buildThread() throws DaoException, InterruptedException {
+		
+		List<Notification> nots = getClosestNotifcations();
+
+		currNotification = nots.get(0);
+		
+		List<Integer> usersId = getUsersId(nots);
+
+		List<Subscription> subs = getSubscriptionsByUsersId(usersId);
+
+		Runnable task = new NotificationTask(nots, subs, msgConfig);
+
+		task.run();
+		
+		long delay = getDelayTime(currNotification);
+		
+		Thread.sleep(delay*MILLI_SECOND);
 	}
 
 	private List<Integer> getUsersId(List<Notification> nots) throws DaoException {
@@ -110,8 +132,14 @@ public class NotificationManager {
 	}
 
 	private List<Notification> getClosestNotifcations() {
+		List<Notification> nots = new ArrayList<Notification>();
+		Notification tmp = notifications.poll();
+		nots.add(tmp);
+		
+		while (tmp.getAlertTime().equals(notifications.peek().getAlertTime()))
+			nots.add(notifications.poll());
 
-		return null;
+		return nots;
 	}
 
 	private long getDelayTime(Notification notification) {
@@ -126,9 +154,6 @@ public class NotificationManager {
 		return delay;
 	}
 
-	private boolean isAlertTimeEarliar(Notification notification) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+
 
 }

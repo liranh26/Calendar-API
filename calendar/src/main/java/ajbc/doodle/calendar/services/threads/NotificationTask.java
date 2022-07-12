@@ -23,19 +23,23 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import org.hibernate.internal.build.AllowSysOut;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.auth0.jwt.JWT;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import ajbc.doodle.calendar.Application;
 import ajbc.doodle.calendar.daos.DaoException;
+import ajbc.doodle.calendar.daos.interfaces.NotificationDao;
 import ajbc.doodle.calendar.entities.ErrorMessage;
 import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.webpush.PushMessage;
 import ajbc.doodle.calendar.entities.webpush.PushMessageConfig;
 import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.services.NotificationService;
+
 
 public class NotificationTask implements Runnable {
 
@@ -45,7 +49,7 @@ public class NotificationTask implements Runnable {
 	private final int NUM_OF_THREADS = 10;
 
 	ExecutorService executorService = Executors.newFixedThreadPool(NUM_OF_THREADS);
-
+	
 	public NotificationTask(List<Notification> nots, List<Subscription> subs, PushMessageConfig config) {
 		this.notifications = nots;
 		this.subscriptions = subs;
@@ -59,6 +63,7 @@ public class NotificationTask implements Runnable {
 			PushMessage msg = new PushMessage("message: ", notifications.get(i).toString());
 			Subscription sub = subscriptions.get(i);
 			executorService.execute(() -> sendPushMessageToUser(sub, msg));
+			
 		}
 
 	}

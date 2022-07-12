@@ -97,7 +97,8 @@ public class NotificationController {
 	
 			notifications = notificationService.addListNotificationsToDB(notifications);
 			
-			//TODO add to manager list.
+			for (Notification notification : notifications) 
+				manager.addNotification(notification);
 			
 			return ResponseEntity.status(HttpStatus.CREATED).body(notifications);
 		} catch (DaoException e) {
