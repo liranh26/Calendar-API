@@ -173,7 +173,7 @@ public class NotificationController {
 			
 			notificationService.updateNotification(notification);
 			
-			manager.updateNotificationQueue(notification);
+//			manager.updateNotificationQueue(notification);
 			
 			return ResponseEntity.status(HttpStatus.OK).body(notification);
 		} catch (DaoException e) {
