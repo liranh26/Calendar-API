@@ -1,10 +1,7 @@
 package ajbc.doodle.calendar.daos.interfaces;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import ajbc.doodle.calendar.daos.DaoException;

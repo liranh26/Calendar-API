@@ -2,8 +2,6 @@ package ajbc.doodle.calendar.entities.webpush;
 
 import java.net.http.HttpClient;
 
-import javax.persistence.Entity;
-
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.algorithms.Algorithm;

@@ -1,13 +1,10 @@
 package ajbc.doodle.calendar.entities;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -24,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
-import ajbc.doodle.calendar.entities.webpush.SubscriptionKeys;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -57,18 +53,15 @@ public class User {
 	@JsonProperty(access = Access.WRITE_ONLY)
 	private String auth;
 
-
 	@JsonIgnore
-	@ManyToMany(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
+	@ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
 	@JoinTable(name = "Event_users", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "eventId"))
 	Set<Event> events = new HashSet<Event>();
 
-	
-	
 	public void addEvent(Event event) {
 		events.add(event);
 	}
-	
+
 	public User(String firstName, String lastName, String email, LocalDate birthDate, LocalDate joinDate) {
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -77,5 +70,5 @@ public class User {
 		this.joinDate = joinDate;
 		this.discontinued = false;
 	}
-	
+
 }

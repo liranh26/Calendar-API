@@ -1,9 +1,7 @@
 package ajbc.doodle.calendar.services;
 
-import java.lang.Thread.State;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -31,6 +29,7 @@ public class NotificationManager {
 	@Autowired
 	private NotificationManagerService managerService;
 
+	// timeComparator compares between the alert time of each notification
 	Comparator<Notification> timeComparator = new Comparator<Notification>() {
 		@Override
 		public int compare(Notification not1, Notification not2) {
@@ -43,27 +42,27 @@ public class NotificationManager {
 	protected PriorityBlockingQueue<Notification> notificationsQueue = new PriorityBlockingQueue<Notification>(
 			INITIAL_SIZE, timeComparator);
 
+	// uses SynchronousQueue only limitation for a cached thread pool is the
+	// available system resources.
 	protected ExecutorService executorService = Executors.newCachedThreadPool();
 
-	public void deleteNotificationAndInitiateThread(Notification notToDelete) {	
+	public void deleteNotificationAndInitiateThread(Notification notToDelete) {
 		deleteNotificationQueue(notToDelete);
 		initiateThreadManager();
 	}
-	
+
 	public void deleteListNotificationInQueue(List<Notification> notsToUpdate) {
 		notsToUpdate.stream().forEach(n -> deleteNotificationQueue(n));
 		initiateThreadManager();
 	}
-	
+
 	protected void deleteNotificationQueue(Notification notToDelete) {
 		for (Notification notification : notificationsQueue)
 			if (notification.getNotificationId() == notToDelete.getNotificationId()) {
 				notificationsQueue.remove(notification);
-				System.out.println("Notification removed! : " + notification);
 				break;
 			}
 	}
-
 
 	public void updateListNotificationInQueue(List<Notification> notsToUpdate) {
 		notsToUpdate.stream().forEach(n -> updateNotificationInQueue(n));
@@ -83,7 +82,7 @@ public class NotificationManager {
 				break;
 			}
 	}
-	
+
 	public void addNotificationAndInitiateThread(Notification notification) throws DaoException {
 		insertNotificationToQueue(notification);
 		initiateThreadManager();
@@ -93,20 +92,18 @@ public class NotificationManager {
 		if (!notification.isDiscontinued())
 			this.notificationsQueue.add(notification);
 	}
-	
-	public void addNotifications(List<Notification> notifications) throws DaoException {		
+
+	public void addNotifications(List<Notification> notifications) throws DaoException {
 		notifications.stream().forEach(n -> insertNotificationToQueue(n));
 		initiateThreadManager();
 	}
-	
+
 	protected void initiateThreadManager() {
 		if (managerThread.isAlive())
 			managerThread.interrupt();
-		
+
 		startThreadManager();
 	}
-
-	// TODO Notification...
 
 	private void startThreadManager() {
 
@@ -126,45 +123,37 @@ public class NotificationManager {
 	@Transactional
 	private void buildThread() throws DaoException, InterruptedException {
 
-		System.out.println("size  :  " + notificationsQueue.size());
-
 		while (!notificationsQueue.isEmpty()) {
 
 			Notification queueHead;
 
-			//
+			// get delay of closest notification (head) of queue
 			queueHead = notificationsQueue.peek();
 			Long delay = getDelayTime(queueHead);
-
-			System.out.println("next notification: " + queueHead);
-			System.out.println("sleep for " + delay);
 
 			if (delay > 0)
 				try {
 					Thread.sleep(delay);
 				} catch (InterruptedException e) {
-					System.out.println("Interupted");
 					break;
 				}
 
-			User user = managerService.getUserByNotification(queueHead); // TODO name
+			User user = managerService.getUserByNotification(queueHead);
 
-			// poll here in case user not logged infinity loop
+			// poll here to avoid infinity loop in case user not logged 
 			queueHead = notificationsQueue.poll();
 
 			if (managerService.isUserLogged(user)) {
 				executorService.execute(new NotificationTask(queueHead, user, msgConfig));
-			} else
-				System.out.println("User not logged!"); // TODO remove before end
+			}
 
+			// mark notification as sent (discontinued = true)
 			managerService.setNotificationsInactive(queueHead);
-
 		}
 
 	}
 
 	protected long getDelayTime(Notification notification) {
-
 		Duration duration = Duration.between(LocalDateTime.now(), notification.getAlertTime());
 		long delay = duration.getSeconds();
 

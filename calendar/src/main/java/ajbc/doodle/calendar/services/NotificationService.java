@@ -1,59 +1,19 @@
 package ajbc.doodle.calendar.services;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpRequest.Builder;
-import java.net.http.HttpResponse.BodyHandlers;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.PriorityBlockingQueue;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import ajbc.doodle.calendar.Application;
-import ajbc.doodle.calendar.ServerKeys;
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.daos.interfaces.EventDao;
 import ajbc.doodle.calendar.daos.interfaces.EventUserDao;
 import ajbc.doodle.calendar.daos.interfaces.NotificationDao;
 import ajbc.doodle.calendar.daos.interfaces.UserDao;
-import ajbc.doodle.calendar.entities.ErrorMessage;
 import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.EventUser;
 import ajbc.doodle.calendar.entities.Notification;
-import ajbc.doodle.calendar.entities.User;
-import ajbc.doodle.calendar.entities.webpush.PushMessage;
 import ajbc.doodle.calendar.entities.webpush.PushMessageConfig;
 import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.entities.webpush.SubscriptionEndpoint;

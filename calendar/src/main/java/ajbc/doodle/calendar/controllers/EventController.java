@@ -32,16 +32,44 @@ public class EventController {
 	@Autowired
 	private EventService eventService;
 
-	/*** CREATE ***/
+	// CREATE //
 	
-	
+	/**
+	 * This method creates an event entered by the user and writes it to the DB. 
+	 *
+	 * @param event - gets an event entered by the user. id is generated automatically for the event.
+	 * @param userId - the owner of the created event.
+	 * @return in case of success the created event, in case failure a custom error message.
+	 */
 	@PostMapping(path = "/single/{userId}")
-	public ResponseEntity<?> createEventToUser(@RequestBody Event event , @PathVariable Integer userId) throws DaoException {
+	public ResponseEntity<?> createEventToUser(@RequestBody Event event , @PathVariable Integer userId) {
 
 		try {
 			event = eventService.createEventForUser(userId, event);
-			
 			return ResponseEntity.status(HttpStatus.CREATED).body(event);
+			
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to create event to the user "+ userId);
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
+		}
+	}
+	
+	/**
+	 * This method creates an List of events entered by the user and writes it to the DB. 
+	 * 
+	 * @param events - gets List of events entered by the user.
+	 * @param userId - the owner of the created events.
+	 * @return in case of success the created events, in case failure a custom error message.
+	 */
+	@PostMapping(path = "/list/{userId}")
+	public ResponseEntity<?> createEventsToUser(@RequestBody List<Event> events , @PathVariable Integer userId) {
+
+		try {
+			events = eventService.createListEventsToUser(userId, events);
+			return ResponseEntity.status(HttpStatus.CREATED).body(events);
+			
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
@@ -50,22 +78,14 @@ public class EventController {
 		}
 	}
 	
-	@PostMapping(path = "/list/{userId}")
-	public ResponseEntity<?> createEventsToUser(@RequestBody List<Event> events , @PathVariable Integer userId) throws DaoException {
-
-		try {
-			
-			events = eventService.createEventsToUser(userId, events);
-			
-			return ResponseEntity.status(HttpStatus.CREATED).body(events);
-		} catch (DaoException e) {
-			ErrorMessage errMsg = new ErrorMessage();
-			errMsg.setData(e.getMessage());
-			errMsg.setMessage("Failed to add usssssser to event.");
-			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
-		}
-	}
-	
+	/**
+	 * This method adds List of guests to an event entered by the user and writes it to the DB. 
+	 * 
+	 * @param users - gets a List of users to add to a specific event.
+	 * @param eventId - the event id to add the List of users entered.
+	 * @return - in case of success the created events, in case failure a custom error message.
+	 * @throws DaoException
+	 */
 	@PostMapping(path = "/guests/{eventId}")
 	public ResponseEntity<?> addGuestsToEvent(@RequestBody List<User> users , @PathVariable Integer eventId) throws DaoException {
 		
@@ -79,7 +99,7 @@ public class EventController {
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
-			errMsg.setMessage("Failed to add usssssser to event.");
+			errMsg.setMessage("Failed to add users to event.");
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 	}
@@ -87,6 +107,12 @@ public class EventController {
 
 	/*** GET ***/
 	
+	
+	/**
+	 * This method sends all events that exist in the DB.
+	 *  
+	 * @return return a List of all events in DB.
+	 */
 	@GetMapping
 	public ResponseEntity<?> getAllEvents() {
 		List<Event> events;
@@ -96,14 +122,20 @@ public class EventController {
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
-			errMsg.setMessage("Failed to get events.");
+			errMsg.setMessage("Failed to get all events from the database.");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
 			
 		}
 		
 	}
 
-	
+	/**
+	 * This method sends an event from the DB by entered id from user.
+	 * In case such event does not exists an error message is returned.
+	 * 
+	 * @param id - the id of the requested event.
+	 * @return
+	 */
 	@GetMapping(path = "/{id}")
 	public ResponseEntity<?> getEventById(@PathVariable Integer id) {
 		Event event;
@@ -119,7 +151,18 @@ public class EventController {
 		}
 	}
 
-
+	/**
+	 * This method send custom events for specific user. 
+	 * It receives @RequestParam map with keys & values of required operations.
+	 * The default is to get all events for a user.
+	 * values: 'start' + 'end' represent events of a user in a range between start date and time to end date and time.
+	 * value: 'future' represent upcoming events of a user.
+	 * values: 'minutes' + 'hours' represent events of a user the next coming num of minutes and hours.
+	 * 
+	 * @param map
+	 * @param id
+	 * @return
+	 */
 	@GetMapping(path = "/user/{id}")
 	public ResponseEntity<?> getEventsForUser(@RequestParam Map<String, String> map, @PathVariable Integer id) {
 		List<Event> events;
@@ -150,6 +193,13 @@ public class EventController {
 		}
 	}
 	
+	/**
+	 * This method send custom events. 
+	 * values: 'start' + 'end' are LocalDateTime variables which represent events in a range between start date and time to end date and time.
+	 * 
+	 * @param map with keys & values of required operations.
+	 * @return range of events between the requested values.
+	 */
 	@GetMapping(path = "/range")
 	public ResponseEntity<?> getEventsByRange(@RequestParam Map<String, String> map) {
 		Set<String> keys = map.keySet();
@@ -174,6 +224,14 @@ public class EventController {
 	
 	/*** UPDATE ***/
 	
+	/**
+	 * This method update an event in the database.
+	 * NOTE - in case the event does not exist a custom message will be sent.
+	 * 
+	 * @param event - the event object to enter.
+	 * @param eventId - the id of the event to update.
+	 * @return the updated event.
+	 */
 	@PutMapping(path = "/{eventId}")
 	public ResponseEntity<?> updateEvent(@RequestBody Event event, @PathVariable Integer eventId){
 		
@@ -186,11 +244,18 @@ public class EventController {
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
-			errMsg.setMessage("failed to update user in DB.");
+			errMsg.setMessage("failed to update event in DB.");
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg) ;
 		}
 	}
 	
+	/**
+	 * This method update a List of events in the database.
+	 * NOTE - in case the event does not exist a custom message will be sent.
+	 *
+	 * @param events - the list of the events to update.
+	 * @return the updates events.
+	 */
 	@PutMapping
 	public ResponseEntity<?> updateListEvents(@RequestBody List<Event> events){
 		
@@ -202,7 +267,7 @@ public class EventController {
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
-			errMsg.setMessage("failed to update user in DB.");
+			errMsg.setMessage("failed to update events in DB.");
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg) ;
 		}
 	}
@@ -210,7 +275,15 @@ public class EventController {
 	
 	
 	/*** DELETE ***/
-	
+	/**
+	 * This method deletes an event by 2 options: 1. soft delete 2. hard delete.
+	 * soft delete - set a flag for this event.
+	 * hard delete - erase the event from the DB.
+	 * 
+	 * @param map contains key and value of the required method type to delete.
+	 * @param id is the event id required to delete.
+	 * @return the deleted event is case of success, or a costume message error in case of failure.
+	 */
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> deleteEvent(@RequestParam Map<String, String> map, @PathVariable Integer id) {
 		Collection<String> values = map.values();
@@ -233,7 +306,15 @@ public class EventController {
 		}
 	}
 	
-	
+	/**
+	 * This method deletes List of events by 2 options: 1. soft delete 2. hard delete.
+	 * soft delete - set a flag for the events.
+	 * hard delete - erase the events from the DB. 
+	 * 
+	 * @param map contains key and value of the required method type to delete.
+	 * @param events is the list of events required to delete.
+	 * @return the deleted events is case of success, or a costume message error in case of failure.
+	 */
 	@DeleteMapping 
 	public ResponseEntity<?> deleteListOfEvents(@RequestParam Map<String, String> map, @RequestBody List<Event> events) {
 		Collection<String> values = map.values();

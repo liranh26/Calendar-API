@@ -77,7 +77,6 @@ public class UserService {
 	}
 
 	public boolean emailExistInDB(String email) throws DaoException {
-		System.out.println(userDao.doesEmailExist(email));
 		return userDao.doesEmailExist(email);
 	}
 
@@ -105,7 +104,6 @@ public class UserService {
 		
 		events.stream().forEach(e -> users.addAll(e.getGuests()));
 		
-		
 		for (Event event : events) {
 			 List<EventUser> eventUsers = eventUserdao.getUsersByEventId(event.getEventId());
 			 for (EventUser eventUser : eventUsers) {
@@ -130,7 +128,7 @@ public class UserService {
 
 	public void unsubscribeUser(String email, SubscriptionEndpoint subscription) throws DaoException {
 		User user = getUserByEmail(email); 
-		
+		// delete subscription from DB
 		user.setEndpoint(null);
 		user.setP256dh(null);
 		user.setAuth(null);
@@ -152,7 +150,7 @@ public class UserService {
 	}
 
 	public void hardDeleteUser(User user) throws DaoException {
-		
+		//delete foreign keys of user before hard deleting 
 		hardDeleteUserNotifications(user);
 		
 		hardDeleteEventUserOfUser(user);

@@ -1,30 +1,21 @@
 package ajbc.doodle.calendar.services;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.stereotype.Service;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.daos.interfaces.EventDao;
 import ajbc.doodle.calendar.daos.interfaces.EventUserDao;
-import ajbc.doodle.calendar.daos.interfaces.NotificationDao;
 import ajbc.doodle.calendar.daos.interfaces.UserDao;
 import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.EventUser;
 import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.User;
-import ajbc.doodle.calendar.enums.EventRepeating;
 
 @Service
 public class EventService {
@@ -48,8 +39,7 @@ public class EventService {
 	private NotificationService notificationService;
 
 	
-	//CREATE
-	
+	// CREATE
 	public Event createEventForUser(Integer userId, Event event) throws DaoException {
 
 		User user = userDao.getUser(userId);
@@ -58,7 +48,8 @@ public class EventService {
 		event.setEventOwnerId(user.getUserId());
 		event.setOwner(user);
 
-		addEventToDB(event);
+//		addEventToDB(event);
+		eventDao.addEvent(event);
 		
 		//update event by updating the guest (user) after adding him to event 
 		event = getEventById(event.getEventId());
@@ -71,20 +62,16 @@ public class EventService {
 		return event;
 	}
 
-	public List<Event> createEventsToUser(Integer userId, List<Event> events) throws DaoException {
+	public List<Event> createListEventsToUser(Integer userId, List<Event> events) throws DaoException {
 		for (Event event : events)
 			createEventForUser(userId, event);
 
 		return events;
 	}
 
-	public void addEventToDB(Event event) throws DaoException {
-		eventDao.addEvent(event);
-	}
 	
 	
-	// GET
-	
+	// GET 
 	public List<Event> getAllEvents() throws DaoException {
 		return eventDao.getAllEvents();
 	}
@@ -124,7 +111,6 @@ public class EventService {
 		return events;
 	}
 
-	// TODO add guests to event
 	public Event addGuestsToEvent(Event event, List<Integer> usersIds) throws DaoException {
 		for (Integer userId : usersIds) {
 			User user = userDao.getUser(userId);

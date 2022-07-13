@@ -1,39 +1,23 @@
 package ajbc.doodle.calendar.entities;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
-
 import ajbc.doodle.calendar.enums.EventRepeating;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -55,11 +39,11 @@ public class Event {
 
 	@Column(insertable = false, updatable = false)
 	private Integer eventOwnerId;
-	
+
 	@OneToOne
-	@JoinColumn(name="eventOwnerId")
+	@JoinColumn(name = "eventOwnerId")
 	private User owner;
-	
+
 	private String title;
 	private Integer isAllDay;
 	private LocalDateTime startTime;
@@ -76,8 +60,6 @@ public class Event {
 	@ManyToMany(mappedBy = "events")
 	private List<User> guests = new ArrayList<>();
 
-	
-	
 	public Event(Integer eventOwnerId, String title, Integer isAllDay, LocalDateTime startTime, LocalDateTime endTime,
 			String address, String description, EventRepeating repeating) {
 		this.eventOwnerId = eventOwnerId;
@@ -90,26 +72,11 @@ public class Event {
 		this.repeating = repeating;
 		this.discontinued = false;
 	}
-	
-	
+
 	public void addGuests(User... users) {
 		for (User user : users) {
 			user.addEvent(this);
 		}
 	}
 
-	
-	
 }
-
-
-
-
-
-
-
-
-
-
-
-

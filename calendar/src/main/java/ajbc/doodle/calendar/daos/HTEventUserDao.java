@@ -9,12 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.stereotype.Repository;
 
-import ajbc.doodle.calendar.daos.interfaces.EventDao;
 import ajbc.doodle.calendar.daos.interfaces.EventUserDao;
-import ajbc.doodle.calendar.entities.Event;
 import ajbc.doodle.calendar.entities.EventUser;
-import ajbc.doodle.calendar.entities.Notification;
-import ajbc.doodle.calendar.entities.User;
 
 @SuppressWarnings("unchecked")
 @Repository("htEventUserDao")
@@ -23,6 +19,7 @@ public class HTEventUserDao implements EventUserDao {
 	@Autowired
 	private HibernateTemplate template;
 
+	// CRUD operations
 	@Override
 	public void addEventToUser(EventUser eventUser) throws DaoException {
 		template.persist(eventUser);
@@ -33,7 +30,12 @@ public class HTEventUserDao implements EventUserDao {
 		template.merge(eventUser);
 	}
 
+	@Override
+	public void deleteUserEvent(EventUser eventUser) throws DaoException {
+		template.delete(eventUser);
+	}
 
+	// QUERIES operations
 	@Override
 	public EventUser getEventForUser(EventUser eventUser) throws DaoException {
 		DetachedCriteria criteria = DetachedCriteria.forClass(EventUser.class);
@@ -48,17 +50,12 @@ public class HTEventUserDao implements EventUserDao {
 	}
 
 	@Override
-	public void deleteUserEvent(EventUser eventUser) throws DaoException {
-		template.delete(eventUser);
-	}
-
-	@Override
 	public List<EventUser> getAllUsersForEvent(EventUser eventUser) throws DaoException {
 		DetachedCriteria criteria = DetachedCriteria.forClass(EventUser.class);
 		criteria.add(Restrictions.eq("eventId", eventUser.getEventId()));
 		return (List<EventUser>) template.findByCriteria(criteria);
 	}
-	
+
 	@Override
 	public List<EventUser> getAllEventsAndUsers() throws DaoException {
 		DetachedCriteria criteria = DetachedCriteria.forClass(EventUser.class);
@@ -90,6 +87,5 @@ public class HTEventUserDao implements EventUserDao {
 		criteria.add(Restrictions.eq("userId", userId));
 		return (List<EventUser>) template.findByCriteria(criteria);
 	}
-	
-	
+
 }

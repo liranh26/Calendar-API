@@ -14,9 +14,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
@@ -30,13 +27,12 @@ import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.entities.webpush.PushMessage;
 import ajbc.doodle.calendar.entities.webpush.PushMessageConfig;
 
-
 public class NotificationTask implements Runnable {
 
 	private Notification notification;
-	private	User user;
+	private User user;
 	private PushMessageConfig config;
-	
+
 	public NotificationTask(Notification polledNotification, User user, PushMessageConfig config) {
 		this.notification = polledNotification;
 		this.user = user;
@@ -45,9 +41,9 @@ public class NotificationTask implements Runnable {
 
 	@Override
 	public void run() {
-
-			PushMessage msg = new PushMessage("message: ", notification.toString());
-			sendPushMessageToUser(msg);
+		
+		PushMessage msg = new PushMessage("message: ", notification.toString());
+		sendPushMessageToUser(msg);
 
 	}
 
@@ -95,19 +91,10 @@ public class NotificationTask implements Runnable {
 
 		Builder httpRequestBuilder = HttpRequest.newBuilder();
 		if (body != null) {
-
-			httpRequestBuilder.POST(BodyPublishers.ofByteArray(body)).header("Content-Type", "application/octet-stream") // describes
-																															// the
-																															// content
-																															// of
-																															// the
-																															// body.
-																															// an
-																															// encrypted
-																															// stream
-																															// of
-																															// bytes
-					.header("Content-Encoding", "aes128gcm"); // describes how the encrypted payload is formatted.
+			// Content-Type describes the content of the body. an encrypted stream of bytes
+			httpRequestBuilder.POST(BodyPublishers.ofByteArray(body)).header("Content-Type", "application/octet-stream")
+					.header("Content-Encoding", "aes128gcm"); // Content-Encoding describes how the encrypted payload is
+																// formatted.
 		} else {
 			httpRequestBuilder.POST(BodyPublishers.ofString(""));
 			// httpRequestBuilder.header("Content-Length", "0");
@@ -143,8 +130,6 @@ public class NotificationTask implements Runnable {
 			}
 		} catch (IOException | InterruptedException e) {
 			Application.logger.error("send push message", e);
-			// --- here roll back!!! After the application has sent the request to the push
-			// service, it needs to check the response's status code.
 		}
 
 		return false;

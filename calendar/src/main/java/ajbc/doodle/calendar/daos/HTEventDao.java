@@ -1,7 +1,5 @@
 package ajbc.doodle.calendar.daos;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -21,8 +19,8 @@ public class HTEventDao implements EventDao {
 	@Autowired
 	private HibernateTemplate template;
 	
-	// CRUD operations
 	
+	// CRUD operations
 	@Override
 	public void addEvent(Event event) throws DaoException {
 		template.persist(event);
@@ -46,7 +44,7 @@ public class HTEventDao implements EventDao {
 		template.delete(event);
 	}
 	
-	// QUERIES
+	// QUERIES operations
 
 	@Override
 	public List<Event> getEventsForUser(Integer userId) throws DaoException {

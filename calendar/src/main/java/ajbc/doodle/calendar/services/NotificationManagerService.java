@@ -1,7 +1,5 @@
 package ajbc.doodle.calendar.services;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -37,10 +35,8 @@ public class NotificationManagerService {
 	}
 
 	public void setNotificationsInactive(Notification notification) throws DaoException {
-		
-			notification.setDiscontinued(true);
-			notificationDao.updateNotification(notification);
-	
+		notification.setDiscontinued(true);
+		notificationDao.updateNotification(notification);
 	}
 
 }
