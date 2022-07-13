@@ -56,7 +56,7 @@ public class Notification {
 	private ChronoUnit units;
 	private LocalDateTime alertTime;
 	
-	private Integer discontinued;
+	private boolean discontinued;
 
 
 	@JsonIgnore
@@ -66,12 +66,11 @@ public class Notification {
 	
 
 
-	public Notification(String title, Integer timeToAlertBefore, ChronoUnit units,
-			Integer discontinued) {
+	public Notification(String title, Integer timeToAlertBefore, ChronoUnit units) {
 		this.title = title;
 		this.timeToAlertBefore = timeToAlertBefore;
 		this.units = units;
-		this.discontinued = 0;
+		this.discontinued = false;
 	}
 
 

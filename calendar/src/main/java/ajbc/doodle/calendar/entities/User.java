@@ -48,10 +48,8 @@ public class User {
 	private String email;
 	private LocalDate birthDate;
 	private LocalDate joinDate;
-	private Integer discontinued;
+	private boolean discontinued;
 
-	@JsonProperty(access = Access.WRITE_ONLY)
-	private Long expirationTime;
 	@JsonProperty(access = Access.WRITE_ONLY)
 	private String endpoint;
 	@JsonProperty(access = Access.WRITE_ONLY)
@@ -71,14 +69,13 @@ public class User {
 		events.add(event);
 	}
 	
-	public User(String firstName, String lastName, String email, LocalDate birthDate, LocalDate joinDate,
-			Integer discontinued) {
+	public User(String firstName, String lastName, String email, LocalDate birthDate, LocalDate joinDate) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
 		this.birthDate = birthDate;
 		this.joinDate = joinDate;
-		this.discontinued = discontinued;
+		this.discontinued = false;
 	}
 	
 }

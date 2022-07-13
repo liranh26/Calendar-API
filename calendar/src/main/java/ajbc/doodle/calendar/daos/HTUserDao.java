@@ -92,7 +92,7 @@ public class HTUserDao implements UserDao {
 	public Subscription getSubscriptionByUserId(Integer userId) throws DaoException {
 		User user = getUser(userId);
 		
-		return new Subscription(user.getEndpoint(), user.getExpirationTime(), new SubscriptionKeys(user.getP256dh(), user.getAuth()));
+		return new Subscription(user.getEndpoint(), null, new SubscriptionKeys(user.getP256dh(), user.getAuth()));
 	}
 
 	

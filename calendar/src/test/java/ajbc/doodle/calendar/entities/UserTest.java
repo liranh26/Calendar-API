@@ -2,6 +2,7 @@ package ajbc.doodle.calendar.entities;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -22,8 +23,8 @@ import ajbc.doodle.calendar.enums.EventRepeating;
 @TestInstance(Lifecycle.PER_CLASS)
 public class UserTest {
 		
-		private static Integer discontinued;
-		private static final String firstName, lastName , email;
+		private static boolean discontinued;
+		private static final String firstName, lastName , email, demoString;
 		private static LocalDate birthDate, joinDate;
 	
 		static {
@@ -32,26 +33,83 @@ public class UserTest {
 			email ="test@test.com";
 			birthDate =  LocalDate.of(1990, 2, 26);
 			joinDate = LocalDate.of(2022, 1, 1);
-			discontinued = 0;
+			discontinued = true;
+			demoString = "demo";
 		}
 		
 		User user;
 		User emptyUser;
 		static String message = "Tests for User class";
 		
-		
-		@BeforeAll
-		static void startMessage() {
-			System.out.println(message);
-		}
-		
 		UserTest(){
-			user = new User("Liran", "Hadad", "test@test.com", LocalDate.of(1990, 2, 26), LocalDate.of(2022, 1, 1), 0);
+			user = new User("Liran", "Hadad", "test@test.com", LocalDate.of(1990, 2, 26), LocalDate.of(2022, 1, 1));
 			emptyUser = new User();
 		}
 		
 
+		
+		
 		@Test
+		@DisplayName("checks first name getter")
+		void checkFirstNameGetter() {
+			assertEquals(firstName, user.getFirstName());
+		}
+		
+		@Test
+		@DisplayName("checks last name getter")
+		void checkLastNameGetter() {
+			assertEquals(lastName, user.getLastName());
+		}
+		
+		@Test
+		@DisplayName("checks email getter")
+		void checkEmailGetter() {
+			assertEquals(email, user.getEmail());
+		}
+		
+		@Test
+		@DisplayName("checks birthdate getter")
+		void checkBirthDateGetter() {
+			assertEquals(LocalDate.of(1990, 2, 26), user.getBirthDate());
+		}
+		
+		@Test
+		@DisplayName("checks join date getter")
+		void checkJoinDateGetter() {
+			assertEquals(LocalDate.of(2022, 1, 1), user.getJoinDate());
+		}
+		
+		@Test
+		@DisplayName("checks discontinued getter")
+		void checkDiscontinuedGetter() {
+			assertFalse(user.isDiscontinued());
+		}
+		
+		@Test
+		@DisplayName("checks events getter")
+		void checkEventsGetter() {
+			assertTrue(user.getEvents().isEmpty());
+		}
+		
+		@Test
+		@DisplayName("checks end point getter")
+		void checkEndPointGetter() {
+			assertTrue(user.getEndpoint() == null);
+		}
+		
+		@Test
+		@DisplayName("checks browser public key p256dh getter")
+		void checkP256dhGetter() {
+			assertTrue(user.getP256dh() == null);
+		}
+		
+		@Test
+		@DisplayName("checks browser auth key p256dh getter")
+		void checkAuthGetter() {
+			assertTrue(user.getAuth() == null);
+		}
+		
+		@BeforeAll
 		@DisplayName("checks custom constructor")
 		void checkDefaultConstructor() {
 			assertEquals(firstName, user.getFirstName());
@@ -59,7 +117,6 @@ public class UserTest {
 			assertEquals(email, user.getEmail());
 			assertEquals(birthDate, user.getBirthDate());
 			assertEquals(joinDate, user.getJoinDate());
-			assertEquals(discontinued, user.getDiscontinued());
 			
 			assertEquals(null, user.getEndpoint());
 		}
@@ -67,22 +124,22 @@ public class UserTest {
 		@Test
 		@DisplayName("checks firstName setter")
 		void checkFirstNameSetter() {
-			emptyUser.setFirstName("sapir");
-			assertEquals("sapir", emptyUser.getFirstName());
+			emptyUser.setFirstName(firstName);
+			assertEquals(firstName, emptyUser.getFirstName());
 		}
 		
 		@Test
 		@DisplayName("checks lastName setter")
 		void checkLastNameSetter() {
-			emptyUser.setLastName("hadad");
-			assertEquals("hadad", emptyUser.getLastName());
+			emptyUser.setLastName(lastName);
+			assertEquals(lastName, emptyUser.getLastName());
 		}
 		
 		@Test
 		@DisplayName("checks email setter")
 		void checkEmailSetter() {
-			emptyUser.setEmail("sapir@test.com");
-			assertEquals("sapir@test.com", emptyUser.getEmail());
+			emptyUser.setEmail(email);
+			assertEquals(email, emptyUser.getEmail());
 		}
 		
 		@Test
@@ -102,16 +159,38 @@ public class UserTest {
 		@Test
 		@DisplayName("checks discontinued setter")
 		void checkDiscontinuedSetter() {
-			emptyUser.setDiscontinued(1);
-			assertEquals(1, emptyUser.getDiscontinued());
+			emptyUser.setDiscontinued(discontinued);
+			assertTrue(emptyUser.isDiscontinued());
 		}
+		
+		@Test
+		@DisplayName("checks end point setter")
+		void checkEndPointSetter() {
+			user.setEndpoint(demoString);
+			assertTrue(demoString.equals(user.getEndpoint()));
+		}
+		
+		@Test
+		@DisplayName("checks browser public key p256dh setter")
+		void checkP256dhSetter() {
+			user.setP256dh(demoString);
+			assertTrue(demoString.equals(user.getP256dh()));
+		}
+		
+		@Test
+		@DisplayName("checks browser auth key auth setter")
+		void checkAuthSetter() {
+			user.setAuth(demoString);
+			assertTrue(demoString.equals(user.getAuth()));
+		}
+		
 		
 		@Test
 		@DisplayName("checks adding event")
 		void checkAddEvent() {
 			Event event = new Event(1,"shopping", 0, LocalDateTime.of(2022, 8, 8, 16, 0),
 					LocalDateTime.of(2022, 8, 8, 18, 30), "Tel-Aviv", "buying equipment",
-					EventRepeating.WEEKLY, 0);
+					EventRepeating.WEEKLY);
 					
 			emptyUser.addEvent(event);
 			assertTrue(emptyUser.getEvents().contains(event));

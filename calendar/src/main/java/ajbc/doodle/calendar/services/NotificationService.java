@@ -172,7 +172,7 @@ public class NotificationService {
 	
 	public Notification createDefaultNotification(Event event) throws DaoException {
 
-		Notification not = new Notification(event.getTitle(), 0, ChronoUnit.SECONDS, 0);
+		Notification not = new Notification(event.getTitle(), 0, ChronoUnit.SECONDS);
 
 		createNotification(not, event.getEventId(), event.getEventOwnerId());
 		
@@ -184,7 +184,7 @@ public class NotificationService {
 	/*** DELETE ***/
 	
 	public void softDelete(Notification notification) throws DaoException {
-		notification.setDiscontinued(1);
+		notification.setDiscontinued(true);
 		dao.updateNotification(notification);
 		manager.deleteNotificationQueue(notification);
 	}
@@ -200,7 +200,7 @@ public class NotificationService {
 
 		for (Notification notification : notifications) {
 			notification = dao.getNotification(notification.getNotificationId());
-			notification.setDiscontinued(1);
+			notification.setDiscontinued(true);
 			dao.updateNotification(notification);
 		}
 		

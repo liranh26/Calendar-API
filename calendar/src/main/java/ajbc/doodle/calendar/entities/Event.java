@@ -70,7 +70,7 @@ public class Event {
 	@Enumerated(EnumType.STRING)
 	private EventRepeating repeating;
 
-	private Integer discontinued; // TODO change to inactive and bit in db
+	private boolean discontinued; // TODO change to inactive and bit in db
 
 	@JsonIgnore
 	@ManyToMany(mappedBy = "events")
@@ -79,7 +79,7 @@ public class Event {
 	
 	
 	public Event(Integer eventOwnerId, String title, Integer isAllDay, LocalDateTime startTime, LocalDateTime endTime,
-			String address, String description, EventRepeating repeating, Integer discontinued) {
+			String address, String description, EventRepeating repeating) {
 		this.eventOwnerId = eventOwnerId;
 		this.title = title;
 		this.isAllDay = isAllDay;
@@ -88,7 +88,7 @@ public class Event {
 		this.address = address;
 		this.description = description;
 		this.repeating = repeating;
-		this.discontinued = discontinued;
+		this.discontinued = false;
 	}
 	
 	

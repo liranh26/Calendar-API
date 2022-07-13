@@ -86,7 +86,7 @@ public class NotificationManager {
 		if (managerThread.isAlive())
 			managerThread.interrupt();
 
-		if (notification.getDiscontinued() == 0)
+		if (!notification.isDiscontinued())
 			this.notificationsQueue.add(notification);
 
 		startThreadManager();
@@ -102,7 +102,7 @@ public class NotificationManager {
 			managerThread.interrupt();
 
 		for (Notification notification : notifications)
-			if (notification.getDiscontinued() == 0)
+			if (!notification.isDiscontinued())
 				this.notificationsQueue.add(notification);
 
 		startThreadManager();
@@ -131,33 +131,34 @@ public class NotificationManager {
 
 		while (!notificationsQueue.isEmpty()) {
 
-			Notification head, polledNotification;
+			Notification queueHead;
 
-			try {
-				// 
-				head = notificationsQueue.peek();
-				Long delay = getDelayTime(head);
+			//
+			queueHead = notificationsQueue.peek();
+			Long delay = getDelayTime(queueHead);
 
-				System.out.println("next notification: " + head);
-				System.out.println("sleep for " + delay);
-				if (delay > 0)
-					Thread.sleep(delay * MILLI_SECOND);
-			} catch (InterruptedException e) {
-				System.out.println("interrupted");
-				break;
-			}
+			System.out.println("next notification: " + queueHead);
+			System.out.println("sleep for " + delay);
 
-			User user = managerService.getUser(head); //TODO name
+			if (delay > 0)
+				try {
+					Thread.sleep(delay);
+				} catch (InterruptedException e) {
+					System.out.println("Interupted");
+					break;
+				}
+
+			User user = managerService.getUserByNotification(queueHead); // TODO name
 
 			// poll here in case user not logged infinity loop
-			polledNotification = notificationsQueue.poll();
+			queueHead = notificationsQueue.poll();
 
-			if (managerService.isUserLogged(user)) { 
-				executorService.execute(new NotificationTask(polledNotification, user, msgConfig));
+			if (managerService.isUserLogged(user)) {
+				executorService.execute(new NotificationTask(queueHead, user, msgConfig));
 			} else
-				System.out.println("User not logged!");
+				System.out.println("User not logged!"); // TODO remove before end
 
-			managerService.setNotificationsInactive(polledNotification);
+			managerService.setNotificationsInactive(queueHead);
 
 		}
 

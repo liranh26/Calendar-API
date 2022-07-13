@@ -24,7 +24,7 @@ public class NotificationManagerService {
 	@Qualifier("htNotificationDao")
 	NotificationDao notificationDao;
 
-	public User getUser(Notification notification) throws DaoException {
+	public User getUserByNotification(Notification notification) throws DaoException {
 		return userDao.getUser(notification.getUserId());
 	}
 
@@ -38,7 +38,7 @@ public class NotificationManagerService {
 
 	public void setNotificationsInactive(Notification notification) throws DaoException {
 		
-			notification.setDiscontinued(1);
+			notification.setDiscontinued(true);
 			notificationDao.updateNotification(notification);
 	
 	}

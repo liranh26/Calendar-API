@@ -143,7 +143,7 @@ public class EventService {
 
 	public void softDeleteEvent(Event event) throws DaoException {
 
-		event.setDiscontinued(1);
+		event.setDiscontinued(true);
 		eventDao.updateEvent(event);
 
 		List<Notification> nots = notificationService.getNotificationsByEvent(event.getEventId());

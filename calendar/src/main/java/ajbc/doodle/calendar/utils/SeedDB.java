@@ -72,9 +72,8 @@ public class SeedDB {
 				+ "email nvarchar(64) unique,\r\n"
 				+ "birthdate date,\r\n"
 				+ "joinDate date,\r\n"
-				+ "discontinued int,\r\n"
+				+ "discontinued bit,\r\n"
 				+ "endpoint nvarchar(512),\r\n"
-				+ "expirationTime bigint,\r\n"
 				+ "p256dh nvarchar(128),\r\n"
 				+ "auth nvarchar(128),\r\n"
 				+ "primary key(userId)\r\n"
@@ -91,7 +90,7 @@ public class SeedDB {
 				+ "address nvarchar(100),"
 				+ "description nvarchar(100),"
 				+ "repeating nvarchar(40),"
-				+ "discontinued int,"
+				+ "discontinued bit,"
 				+ "foreign key(eventOwnerId) references users(userId),"
 				+ "primary key(eventId)"
 				+ ") ";
@@ -114,7 +113,7 @@ public class SeedDB {
 				+ "timeToAlertBefore int,"
 				+ "units nvarchar(40),"
 				+ "alertTime datetime,"
-				+ "discontinued int,"
+				+ "discontinued bit,"
 				+ "foreign key(userId, eventId) references event_users(userId, eventId),"
 				+ "primary key(notificationId)"
 				+ ") ";
@@ -143,9 +142,9 @@ public class SeedDB {
 	
 	public void seedUsers() throws DaoException {
 
-		userDao.addUser(new User("Liran", "Hadad", "test@test.com", LocalDate.of(1990, 2, 26), LocalDate.of(2022, 1, 1), 0));
-		userDao.addUser(new User("Snir", "Hadad", "test2@test.com", LocalDate.of(1993, 7, 8), LocalDate.of(2022, 5, 5), 0));
-		userDao.addUser(new User("Sapir", "Hadad", "test3@test.com", LocalDate.of(1990, 7, 23), LocalDate.of(2022, 6, 6), 0));
+		userDao.addUser(new User("Liran", "Hadad", "test@test.com", LocalDate.of(1990, 2, 26), LocalDate.of(2022, 1, 1)));
+		userDao.addUser(new User("Snir", "Hadad", "test2@test.com", LocalDate.of(1993, 7, 8), LocalDate.of(2022, 5, 5)));
+		userDao.addUser(new User("Sapir", "Hadad", "test3@test.com", LocalDate.of(1990, 7, 23), LocalDate.of(2022, 6, 6)));
 
 	}
 
@@ -156,7 +155,7 @@ public class SeedDB {
 		
 		Event event = new Event(users.get(0).getUserId(), "wedding", 0, LocalDateTime.of(2022, 8, 7, 20, 0),
 				LocalDateTime.of(2022, 8, 7, 23, 30), "Troya", "Tomer getting married",
-				EventRepeating.NONE, 0);
+				EventRepeating.NONE);
 
 		
 		eventService.createEventForUser(users.get(0).getUserId(), event);
@@ -169,7 +168,7 @@ public class SeedDB {
 		
 		Event event2 = new Event(users.get(1).getUserId(), "shopping", 0, LocalDateTime.of(2022, 8, 8, 16, 0),
 				LocalDateTime.of(2022, 8, 8, 18, 30), "Tel-Aviv", "buying equipment",
-				EventRepeating.WEEKLY, 0);
+				EventRepeating.WEEKLY);
 		
 		users = userService.getAllUsers();
 		
@@ -188,7 +187,7 @@ public class SeedDB {
 		EventUser eventUser = new EventUser(user.getUserId() , event.getEventId());
 		eventUser = eventUserService.getEventUser(eventUser);
 		
-		Notification not = new Notification("Remember take the check", 90, ChronoUnit.MINUTES, 0);
+		Notification not = new Notification("Remember take the check", 90, ChronoUnit.MINUTES);
 	
 		not.setEventUser(eventUser);
 		not.setAlertTime(event.getStartTime().minus(not.getTimeToAlertBefore(),not.getUnits()));
@@ -207,7 +206,7 @@ public class SeedDB {
 		eventUser = new EventUser(user.getUserId() , event.getEventId());
 		eventUser = eventUserService.getEventUser(eventUser);
 		
-		not = new Notification("Remember your wallet!", 15, ChronoUnit.MINUTES, 0);
+		not = new Notification("Remember your wallet!", 15, ChronoUnit.MINUTES);
 
 		not.setEventUser(eventUser);
 		not.setAlertTime(event.getStartTime().minus(not.getTimeToAlertBefore(),not.getUnits()));

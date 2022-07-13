@@ -122,7 +122,6 @@ public class UserService {
 		User user = getUserByEmail(email);
 		//set subscription keys
 		user.setEndpoint(subscription.getEndpoint());
-		user.setExpirationTime(subscription.getExpirationTime());
 		user.setP256dh(subscription.getKeys().getP256dh());
 		user.setAuth(subscription.getKeys().getAuth());
 
@@ -133,7 +132,6 @@ public class UserService {
 		User user = getUserByEmail(email); 
 		
 		user.setEndpoint(null);
-		user.setExpirationTime(null);
 		user.setP256dh(null);
 		user.setAuth(null);
 		
@@ -149,7 +147,7 @@ public class UserService {
 	/*** DELETE ***/
 	
 	public void softDeleteUser(User user) throws DaoException {
-		user.setDiscontinued(1);
+		user.setDiscontinued(true);
 		updateUser(user);
 	}
 
