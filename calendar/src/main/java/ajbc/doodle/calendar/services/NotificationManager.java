@@ -61,13 +61,13 @@ public class NotificationManager {
 	}
 
 	public void initManager() throws DaoException {
-		if (managerService.isUserLogged(notifications.peek()))
+//		if (managerService.isUserLogged(notifications.peek()))
 			startThreadManager();
 	}
 
 	
 	private void startThreadManager() {
-		managerThread.setDaemon(true);
+		
 		managerThread = new Thread(() -> {
 			System.out.println("hi");
 			try {
@@ -105,9 +105,11 @@ public class NotificationManager {
 
 			Thread.sleep(delay * MILLI_SECOND);
 
-			task.run();
+			if (managerService.isUserLogged(nots.get(0))) {
+				task.run();
+				managerService.setNotificationsInactive(nots);				
+			}
 			
-			managerService.setNotificationsInactive(nots);
 		}
 
 	}
@@ -151,31 +153,38 @@ public class NotificationManager {
 		return delay;
 	}
 	
-	//TODO update, delete - rethink mybe to add new queue
+
 	
-	public void updateListNotificationInQueue(List<Notification> notsToUpdate) {
-		notsToUpdate.stream().forEach(n -> updateNotificationQueue(n));
-	}
-	
-	public void updateNotificationQueue(Notification notToUpdate) {
+	public void updateNotificationQueue(Notification notToUpdate) throws DaoException {
 		for (Notification notification : notifications) 
 			if(notification.getNotificationId() == notToUpdate.getNotificationId()) {
+				System.out.println("step 1111 "+notification);
 				notifications.remove(notification);
+				System.out.println("step 2222 "+ notToUpdate);
 				notifications.add(notToUpdate);
 			}
+		if(managerThread.getState() == State.WAITING) 
+			managerThread.interrupt();
 		
+		initManager();
 	}
 	
-	public void deleteListNotificationInQueue(List<Notification> notsToUpdate) {
-		notsToUpdate.stream().forEach(n -> deleteNotificationQueue(n));
+
+	
+	public void updateOrDeleteListNotifications(List<Notification> notifications) throws DaoException {
+		addNotifications(notifications);
 	}
 	
-	public void deleteNotificationQueue(Notification notToDelete) {
+	public void deleteNotificationQueue(Notification notToDelete) throws DaoException {
 		for (Notification notification : notifications) 
 			if(notification.getNotificationId() == notToDelete.getNotificationId())
 				notifications.remove(notToDelete);
 		
+		if(managerThread.getState() == State.WAITING) 
+			managerThread.interrupt();
+		
+		initManager();
+		
 	}
 	
-
 }

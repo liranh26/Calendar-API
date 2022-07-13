@@ -33,7 +33,6 @@ public class NotificationManagerService {
 	}
 
 	public boolean isUserLogged(Notification notification) throws DaoException {
-		System.out.println(userDao.getUser(notification.getUserId()).getEndpoint());
 		return userDao.getUser(notification.getUserId()).getEndpoint() != null;
 	}
 

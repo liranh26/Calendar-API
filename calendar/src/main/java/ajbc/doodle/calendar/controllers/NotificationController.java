@@ -183,8 +183,7 @@ public class NotificationController {
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 	}
-	
-	
+
 	
 	@PutMapping
 	public ResponseEntity<?> updateNotifications(@RequestBody List<Notification> notifications) {
@@ -193,7 +192,7 @@ public class NotificationController {
 	
 			notificationService.updateListNotifications(notifications);
 			
-			manager.updateListNotificationInQueue(notifications);
+//			manager.updateListNotificationInQueue(notifications);
 			
 			return ResponseEntity.status(HttpStatus.OK).body(notifications);
 		} catch (DaoException e) {
@@ -241,7 +240,7 @@ public class NotificationController {
 			else
 				notificationService.hardDeleteListNotification(notifications);
 
-			manager.deleteListNotificationInQueue(notifications);
+//			manager.deleteListNotificationInQueue(notifications);
 
 			return ResponseEntity.ok(notifications);
 		} catch (DaoException e) {

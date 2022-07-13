@@ -46,9 +46,8 @@ public class NotificationTask implements Runnable {
 	private List<Notification> notifications;
 	private List<Subscription> subscriptions;
 	private PushMessageConfig config;
-	private final int NUM_OF_THREADS = 10;
 
-	ExecutorService executorService = Executors.newFixedThreadPool(NUM_OF_THREADS);
+	ExecutorService executorService = Executors.newCachedThreadPool();
 	
 	public NotificationTask(List<Notification> nots, List<Subscription> subs, PushMessageConfig config) {
 		this.notifications = nots;

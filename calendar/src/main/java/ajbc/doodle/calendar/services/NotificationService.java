@@ -103,17 +103,24 @@ public class NotificationService {
 		notification.setEventUser(eventUser);
 		setAlertTime(notification, eventDao.getEvent(notification.getEventId()));
 		dao.updateNotification(notification);
-		updateNotificationManager();
+		manager.updateNotificationQueue(notification); //updateNotificationManager();
 	}
 	
 	public void updateListNotifications(List<Notification> notifications) throws DaoException {
-		for (Notification notification : notifications) 
-			updateNotification(notification);
-	}
-	
-	public void updateNotificationManager() throws DaoException {
+		for (Notification notification : notifications) {
+			EventUser eventUser = new EventUser(notification.getUserId() , notification.getEventId());
+			eventUser = eventUserDao.getEventForUser(eventUser);
+			notification.setEventUser(eventUser);
+			setAlertTime(notification, eventDao.getEvent(notification.getEventId()));
+			dao.updateNotification(notification);
+		}
+//			updateNotification(notification);
 		manager.addNotifications(getAllNotifications());
 	}
+	
+//	public void updateNotificationManager() throws DaoException {
+//		manager.addNotifications(getAllNotifications());
+//	}
 	
 	public Notification createNotification(Notification notification, Integer eventId, Integer userId) throws DaoException {
 
@@ -169,12 +176,12 @@ public class NotificationService {
 	public void softDelete(Notification notification) throws DaoException {
 		notification.setDiscontinued(1);
 		dao.updateNotification(notification);
-		updateNotificationManager();
+		manager.updateNotificationQueue(notification);
 	}
 
 	public void hardDelete(Notification notification) throws DaoException {
 		dao.deleteNotification(notification);
-		updateNotificationManager(); 
+		manager.deleteNotificationQueue(notification);
 	}
 
 	public List<Notification> getNotificationsByEvent(Integer eventId) throws DaoException {
@@ -197,6 +204,9 @@ public class NotificationService {
 			notification.setDiscontinued(1);
 			dao.updateNotification(notification);
 		}
+		
+//		 updateNotificationManager();
+		manager.addNotifications(getAllNotifications());
 	}
 
 	public void hardDeleteListNotification(List<Notification> notifications) throws DaoException {
@@ -206,7 +216,7 @@ public class NotificationService {
 			dao.deleteNotification(notification);
 		}
 		
-		updateNotificationManager();
+		manager.addNotifications(getAllNotifications());
 	}
 
 }
