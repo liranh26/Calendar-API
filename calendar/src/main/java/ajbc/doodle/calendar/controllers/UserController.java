@@ -33,9 +33,15 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
-	
 	/*** GET ***/
-	
+
+	/**
+	 * This method gets a list of users assigned to an event.
+	 * 
+	 * @param eventId the event of the users.
+	 * @return list of users assigned to the event in case of success, or a costume
+	 *         message error in case of failure.
+	 */
 	@GetMapping(path = "/event/{eventId}")
 	public ResponseEntity<?> getUsersForEvent(@PathVariable Integer eventId) {
 		List<User> users;
@@ -52,6 +58,12 @@ public class UserController {
 
 	}
 
+	/**
+	 * This method gets all users in the DB.
+	 * 
+	 * @return list of users from the DB, or a costume message error in case of
+	 *         failure.
+	 */
 	@GetMapping(path = "/allUsers")
 	public ResponseEntity<?> getAllUser() {
 		List<User> users;
@@ -65,7 +77,14 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
 		}
 	}
-	
+
+	/**
+	 * This method gets a user by hit email.
+	 * 
+	 * @param email the user email is unique in the database.
+	 * @return user with the required email, or a costume message error in case of
+	 *         failure.
+	 */
 	@GetMapping(path = "/email/{email}")
 	public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
 		User user;
@@ -82,6 +101,12 @@ public class UserController {
 
 	}
 
+	/**
+	 * This method get a user from the DB.
+	 * 
+	 * @param id the user required to fetch from the DB.
+	 * @return user, or a costume message error in case of failure.
+	 */
 	@GetMapping(path = "/id/{id}")
 	public ResponseEntity<?> getUserById(@PathVariable Integer id) {
 		User user;
@@ -96,37 +121,52 @@ public class UserController {
 
 		}
 	}
-	
 
+	/**
+	 * This method gets all users that have an event between start date and time to
+	 * end date and time. values: 'start' + 'end' are LocalDateTime variables which
+	 * represent users with events in a range between start date and time to end
+	 * date and time.
+	 *
+	 * @param map with keys & values of required operations.
+	 * @return range of users with events between the requested values.
+	 */
 	@GetMapping(path = "/range")
 	public ResponseEntity<?> getUserById(@RequestParam Map<String, String> map) {
-		List<User> users;
-		Collection<String> values = map.values();
+		List<User> users = null;
 		Collection<String> keys = map.keySet();
-		
+
 		try {
-			
-			LocalDateTime start = LocalDateTime.parse(map.get("start"));
-			LocalDateTime end = LocalDateTime.parse(map.get("end"));
-			
-			users = userService.getUsersWithEventsInRange(start, end);
-			
+			if (keys.contains("start") && keys.contains("end")) {
+				LocalDateTime start = LocalDateTime.parse(map.get("start"));
+				LocalDateTime end = LocalDateTime.parse(map.get("end"));
+
+				users = userService.getUsersWithEventsInRange(start, end);
+			}
 			return ResponseEntity.ok(users);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
-			errMsg.setMessage("Failed to get users in dates range." );
+			errMsg.setMessage("Failed to get users in dates range.");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errMsg);
 
 		}
 
 	}
 
+	
+	
+	// CREATE //
 
-	/*** CREATE ***/
-
+	
+	/**
+	 * This method creates a new user.
+	 * 
+	 * @param user the body of the user content.
+	 * @return new user, or a costume message error in case of failure.
+	 */
 	@PostMapping
-	public ResponseEntity<?> addUser(@RequestBody User user) throws DaoException {
+	public ResponseEntity<?> addUser(@RequestBody User user) {
 		try {
 			userService.addUser(user);
 			return ResponseEntity.status(HttpStatus.CREATED).body(user);
@@ -137,8 +177,13 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 	}
-	
-	
+
+	/**
+	 * This method adds a list of users to the DB.
+	 * 
+	 * @param users list containsUser objects with the body of the user content.
+	 * @return a list of the added users, or a costume message error in case of failure.
+	 */
 	@PostMapping(path = "/list")
 	public ResponseEntity<?> addListUsers(@RequestBody List<User> users) throws DaoException {
 		try {
@@ -151,56 +196,76 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 	}
-	
+
+	/**
+	 * This method sends the subscription of a user.
+	 * 
+	 * @param subscription the data from browser.
+	 * @param email the user email which trys to login.
+	 * @return the email of the user.
+	 */
 	@PostMapping("/login/{email}")
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<?> subscribe(@RequestBody Subscription subscription, @PathVariable(required = false) String email) {
-		
+	public ResponseEntity<?> subscribe(@RequestBody Subscription subscription,
+			@PathVariable(required = false) String email) {
+
 		try {
 			userService.addUserSubscription(email, subscription);
-			
-			System.out.println("Subscription added with email "+email);
+
 			return ResponseEntity.status(HttpStatus.OK).body(email);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
-			errMsg.setMessage("failed to subscribe user with email: "+email);
+			errMsg.setMessage("failed to subscribe user with email: " + email);
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 
 	}
-	
+
+	/**
+	 * This method logs out a user.
+	 * 
+	 * @param subscription the user data.
+	 * @param email the logged user email.
+	 * @return email of the user.
+	 */
 	@PostMapping("/logout/{email}")
-	public ResponseEntity<?> unsubscribe(@RequestBody SubscriptionEndpoint subscription, @PathVariable(required = false) String email) {
-		
+	public ResponseEntity<?> unsubscribe(@RequestBody SubscriptionEndpoint subscription,
+			@PathVariable(required = false) String email) {
+
 		try {
-			//throws exception if null
+			// throws exception if null
 			userService.unsubscribeUser(email, subscription);
-			
-			System.out.println("Subscription with email "+email+" got removed!");
-			
+
 			return ResponseEntity.status(HttpStatus.OK).body(email);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
-			errMsg.setMessage("failed to unsubscribe user with email: "+email);
+			errMsg.setMessage("failed to unsubscribe user with email: " + email);
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
-	
-	}
-	
-	
-	
 
-	/*** UPDATE ***/
+	}
+
 	
+	
+	// UPDATE //
+
+	
+	/**
+	 * This method updates a user by id.
+	 * 
+	 * @param user the body of the object to update.
+	 * @param id the user id to update.
+	 * @return the user after update.
+	 */
 	@PutMapping(path = "/{id}")
 	public ResponseEntity<?> updateUser(@RequestBody User user, @PathVariable Integer id) {
 
 		try {
 			user.setUserId(id);
 			userService.updateUser(user);
-			
+
 			return ResponseEntity.status(HttpStatus.OK).body(user);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
@@ -210,6 +275,12 @@ public class UserController {
 		}
 	}
 
+	/**
+	 * This method updates a list of users.
+	 * 
+	 * @param users is the list of objects to update.
+	 * @return the updated list of users.
+	 */
 	@PutMapping
 	public ResponseEntity<?> updateListOfUsers(@RequestBody List<User> users) {
 
@@ -225,21 +296,32 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 	}
+
 	
-	/*** DELETE ***/
 	
+	// DELETE //
+
+	
+	/**
+	 * This method deletes a user from DB.
+	 * soft delete - set a flag for this user.
+	 * hard delete - erase the user from the DB.
+	 * 
+	 * @param map contains key and value of the required method type to delete.
+	 * @param id is the user id required to delete.
+	 * @return the deleted user is case of success, or a costume message error in case of failure.
+	 */
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> softDeleteUser(@RequestParam Map<String, String> map, @PathVariable Integer id) {
 		Collection<String> values = map.values();
 		try {
 			User user = userService.getUserById(id);
-			
+
 			if (values.contains("soft"))
 				userService.softDeleteUser(user);
 			else
 				userService.hardDeleteUser(user);
 
-			
 			return ResponseEntity.ok(user);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
@@ -248,6 +330,5 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 	}
-	
 
 }

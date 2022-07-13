@@ -54,7 +54,7 @@ public class Event {
 	@Enumerated(EnumType.STRING)
 	private EventRepeating repeating;
 
-	private boolean discontinued; // TODO change to inactive and bit in db
+	private boolean discontinued;
 
 	@JsonIgnore
 	@ManyToMany(mappedBy = "events")

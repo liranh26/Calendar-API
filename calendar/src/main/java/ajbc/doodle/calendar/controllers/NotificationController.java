@@ -49,7 +49,7 @@ public class NotificationController {
 	public ResponseEntity<?> addNotification(@RequestBody Notification notification, @PathVariable Integer userId, @PathVariable Integer eventId) {
 		try {
 		
-			notification = notificationService.createNotification(notification, eventId, userId);
+			notification = notificationService.createNotificationAndUpdateManger(notification, eventId, userId);
 						
 			return ResponseEntity.status(HttpStatus.CREATED).body(notification);
 		} catch (DaoException e) {
