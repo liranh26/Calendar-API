@@ -38,7 +38,6 @@ public class NotificationManager {
 	private final int INITIAL_SIZE=10;
 	private final int MILLI_SECOND = 1000;
 	private Thread managerThread = new Thread();
-//	private Notification currNotification;
 	private PriorityBlockingQueue<Notification> notifications = new PriorityBlockingQueue<Notification>(INITIAL_SIZE,
 			timeComparator);
 
@@ -68,6 +67,7 @@ public class NotificationManager {
 
 	
 	private void startThreadManager() {
+		managerThread.setDaemon(true);
 		managerThread = new Thread(() -> {
 			System.out.println("hi");
 			try {
@@ -81,6 +81,7 @@ public class NotificationManager {
 			}
 		});
 		managerThread.start();
+	
 	}
 
 	@Transactional

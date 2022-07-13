@@ -80,7 +80,8 @@ public class NotificationService {
 	@Autowired
 	PushMessageConfig msgConfig;
 
-
+	@Autowired
+	private NotificationManager manager;
 
 	public byte[] publicSigningKey() {
 		return msgConfig.getServerKeys().getPublicKeyUncompressed();
@@ -139,6 +140,8 @@ public class NotificationService {
 		Notification not = new Notification(event.getTitle(), 0, ChronoUnit.SECONDS, 0);
 
 		createNotification(not, event.getEventId(), event.getEventOwnerId());
+		
+		manager.addNotifications(getAllNotifications());
 		
 		return not;
 	}
