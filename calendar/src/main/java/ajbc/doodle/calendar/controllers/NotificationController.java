@@ -210,7 +210,7 @@ public class NotificationController {
 			else
 				notificationService.hardDeleteNotification(notification);
 			
-			manager.deleteNotificationQueue(notification);
+			manager.deleteNotificationAndInitiateThread(notification);
 
 			return ResponseEntity.ok(notification);
 		} catch (DaoException e) {

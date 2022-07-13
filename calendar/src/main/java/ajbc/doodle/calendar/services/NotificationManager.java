@@ -36,78 +36,75 @@ public class NotificationManager {
 		}
 	};
 
-	private final int INITIAL_SIZE = 10;
-	private final int MILLI_SECOND = 1000;
-	private Thread managerThread = new Thread();
-	private PriorityBlockingQueue<Notification> notificationsQueue = new PriorityBlockingQueue<Notification>(
+	protected final int INITIAL_SIZE = 20;
+	protected Thread managerThread = new Thread();
+	protected PriorityBlockingQueue<Notification> notificationsQueue = new PriorityBlockingQueue<Notification>(
 			INITIAL_SIZE, timeComparator);
 
-	private ExecutorService executorService = Executors.newCachedThreadPool();
+	protected ExecutorService executorService = Executors.newCachedThreadPool();
 
-	public void deleteNotificationQueue(Notification notToDelete) {
-		if (managerThread.isAlive())
-			managerThread.interrupt();
-
+	public void deleteNotificationAndInitiateThread(Notification notToDelete) {	
+		deleteNotificationQueue(notToDelete);
+		initiateThreadManager();
+	}
+	
+	public void deleteListNotificationInQueue(List<Notification> notsToUpdate) {
+		notsToUpdate.stream().forEach(n -> deleteNotificationQueue(n));
+		initiateThreadManager();
+	}
+	
+	protected void deleteNotificationQueue(Notification notToDelete) {
 		for (Notification notification : notificationsQueue)
 			if (notification.getNotificationId() == notToDelete.getNotificationId()) {
 				notificationsQueue.remove(notification);
 				System.out.println("Notification removed! : " + notification);
 				break;
 			}
-
-		startThreadManager();
-
 	}
 
-	public void deleteListNotificationInQueue(List<Notification> notsToUpdate) {
-		notsToUpdate.stream().forEach(n -> deleteNotificationQueue(n));
-	}
 
 	public void updateListNotificationInQueue(List<Notification> notsToUpdate) {
-		notsToUpdate.stream().forEach(n -> updateNotificationQueue(n));
+		notsToUpdate.stream().forEach(n -> updateNotificationInQueue(n));
+		initiateThreadManager();
 	}
 
-	public void updateNotificationQueue(Notification notToUpdate) {
-		if (managerThread.isAlive())
-			managerThread.interrupt();
+	public void updateNotificationAndInitiateThread(Notification notToUpdate) {
+		updateNotificationInQueue(notToUpdate);
+		initiateThreadManager();
+	}
 
+	protected void updateNotificationInQueue(Notification notToUpdate) {
 		for (Notification notification : notificationsQueue)
 			if (notification.getNotificationId() == notToUpdate.getNotificationId()) {
 				notificationsQueue.remove(notification);
 				notificationsQueue.add(notToUpdate);
 				break;
 			}
-
-		startThreadManager();
+	}
+	
+	public void addNotificationAndInitiateThread(Notification notification) throws DaoException {
+		insertNotificationToQueue(notification);
+		initiateThreadManager();
 	}
 
-	public void addNotification(Notification notification) throws DaoException {
-
-		if (managerThread.isAlive())
-			managerThread.interrupt();
-
+	protected void insertNotificationToQueue(Notification notification) {
 		if (!notification.isDiscontinued())
 			this.notificationsQueue.add(notification);
-
+	}
+	
+	public void addNotifications(List<Notification> notifications) throws DaoException {		
+		notifications.stream().forEach(n -> insertNotificationToQueue(n));
+		initiateThreadManager();
+	}
+	
+	protected void initiateThreadManager() {
+		if (managerThread.isAlive())
+			managerThread.interrupt();
+		
 		startThreadManager();
-
 	}
 
 	// TODO Notification...
-	public void addNotifications(List<Notification> notifications) throws DaoException {
-
-		System.out.println(managerThread.getState());
-
-		if (managerThread.isAlive())
-			managerThread.interrupt();
-
-		for (Notification notification : notifications)
-			if (!notification.isDiscontinued())
-				this.notificationsQueue.add(notification);
-
-		startThreadManager();
-
-	}
 
 	private void startThreadManager() {
 

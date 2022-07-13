@@ -116,7 +116,7 @@ public class NotificationService {
 		notification.setEventUser(eventUser);
 		setAlertTime(notification, eventDao.getEvent(notification.getEventId()));
 		dao.updateNotification(notification);
-		manager.updateNotificationQueue(notification); //add 1 notification
+		manager.updateNotificationAndInitiateThread(notification); //add 1 notification
 	}
 	
 	public void updateListNotifications(List<Notification> notifications) throws DaoException {
@@ -148,7 +148,7 @@ public class NotificationService {
 
 		eventUserDao.updateUserEvent(eventUser);
 		
-		manager.addNotification(notification);
+		manager.addNotificationAndInitiateThread(notification);
 		return notification;
 	}
 
@@ -186,13 +186,13 @@ public class NotificationService {
 	public void softDelete(Notification notification) throws DaoException {
 		notification.setDiscontinued(true);
 		dao.updateNotification(notification);
-		manager.deleteNotificationQueue(notification);
+		manager.deleteNotificationAndInitiateThread(notification);
 	}
 
 	
 	public void hardDeleteNotification(Notification notification) throws DaoException {
 		dao.deleteNotification(notification);
-		manager.deleteNotificationQueue(notification);
+		manager.deleteNotificationAndInitiateThread(notification);
 	}
 
 	
