@@ -32,16 +32,15 @@ public class NotificationManagerService {
 		return userDao.getSubscriptionByUserId(userId);
 	}
 
-	public boolean isUserLogged(Notification notification) throws DaoException {
-		return userDao.getUser(notification.getUserId()).getEndpoint() != null;
+	public boolean isUserLogged(User user) throws DaoException {
+		return user.getEndpoint() != null;
 	}
 
-	public void setNotificationsInactive(List<Notification> notifications) throws DaoException {
-		for (Notification notification : notifications) {
+	public void setNotificationsInactive(Notification notification) throws DaoException {
+		
 			notification.setDiscontinued(1);
 			notificationDao.updateNotification(notification);
-		}
-
+	
 	}
 
 }

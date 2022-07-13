@@ -90,9 +90,22 @@ public class NotificationService {
 	public boolean isSubscribed(SubscriptionEndpoint subscription) throws DaoException {
 		return userDao.checkEndPointRegistration(subscription.getEndpoint());
 	}
+	
+	public List<Notification> getAllNotifications() throws DaoException {
+		return dao.getAllNotifications();
+	}
+
+
+	public Notification getNotificationById(Integer id) throws DaoException {
+		return dao.getNotification(id);
+	}
 
 	public Subscription getSubscriptionForUser(Integer userId) throws DaoException {
 		return userDao.getSubscriptionByUserId(userId);
+	}
+	
+	public List<Notification> getNotificationsByEvent(Integer eventId) throws DaoException {
+		return dao.getNotificationsByEvent(eventId);
 	}
 	
 	/*** UPDATE ***/
@@ -103,7 +116,7 @@ public class NotificationService {
 		notification.setEventUser(eventUser);
 		setAlertTime(notification, eventDao.getEvent(notification.getEventId()));
 		dao.updateNotification(notification);
-		manager.updateNotificationQueue(notification); //updateNotificationManager();
+		manager.updateNotificationQueue(notification); //add 1 notification
 	}
 	
 	public void updateListNotifications(List<Notification> notifications) throws DaoException {
@@ -114,13 +127,10 @@ public class NotificationService {
 			setAlertTime(notification, eventDao.getEvent(notification.getEventId()));
 			dao.updateNotification(notification);
 		}
-//			updateNotification(notification);
-		manager.addNotifications(getAllNotifications());
+		manager.addNotifications(notifications); //add list of notifications
 	}
 	
-//	public void updateNotificationManager() throws DaoException {
-//		manager.addNotifications(getAllNotifications());
-//	}
+
 	
 	public Notification createNotification(Notification notification, Integer eventId, Integer userId) throws DaoException {
 
@@ -129,7 +139,6 @@ public class NotificationService {
 		Event event = eventDao.getEvent(eventId);
 			
 		notification.setEventUser(eventUser);
-//		notification.setAlertTime(event.getStartTime().minus(notification.getTimeToAlertBefore(),notification.getUnits()));
 
 		setAlertTime(notification, event);
 		
@@ -142,51 +151,15 @@ public class NotificationService {
 		return notification;
 	}
 
+	
 	private void setAlertTime(Notification notification, Event event) {
 		notification.setAlertTime(event.getStartTime().minus(notification.getTimeToAlertBefore(),notification.getUnits()));
 	}
 	
+	
 	public void addNotificationToDB(Notification notification) throws DaoException {
 		dao.addNotification(notification);
-	}
-
-	
-	public Notification createDefaultNotification(Event event) throws DaoException {
-
-		Notification not = new Notification(event.getTitle(), 0, ChronoUnit.SECONDS, 0);
-
-		createNotification(not, event.getEventId(), event.getEventOwnerId());
-		
-		manager.addNotifications(getAllNotifications());
-		
-		return not;
-	}
-
-	public List<Notification> getAllNotifications() throws DaoException {
-		return dao.getAllNotifications();
-	}
-
-
-	public Notification getNotificationById(Integer id) throws DaoException {
-		return dao.getNotification(id);
-	}
-
-	/*** DELETE ***/
-	
-	public void softDelete(Notification notification) throws DaoException {
-		notification.setDiscontinued(1);
-		dao.updateNotification(notification);
-		manager.updateNotificationQueue(notification);
-	}
-
-	public void hardDelete(Notification notification) throws DaoException {
-		dao.deleteNotification(notification);
-		manager.deleteNotificationQueue(notification);
-	}
-
-	public List<Notification> getNotificationsByEvent(Integer eventId) throws DaoException {
-		
-		return dao.getNotificationsByEvent(eventId);
+		manager.addNotification(notification);
 	}
 
 	public List<Notification> addListNotificationsToDB(List<Notification> notifications) throws DaoException {
@@ -196,8 +169,34 @@ public class NotificationService {
 		
 		return notifications;
 	}
+	
+	public Notification createDefaultNotification(Event event) throws DaoException {
 
-	public void softDeleteListNotification( List<Notification> notifications) throws DaoException {
+		Notification not = new Notification(event.getTitle(), 0, ChronoUnit.SECONDS, 0);
+
+		createNotification(not, event.getEventId(), event.getEventOwnerId());
+		
+		return not;
+	}
+
+
+	
+	/*** DELETE ***/
+	
+	public void softDelete(Notification notification) throws DaoException {
+		notification.setDiscontinued(1);
+		dao.updateNotification(notification);
+		manager.deleteNotificationQueue(notification);
+	}
+
+	
+	public void hardDelete(Notification notification) throws DaoException {
+		dao.deleteNotification(notification);
+		manager.deleteNotificationQueue(notification);
+	}
+
+	
+	public void softDeleteListNotification(List<Notification> notifications) throws DaoException {
 
 		for (Notification notification : notifications) {
 			notification = dao.getNotification(notification.getNotificationId());
@@ -205,10 +204,10 @@ public class NotificationService {
 			dao.updateNotification(notification);
 		}
 		
-//		 updateNotificationManager();
-		manager.addNotifications(getAllNotifications());
+		manager.deleteListNotificationInQueue(notifications);
 	}
 
+	
 	public void hardDeleteListNotification(List<Notification> notifications) throws DaoException {
 
 		for (Notification notification : notifications) {
@@ -216,7 +215,7 @@ public class NotificationService {
 			dao.deleteNotification(notification);
 		}
 		
-		manager.addNotifications(getAllNotifications());
+		manager.deleteListNotificationInQueue(notifications);
 	}
 
 }

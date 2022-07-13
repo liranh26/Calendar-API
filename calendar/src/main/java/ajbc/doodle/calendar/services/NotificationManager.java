@@ -16,7 +16,6 @@ import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.entities.webpush.PushMessageConfig;
-import ajbc.doodle.calendar.entities.webpush.Subscription;
 import ajbc.doodle.calendar.services.threads.NotificationTask;
 
 @Service
@@ -35,110 +34,132 @@ public class NotificationManager {
 		}
 	};
 
-	private final int INITIAL_SIZE=10;
+	private final int INITIAL_SIZE = 10;
 	private final int MILLI_SECOND = 1000;
 	private Thread managerThread = new Thread();
-	private PriorityBlockingQueue<Notification> notifications = new PriorityBlockingQueue<Notification>(INITIAL_SIZE,
-			timeComparator);
+	private PriorityBlockingQueue<Notification> notificationsQueue = new PriorityBlockingQueue<Notification>(
+			INITIAL_SIZE, timeComparator);
 
-	
-	public void addNotifications(List<Notification> allNotifications) throws DaoException {
+	public void deleteNotificationQueue(Notification notToDelete) {
+		if (managerThread.isAlive())
+			managerThread.interrupt();
+
+		for (Notification notification : notificationsQueue)
+			if (notification.getNotificationId() == notToDelete.getNotificationId()) {
+				notificationsQueue.remove(notification);
+				System.out.println("Notification removed! : " + notification);
+				break;
+			}
+
+		startThreadManager();
+
+	}
+
+	public void deleteListNotificationInQueue(List<Notification> notsToUpdate) {
+		notsToUpdate.stream().forEach(n -> deleteNotificationQueue(n));
+	}
+
+	public void updateListNotificationInQueue(List<Notification> notsToUpdate) {
+		notsToUpdate.stream().forEach(n -> updateNotificationQueue(n));
+	}
+
+	public void updateNotificationQueue(Notification notToUpdate) {
+		if (managerThread.isAlive())
+			managerThread.interrupt();
+
+		for (Notification notification : notificationsQueue)
+			if (notification.getNotificationId() == notToUpdate.getNotificationId()) {
+				notificationsQueue.remove(notification);
+				notificationsQueue.add(notToUpdate);
+				break;
+			}
+
+		startThreadManager();
+	}
+
+	public void addNotification(Notification notification) throws DaoException {
 
 		System.out.println(managerThread.getState());
-		
-		if(managerThread.getState() == State.WAITING) 
+
+		if (managerThread.isAlive())
 			managerThread.interrupt();
-		
-		this.notifications = new PriorityBlockingQueue<Notification>(10, timeComparator);
 
-		for (Notification notification : allNotifications) 
-			if(notification.getDiscontinued() == 0)
-				this.notifications.add(notification);
-		
+		if (notification.getDiscontinued() == 0)
+			this.notificationsQueue.add(notification);
 
-		initManager();
+		startThreadManager();
 
 	}
 
-	public void initManager() throws DaoException {
-//		if (managerService.isUserLogged(notifications.peek()))
-			startThreadManager();
+	// TODO Notification...
+	public void addNotifications(List<Notification> notifications) throws DaoException {
+
+		System.out.println(managerThread.getState());
+
+		if (managerThread.isAlive())
+			managerThread.interrupt();
+
+		for (Notification notification : notifications)
+			if (notification.getDiscontinued() == 0)
+				this.notificationsQueue.add(notification);
+
+		startThreadManager();
+
 	}
 
-	
 	private void startThreadManager() {
-		
+
 		managerThread = new Thread(() -> {
-			System.out.println("hi");
 			try {
 				buildThread();
 			} catch (DaoException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		});
 		managerThread.start();
-	
+
 	}
 
 	@Transactional
 	private void buildThread() throws DaoException, InterruptedException {
 
-		System.out.println("size  :  " + notifications.size());
-		
-		while (!notifications.isEmpty()) {
+		System.out.println("size  :  " + notificationsQueue.size());
 
-			List<Notification> nots = getClosestNotifcations();
+		while (!notificationsQueue.isEmpty()) {
 
-			List<User> usersId = getUsers(nots);
+//			List<Notification> nots = getClosestNotifcations();
+			Notification head, polledNotification;
 
-			List<Subscription> subs = getSubscriptionsByUsersId(usersId);
+			try {
+				head = notificationsQueue.peek();
+				Long delay = getDelayTime(head);
 
-			Runnable task = new NotificationTask(nots, subs, msgConfig);
-
-			long delay = getDelayTime(nots.get(0));
-
-			System.out.println("delay :   " + delay);
-
-			Thread.sleep(delay * MILLI_SECOND);
-
-			if (managerService.isUserLogged(nots.get(0))) {
-				task.run();
-				managerService.setNotificationsInactive(nots);				
+				System.out.println("next notification: " + head);
+				System.out.println("sleep for " + delay);
+				if (delay > 0)
+					Thread.sleep(delay * MILLI_SECOND);
+			} catch (InterruptedException e) {
+				System.out.println("interrupted");
+				break;
 			}
-			
+
+			User user = managerService.getUser(head);
+
+			// poll here in case user not logged infinity loop
+			polledNotification = notificationsQueue.poll();
+
+			if (managerService.isUserLogged(user)) {
+				Runnable task = new NotificationTask(polledNotification, user, msgConfig);
+				task.run();
+			} else
+				System.out.println("User not logged!");
+
+			managerService.setNotificationsInactive(polledNotification);
+
 		}
 
-	}
-
-	private List<User> getUsers(List<Notification> nots) throws DaoException {
-		List<User> usersId = new ArrayList<User>();
-		for (Notification notification : nots)
-			usersId.add(managerService.getUser(notification));
-		return usersId;
-	}
-
-	private List<Subscription> getSubscriptionsByUsersId(List<User> users) throws DaoException {
-		List<Subscription> subs = new ArrayList<Subscription>();
-		for (User user : users)
-			subs.add(managerService.getSubscriptionByUserId(user.getUserId()));
-		return subs;
-	}
-
-	private List<Notification> getClosestNotifcations() throws DaoException {
-		List<Notification> nots = new ArrayList<Notification>();
-		Notification tmp = notifications.poll();
-		nots.add(tmp);
-
-		while (notifications.size() > 0 && tmp.getAlertTime().equals(notifications.peek().getAlertTime())) {
-			Notification not = notifications.poll();
-			nots.add(not);
-		}
-
-		return nots;
 	}
 
 	private long getDelayTime(Notification notification) {
@@ -152,39 +173,5 @@ public class NotificationManager {
 
 		return delay;
 	}
-	
 
-	
-	public void updateNotificationQueue(Notification notToUpdate) throws DaoException {
-		for (Notification notification : notifications) 
-			if(notification.getNotificationId() == notToUpdate.getNotificationId()) {
-				System.out.println("step 1111 "+notification);
-				notifications.remove(notification);
-				System.out.println("step 2222 "+ notToUpdate);
-				notifications.add(notToUpdate);
-			}
-		if(managerThread.getState() == State.WAITING) 
-			managerThread.interrupt();
-		
-		initManager();
-	}
-	
-
-	
-	public void updateOrDeleteListNotifications(List<Notification> notifications) throws DaoException {
-		addNotifications(notifications);
-	}
-	
-	public void deleteNotificationQueue(Notification notToDelete) throws DaoException {
-		for (Notification notification : notifications) 
-			if(notification.getNotificationId() == notToDelete.getNotificationId())
-				notifications.remove(notToDelete);
-		
-		if(managerThread.getState() == State.WAITING) 
-			managerThread.interrupt();
-		
-		initManager();
-		
-	}
-	
 }

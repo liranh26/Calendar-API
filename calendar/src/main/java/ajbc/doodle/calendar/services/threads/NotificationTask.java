@@ -14,8 +14,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
-import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,57 +21,47 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.hibernate.internal.build.AllowSysOut;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-
 import com.auth0.jwt.JWT;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import ajbc.doodle.calendar.Application;
-import ajbc.doodle.calendar.daos.DaoException;
-import ajbc.doodle.calendar.daos.interfaces.NotificationDao;
-import ajbc.doodle.calendar.entities.ErrorMessage;
 import ajbc.doodle.calendar.entities.Notification;
+import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.entities.webpush.PushMessage;
 import ajbc.doodle.calendar.entities.webpush.PushMessageConfig;
-import ajbc.doodle.calendar.entities.webpush.Subscription;
-import ajbc.doodle.calendar.services.NotificationService;
 
 
 public class NotificationTask implements Runnable {
 
-	private List<Notification> notifications;
-	private List<Subscription> subscriptions;
+	private Notification notification;
+	private	User user;
 	private PushMessageConfig config;
-
+	
+	
 	ExecutorService executorService = Executors.newCachedThreadPool();
 	
-	public NotificationTask(List<Notification> nots, List<Subscription> subs, PushMessageConfig config) {
-		this.notifications = nots;
-		this.subscriptions = subs;
+	public NotificationTask(Notification polledNotification, User user, PushMessageConfig config) {
+		this.notification = polledNotification;
+		this.user = user;
 		this.config = config;
 	}
 
 	@Override
 	public void run() {
 
-		for (int i = 0; i < notifications.size(); i++) {
-			PushMessage msg = new PushMessage("message: ", notifications.get(i).toString());
-			Subscription sub = subscriptions.get(i);
-			executorService.execute(() -> sendPushMessageToUser(sub, msg));
-			
-		}
+
+			PushMessage msg = new PushMessage("message: ", notification.toString());
+			executorService.execute(() -> sendPushMessageToUser(msg));
 
 	}
 
-	private boolean sendPushMessageToUser(Subscription subscription, PushMessage message) {
+	private boolean sendPushMessageToUser(PushMessage message) {
 		try {
 
 			byte[] result = config.getCryptoService().encrypt(config.getObjectMapper().writeValueAsString(message),
-					subscription.getKeys().getP256dh(), subscription.getKeys().getAuth(), 0);
+					user.getP256dh(), user.getAuth(), 0);
 
-			return sendPushMessage(subscription, result);
+			return sendPushMessage(result);
 
 		} catch (InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException
 				| IllegalStateException | InvalidKeySpecException | NoSuchPaddingException | IllegalBlockSizeException
@@ -88,11 +76,11 @@ public class NotificationTask implements Runnable {
 	 * @return true if the subscription is no longer valid and can be removed, false
 	 *         if everything is okay
 	 */
-	private boolean sendPushMessage(Subscription subscription, byte[] body) {
+	private boolean sendPushMessage(byte[] body) {
 
 		String origin = null;
 		try {
-			URL url = new URL(subscription.getEndpoint());
+			URL url = new URL(user.getEndpoint());
 			origin = url.getProtocol() + "://" + url.getHost();
 		} catch (MalformedURLException e) {
 			Application.logger.error("create origin", e);
@@ -107,7 +95,7 @@ public class NotificationTask implements Runnable {
 		String token = JWT.create().withAudience(origin).withExpiresAt(expires)
 				.withSubject("mailto:example@example.com").sign(config.getJwtAlgorithm());
 
-		URI endpointURI = URI.create(subscription.getEndpoint());
+		URI endpointURI = URI.create(user.getEndpoint());
 
 		Builder httpRequestBuilder = HttpRequest.newBuilder();
 		if (body != null) {
@@ -138,11 +126,11 @@ public class NotificationTask implements Runnable {
 
 			switch (response.statusCode()) {
 			case 201:
-				Application.logger.info("Push message successfully sent: {}", subscription.getEndpoint());
+				Application.logger.info("Push message successfully sent: {}", user.getEndpoint());
 				return true;
 			case 404:
 			case 410:
-				Application.logger.warn("Subscription not found or gone: {}", subscription.getEndpoint());
+				Application.logger.warn("Subscription not found or gone: {}", user.getEndpoint());
 				// remove subscription from our collection of subscriptions
 				return false;
 			case 429:

@@ -73,9 +73,7 @@ public class NotificationController {
 		try {
 		
 			notification = notificationService.createNotification(notification, eventId, userId);
-			
-			manager.addNotifications(notificationService.getAllNotifications());
-			
+						
 			return ResponseEntity.status(HttpStatus.CREATED).body(notification);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
@@ -93,9 +91,7 @@ public class NotificationController {
 		try {
 	
 			notifications = notificationService.addListNotificationsToDB(notifications);
-			
-			manager.addNotifications(notificationService.getAllNotifications());
-			
+						
 			return ResponseEntity.status(HttpStatus.CREATED).body(notifications);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
@@ -172,9 +168,7 @@ public class NotificationController {
 			notification.setNotificationId(id);
 			
 			notificationService.updateNotification(notification);
-			
-//			manager.updateNotificationQueue(notification);
-			
+						
 			return ResponseEntity.status(HttpStatus.OK).body(notification);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
@@ -192,7 +186,6 @@ public class NotificationController {
 	
 			notificationService.updateListNotifications(notifications);
 			
-//			manager.updateListNotificationInQueue(notifications);
 			
 			return ResponseEntity.status(HttpStatus.OK).body(notifications);
 		} catch (DaoException e) {
