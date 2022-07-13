@@ -47,19 +47,25 @@ public class EventService {
 	@Autowired
 	private NotificationService notificationService;
 
+	
+	//CREATE
+	
 	public Event createEventForUser(Integer userId, Event event) throws DaoException {
 
 		User user = userDao.getUser(userId);
-
+		
+		//setting the owner to the event
 		event.setEventOwnerId(user.getUserId());
 		event.setOwner(user);
 
 		addEventToDB(event);
 		
+		//update event by updating the guest (user) after adding him to event 
 		event = getEventById(event.getEventId());
 		event.addGuests(user);
 		userDao.updateUser(user);
-				
+		
+		//creates default notification in the moment of the event
 		notificationService.createDefaultNotification(event);
 		
 		return event;
@@ -72,17 +78,35 @@ public class EventService {
 		return events;
 	}
 
-
 	public void addEventToDB(Event event) throws DaoException {
 		eventDao.addEvent(event);
 	}
-
+	
+	
+	// GET
+	
 	public List<Event> getAllEvents() throws DaoException {
 		return eventDao.getAllEvents();
 	}
 
-	public void deleteAllEvents() throws DaoException {
-		eventDao.deleteAllEvents();
+	public List<Event> getFutureEventsForUser(Integer id) throws DaoException {
+		List<Event> events = getEventsByUserId(id);
+		return events.stream().filter(e -> e.getStartTime().isAfter(LocalDateTime.now())).toList();
+	}
+
+	public List<Event> getEventsOfUserInRange(LocalDateTime start, LocalDateTime end, Integer id) throws DaoException {
+		List<Event> events = getEventsByUserId(id);
+		return events.stream().filter(e -> e.getStartTime().isAfter(start) && e.getEndTime().isBefore(end)).toList();
+	}
+
+	public List<Event> getUserEventsByFollowingTime(Integer id, Integer hours, Integer minutes) throws DaoException {
+		return getEventsOfUserInRange(LocalDateTime.now(), LocalDateTime.now().plusHours(hours).plusMinutes(minutes),
+				id);
+	}
+
+	public List<Event> getEventsByRange(LocalDateTime start, LocalDateTime end) throws DaoException {
+		List<Event> events = getAllEvents();
+		return events.stream().filter(e -> e.getStartTime().isAfter(start) && e.getEndTime().isBefore(end)).toList();
 	}
 
 	public Event getEventById(Integer eventId) throws DaoException {
@@ -93,6 +117,7 @@ public class EventService {
 		List<Event> events = new ArrayList<Event>();
 		List<EventUser> eventUser = eventUserDao.getEventsByUserId(id);
 
+		// get the events for user from the connecting table 'EVENT_USERS'
 		for (EventUser tmpEventUser : eventUser)
 			events.add(getEventById(tmpEventUser.getEventId()));
 
@@ -116,6 +141,9 @@ public class EventService {
 		return ids;
 	}
 	
+	
+	// UPDATE 
+	
 	public void updateListOfEvents(List<Event> events) throws DaoException {
 		for (Event event : events)
 			updateEvent(event);
@@ -130,7 +158,7 @@ public class EventService {
 		eventDao.updateEvent(event);
 	}
 
-	/*** DELETE ***/
+	// DELETE 
 	
 	public void softDeleteListOfEvents(List<Event> events) throws DaoException {
 		for (Event event : events) {
@@ -146,6 +174,7 @@ public class EventService {
 		event.setDiscontinued(true);
 		eventDao.updateEvent(event);
 
+		// remove the notifications of the event from the Push Message Queue
 		List<Notification> nots = notificationService.getNotificationsByEvent(event.getEventId());
 		manager.deleteListNotificationInQueue(nots);
 	
@@ -183,24 +212,6 @@ public class EventService {
 			eventUserDao.deleteUserEvent(eventUser);
 	}
 
-	public List<Event> getFutureEventsForUser(Integer id) throws DaoException {
-		List<Event> events = getEventsByUserId(id);
-		return events.stream().filter(e -> e.getStartTime().isAfter(LocalDateTime.now())).toList();
-	}
 
-	public List<Event> getEventsOfUserInRange(LocalDateTime start, LocalDateTime end, Integer id) throws DaoException {
-		List<Event> events = getEventsByUserId(id);
-		return events.stream().filter(e -> e.getStartTime().isAfter(start) && e.getEndTime().isBefore(end)).toList();
-	}
-
-	public List<Event> getUserEventsByFollowingTime(Integer id, Integer hours, Integer minutes) throws DaoException {
-		return getEventsOfUserInRange(LocalDateTime.now(), LocalDateTime.now().plusHours(hours).plusMinutes(minutes),
-				id);
-	}
-
-	public List<Event> getEventsByRange(LocalDateTime start, LocalDateTime end) throws DaoException {
-		List<Event> events = getAllEvents();
-		return events.stream().filter(e -> e.getStartTime().isAfter(start) && e.getEndTime().isBefore(end)).toList();
-	}
 
 }

@@ -21,6 +21,8 @@ public class HTEventDao implements EventDao {
 	@Autowired
 	private HibernateTemplate template;
 	
+	// CRUD operations
+	
 	@Override
 	public void addEvent(Event event) throws DaoException {
 		template.persist(event);
@@ -33,7 +35,19 @@ public class HTEventDao implements EventDao {
 			throw new DaoException("No such event in the DB");
 		return event;
 	}
+
+	@Override
+	public void updateEvent(Event event) throws DaoException {
+		template.merge(event);
+	}
+
+	@Override
+	public void deleteEvent(Event event) throws DaoException {
+		template.delete(event);
+	}
 	
+	// QUERIES
+
 	@Override
 	public List<Event> getEventsForUser(Integer userId) throws DaoException {
 		DetachedCriteria criteria = DetachedCriteria.forClass(Event.class);
@@ -41,12 +55,6 @@ public class HTEventDao implements EventDao {
 		return (List<Event>) template.findByCriteria(criteria);
 	}
 	
-
-	@Override
-	public void updateEvent(Event event) throws DaoException {
-		template.merge(event);
-	}
-
 	@Override
 	public List<Event> getAllEvents() throws DaoException {
 		DetachedCriteria criteria = DetachedCriteria.forClass(Event.class);
@@ -59,10 +67,7 @@ public class HTEventDao implements EventDao {
 		template.deleteAll(getAllEvents());
 	}
 
-	@Override
-	public void deleteEvent(Event event) throws DaoException {
-		template.delete(event);
-	}
+
 	
 	
 }

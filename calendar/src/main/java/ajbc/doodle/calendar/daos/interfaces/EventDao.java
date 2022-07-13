@@ -13,8 +13,6 @@ import ajbc.doodle.calendar.entities.Event;
 @Transactional(rollbackFor = { DaoException.class }, readOnly = true)
 public interface EventDao {
 
-//	extends JpaRepository<Event, Integer>
-
 	// CRUD operations
 	@Transactional(readOnly = false)
 	public default void addEvent(Event event) throws DaoException {

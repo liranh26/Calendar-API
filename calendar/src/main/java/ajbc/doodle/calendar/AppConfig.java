@@ -23,8 +23,6 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
-
-
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
 @Configuration

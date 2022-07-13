@@ -19,7 +19,9 @@ import ajbc.doodle.calendar.entities.Notification;
 import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.entities.webpush.PushMessageConfig;
 import ajbc.doodle.calendar.services.threads.NotificationTask;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Service
 public class NotificationManager {
 
@@ -161,7 +163,7 @@ public class NotificationManager {
 
 	}
 
-	private long getDelayTime(Notification notification) {
+	protected long getDelayTime(Notification notification) {
 
 		Duration duration = Duration.between(LocalDateTime.now(), notification.getAlertTime());
 		long delay = duration.getSeconds();

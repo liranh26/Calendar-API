@@ -34,7 +34,7 @@ public class EventController {
 
 	/*** CREATE ***/
 	
-
+	
 	@PostMapping(path = "/single/{userId}")
 	public ResponseEntity<?> createEventToUser(@RequestBody Event event , @PathVariable Integer userId) throws DaoException {
 
