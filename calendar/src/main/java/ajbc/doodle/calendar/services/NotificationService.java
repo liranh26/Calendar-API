@@ -190,7 +190,7 @@ public class NotificationService {
 	}
 
 	
-	public void hardDelete(Notification notification) throws DaoException {
+	public void hardDeleteNotification(Notification notification) throws DaoException {
 		dao.deleteNotification(notification);
 		manager.deleteNotificationQueue(notification);
 	}
@@ -217,5 +217,6 @@ public class NotificationService {
 		
 		manager.deleteListNotificationInQueue(notifications);
 	}
+
 
 }

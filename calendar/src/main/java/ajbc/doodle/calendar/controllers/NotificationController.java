@@ -62,7 +62,7 @@ public class NotificationController {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
 			errMsg.setMessage("Failed to check subscription in the DB.");
-			return false; //TODO change return value (client need to receive something else..?)
+			return false;
 		}
 	}
 	
@@ -186,7 +186,6 @@ public class NotificationController {
 	
 			notificationService.updateListNotifications(notifications);
 			
-			
 			return ResponseEntity.status(HttpStatus.OK).body(notifications);
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
@@ -209,7 +208,7 @@ public class NotificationController {
 			if (values.contains("soft"))
 				notificationService.softDelete(notification);
 			else
-				notificationService.hardDelete(notification);
+				notificationService.hardDeleteNotification(notification);
 			
 			manager.deleteNotificationQueue(notification);
 
@@ -232,8 +231,6 @@ public class NotificationController {
 				notificationService.softDeleteListNotification(notifications);
 			else
 				notificationService.hardDeleteListNotification(notifications);
-
-//			manager.deleteListNotificationInQueue(notifications);
 
 			return ResponseEntity.ok(notifications);
 		} catch (DaoException e) {

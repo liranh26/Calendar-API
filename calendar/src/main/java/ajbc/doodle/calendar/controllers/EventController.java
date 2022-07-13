@@ -220,9 +220,9 @@ public class EventController {
 			event = eventService.getEventById(id);
 			
 			if (values.contains("soft"))
-				eventService.softDelete(event);
+				eventService.softDeleteEvent(event);
 			else
-				eventService.hardDelete(event);
+				eventService.hardDeleteEvent(event);
 
 			return ResponseEntity.ok(event);
 		} catch (DaoException e) {

@@ -40,6 +40,9 @@ public class EventService {
 	@Autowired
 	@Qualifier("htUserDao")
 	UserDao userDao;
+	
+	@Autowired
+	private NotificationManager manager;
 
 	@Autowired
 	private NotificationService notificationService;
@@ -127,28 +130,33 @@ public class EventService {
 		eventDao.updateEvent(event);
 	}
 
+	/*** DELETE ***/
+	
 	public void softDeleteListOfEvents(List<Event> events) throws DaoException {
 		for (Event event : events) {
 			User user = userDao.getUser(event.getEventOwnerId());
 			event.setOwner(user);
-			softDelete(event);
+			softDeleteEvent(event);
 		}
 
 	}
 
-	public void softDelete(Event event) throws DaoException {
+	public void softDeleteEvent(Event event) throws DaoException {
 
 		event.setDiscontinued(1);
 		eventDao.updateEvent(event);
 
+		List<Notification> nots = notificationService.getNotificationsByEvent(event.getEventId());
+		manager.deleteListNotificationInQueue(nots);
+	
 	}
 
 	public void hardDeleteListOfEvents(List<Event> events) throws DaoException {
 		for (Event event : events)
-			hardDelete(event);
+			hardDeleteEvent(event);
 	}
 
-	public void hardDelete(Event event) throws DaoException {
+	public void hardDeleteEvent(Event event) throws DaoException {
 		User user = userDao.getUser(event.getEventOwnerId());
 		event.setOwner(user);
 
@@ -162,8 +170,10 @@ public class EventService {
 
 	private void deleteEventNotifications(Event event) throws DaoException {
 		List<Notification> nots = notificationService.getNotificationsByEvent(event.getEventId());
+		
 		for (Notification notification : nots)
-			notificationService.hardDelete(notification);
+			//delete from DB & from the Push Messages Queue 
+			notificationService.hardDeleteNotification(notification);
 	}
 
 	private void deleteUsersFromEvent(Event event) throws DaoException {
