@@ -37,9 +37,6 @@ public class NotificationTask implements Runnable {
 	private	User user;
 	private PushMessageConfig config;
 	
-	
-	ExecutorService executorService = Executors.newCachedThreadPool();
-	
 	public NotificationTask(Notification polledNotification, User user, PushMessageConfig config) {
 		this.notification = polledNotification;
 		this.user = user;
@@ -49,9 +46,8 @@ public class NotificationTask implements Runnable {
 	@Override
 	public void run() {
 
-
 			PushMessage msg = new PushMessage("message: ", notification.toString());
-			executorService.execute(() -> sendPushMessageToUser(msg));
+			sendPushMessageToUser(msg);
 
 	}
 

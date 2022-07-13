@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,8 @@ public class NotificationManager {
 	private Thread managerThread = new Thread();
 	private PriorityBlockingQueue<Notification> notificationsQueue = new PriorityBlockingQueue<Notification>(
 			INITIAL_SIZE, timeComparator);
+
+	private ExecutorService executorService = Executors.newCachedThreadPool();
 
 	public void deleteNotificationQueue(Notification notToDelete) {
 		if (managerThread.isAlive())
@@ -78,8 +82,6 @@ public class NotificationManager {
 	}
 
 	public void addNotification(Notification notification) throws DaoException {
-
-		System.out.println(managerThread.getState());
 
 		if (managerThread.isAlive())
 			managerThread.interrupt();
@@ -129,10 +131,10 @@ public class NotificationManager {
 
 		while (!notificationsQueue.isEmpty()) {
 
-//			List<Notification> nots = getClosestNotifcations();
 			Notification head, polledNotification;
 
 			try {
+				// 
 				head = notificationsQueue.peek();
 				Long delay = getDelayTime(head);
 
@@ -145,14 +147,13 @@ public class NotificationManager {
 				break;
 			}
 
-			User user = managerService.getUser(head);
+			User user = managerService.getUser(head); //TODO name
 
 			// poll here in case user not logged infinity loop
 			polledNotification = notificationsQueue.poll();
 
-			if (managerService.isUserLogged(user)) {
-				Runnable task = new NotificationTask(polledNotification, user, msgConfig);
-				task.run();
+			if (managerService.isUserLogged(user)) { 
+				executorService.execute(new NotificationTask(polledNotification, user, msgConfig));
 			} else
 				System.out.println("User not logged!");
 

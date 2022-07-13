@@ -131,7 +131,7 @@ public class NotificationService {
 	}
 	
 
-	
+	//TODO change name
 	public Notification createNotification(Notification notification, Integer eventId, Integer userId) throws DaoException {
 
 		EventUser eventUser = new EventUser(userId , eventId);
@@ -142,12 +142,13 @@ public class NotificationService {
 
 		setAlertTime(notification, event);
 		
-		addNotificationToDB(notification);
-		
+		addNotificationToDB(notification); 
+
 		eventUser.addNotifications(notification);
 
 		eventUserDao.updateUserEvent(eventUser);
 		
+		manager.addNotification(notification);
 		return notification;
 	}
 
@@ -159,7 +160,6 @@ public class NotificationService {
 	
 	public void addNotificationToDB(Notification notification) throws DaoException {
 		dao.addNotification(notification);
-		manager.addNotification(notification);
 	}
 
 	public List<Notification> addListNotificationsToDB(List<Notification> notifications) throws DaoException {
