@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"ajbc.doodle.calendar.controllers","l":"EventController"},{"p":"ajbc.doodle.calendar.controllers","l":"NotificationController"},{"p":"ajbc.doodle.calendar.controllers","l":"UserController"}];updateSearchResults();
