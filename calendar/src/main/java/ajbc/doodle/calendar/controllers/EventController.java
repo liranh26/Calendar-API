@@ -105,7 +105,7 @@ public class EventController {
 	}
 	
 
-	/*** GET ***/
+	// GET //
 	
 	
 	/**
@@ -222,7 +222,7 @@ public class EventController {
 	}
 	
 	
-	/*** UPDATE ***/
+	// UPDATE //
 	
 	/**
 	 * This method update an event in the database.
@@ -274,7 +274,8 @@ public class EventController {
 	
 	
 	
-	/*** DELETE ***/
+	// DELETE //
+	
 	/**
 	 * This method deletes an event by 2 options: 1. soft delete 2. hard delete.
 	 * soft delete - set a flag for this event.
@@ -301,7 +302,7 @@ public class EventController {
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
-			errMsg.setMessage("failed to update user in DB.");
+			errMsg.setMessage("failed to delete event in DB.");
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 	}
@@ -329,7 +330,7 @@ public class EventController {
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
-			errMsg.setMessage("failed to update user in DB.");
+			errMsg.setMessage("failed to delete events in DB.");
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 	}
