@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ajbc.doodle.calendar.daos.DaoException;
 import ajbc.doodle.calendar.entities.ErrorMessage;
 import ajbc.doodle.calendar.entities.Event;
+import ajbc.doodle.calendar.entities.User;
 import ajbc.doodle.calendar.services.EventService;
 
 @RestController
@@ -33,6 +34,7 @@ public class EventController {
 
 	/*** CREATE ***/
 	
+
 	@PostMapping(path = "/single/{userId}")
 	public ResponseEntity<?> createEventToUser(@RequestBody Event event , @PathVariable Integer userId) throws DaoException {
 
@@ -59,7 +61,25 @@ public class EventController {
 		} catch (DaoException e) {
 			ErrorMessage errMsg = new ErrorMessage();
 			errMsg.setData(e.getMessage());
-			errMsg.setMessage("Failed to add user to event.");
+			errMsg.setMessage("Failed to add usssssser to event.");
+			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
+		}
+	}
+	
+	@PostMapping(path = "/guests/{eventId}")
+	public ResponseEntity<?> addGuestsToEvent(@RequestBody List<User> users , @PathVariable Integer eventId) throws DaoException {
+		
+		Event event;
+		try {
+			List<Integer> usersIds = eventService.getUsersIdsToList(users);
+			event = eventService.getEventById(eventId);
+			event = eventService.addGuestsToEvent(event, usersIds);
+			
+			return ResponseEntity.status(HttpStatus.CREATED).body(event);
+		} catch (DaoException e) {
+			ErrorMessage errMsg = new ErrorMessage();
+			errMsg.setData(e.getMessage());
+			errMsg.setMessage("Failed to add usssssser to event.");
 			return ResponseEntity.status(HttpStatus.valueOf(500)).body(errMsg);
 		}
 	}

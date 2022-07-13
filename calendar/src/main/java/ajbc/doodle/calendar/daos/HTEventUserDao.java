@@ -90,9 +90,6 @@ public class HTEventUserDao implements EventUserDao {
 		criteria.add(Restrictions.eq("userId", userId));
 		return (List<EventUser>) template.findByCriteria(criteria);
 	}
-
-	
-
 	
 	
 }

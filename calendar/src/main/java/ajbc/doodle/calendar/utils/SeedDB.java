@@ -159,16 +159,12 @@ public class SeedDB {
 				EventRepeating.NONE, 0);
 
 		
-		event.setEventOwnerId(users.get(0).getUserId());
-		event.setOwner(users.get(0));
-
-		eventService.addEventToDB(event);
+		eventService.createEventForUser(users.get(0).getUserId(), event);
 		
-		event = eventService.getEventById(event.getEventId());
-		event.addGuests(users.get(0), users.get(1));
-
-		userDao.updateUser(users.get(0));
-		userDao.updateUser(users.get(1));
+		List<Integer> guests = new ArrayList<Integer>();
+		guests.add(users.get(1).getUserId());
+		eventService.addGuestsToEvent(event, guests);
+		
 
 		
 		Event event2 = new Event(users.get(1).getUserId(), "shopping", 0, LocalDateTime.of(2022, 8, 8, 16, 0),
@@ -177,18 +173,10 @@ public class SeedDB {
 		
 		users = userService.getAllUsers();
 		
-		event2.setEventOwnerId(users.get(1).getUserId());
-		event2.setOwner(users.get(1));
-
-		eventService.addEventToDB(event2);
-		
-		event2 =eventService.getEventById(event2.getEventId());
-		event2.addGuests(users.get(1), users.get(2));
-
-		
-		userDao.updateUser(users.get(1));
-		userDao.updateUser(users.get(2));
-	
+		eventService.createEventForUser(users.get(1).getUserId(), event2);
+		guests = new ArrayList<Integer>();
+		guests.add(users.get(2).getUserId());
+		eventService.addGuestsToEvent(event2, guests);
 
 	}
 

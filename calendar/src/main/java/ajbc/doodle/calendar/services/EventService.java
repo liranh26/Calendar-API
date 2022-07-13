@@ -52,7 +52,13 @@ public class EventService {
 		event.setOwner(user);
 
 		addEventToDB(event);
-
+		
+		event = getEventById(event.getEventId());
+		event.addGuests(user);
+		userDao.updateUser(user);
+				
+		notificationService.createDefaultNotification(event);
+		
 		return event;
 	}
 
@@ -63,10 +69,9 @@ public class EventService {
 		return events;
 	}
 
-	// TODO fix default notification
+
 	public void addEventToDB(Event event) throws DaoException {
 		eventDao.addEvent(event);
-//		notificationService.createDefaultNotification(event);
 	}
 
 	public List<Event> getAllEvents() throws DaoException {
@@ -92,12 +97,22 @@ public class EventService {
 	}
 
 	// TODO add guests to event
-//	public void addGuestToEvent(Event event, Integer userId) throws DaoException {
-//		event.getGuests().add(userDao.getUser(userId));
-//		eventUserService.addUserToEvent(new EventUser(event.getEventId(), userId));
-//		
-//	}
+	public Event addGuestsToEvent(Event event, List<Integer> usersIds) throws DaoException {
+		for (Integer userId : usersIds) {
+			User user = userDao.getUser(userId);
+			event.addGuests(user);
+			userDao.updateUser(user);
+		}
+		
+		return event;
+	}
 
+	public List<Integer> getUsersIdsToList(List<User> users){
+		List<Integer> ids = new ArrayList<Integer>();
+		users.stream().forEach(u -> ids.add(u.getUserId()));
+		return ids;
+	}
+	
 	public void updateListOfEvents(List<Event> events) throws DaoException {
 		for (Event event : events)
 			updateEvent(event);
