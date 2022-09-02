@@ -48,7 +48,6 @@ public class EventService {
 		event.setEventOwnerId(user.getUserId());
 		event.setOwner(user);
 
-//		addEventToDB(event);
 		eventDao.addEvent(event);
 		
 		//update event by updating the guest (user) after adding him to event 

@@ -159,9 +159,9 @@ public class EventController {
 	 * value: 'future' represent upcoming events of a user.
 	 * values: 'minutes' + 'hours' represent events of a user the next coming num of minutes and hours.
 	 * 
-	 * @param map
-	 * @param id
-	 * @return
+	 * @param map contains key and value of the required method type to delete.
+	 * @param id is the user id to get for him the events.
+	 * @return list of events by the desired filter.
 	 */
 	@GetMapping(path = "/user/{id}")
 	public ResponseEntity<?> getEventsForUser(@RequestParam Map<String, String> map, @PathVariable Integer id) {
