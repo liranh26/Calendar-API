@@ -26,91 +26,208 @@ Note to assign existing user + password and approved check permissions to the DB
 
 The REST API are described below.
 
+## User Entity Actions
 
-## Get list of all Users
-This call gets all users from the DB.
-### Request
+#### User entity GET APIs
 
-`GET /allUsers`
+```
+Get user by id:
+    GET /users/id/{id}
+    Response:
+        status: 200
+        type: JSON
+        payload: user: User
 
-    http://localhost:8080/users/allUsers
+Get user by email:
+    GET /users//email/{email}
+    Response:
+        status: 200
+        type: JSON
+        payload: user: User
 
-### Response
+Get all users:
+    GET /users/allUsers
+    Response:
+        status: 200
+        type: JSON
+        payload: user: User
 
-    HTTP/1.1 200 OK
-    Date: Fri, 28 Oct 2022 11:30:05 GMT
-    Status: 200 OK
-    Connection: keep-alive
-    Content-Type: application/json
-    Content-Length: 3
+Get list of users assigned to event:
+    GET users/event/{eventId}
+    Response:
+        status: 200
+        type: JSON
+        payload: users: List<User>
 
-    [
-        {
-            "userId": 1,
-            "firstName": "Liran",
-            "lastName": "Hadad",
-            "email": "test@test.com",
-            "birthDate": "1990-02-26",
-            "joinDate": "2022-01-01",
-            "discontinued": false
-        },
-        {
-            "userId": 2,
-            "firstName": "Snir",
-            "lastName": "Hadad",
-            "email": "test2@test.com",
-            "birthDate": "1993-07-08",
-            "joinDate": "2022-05-05",
-            "discontinued": false
-        },
-        {
-            "userId": 3,
-            "firstName": "Sapir",
-            "lastName": "Hadad",
-            "email": "test3@test.com",
-            "birthDate": "1990-07-23",
-            "joinDate": "2022-06-06",
-            "discontinued": false
-        }
-    ]
+Get list of users that have an event between start date and time to end date and time:
+    GET users/range
+        type: JSON
+        body: map: Map<String, String>
+    Response:
+        status: 200
+        type: JSON
+        payload: users: List<User>
+
+```
+#### User entity POST APIs
+```
+Create a user:
+    POST /users/
+        type: JSON
+        payload: {firstName: str, lastName: str, email: str, birthDate: str, joinDate: str, discontinued: boolean}
+    Response:
+        Status: 201
+        type: JSON
+        payload: user: User
+
+Create list of users:
+    POST /users/list
+        type: JSON
+        payload: users: List<User>
+    Response:
+        Status: 201
+        type: JSON
+        payload: users: List<User>
+        
+Log out a user:
+    POST /users/logout/{email}
+        type: JSON
+        payload: subscription: SubscriptionEndpoint, 
+    Response:
+        Status: 200
+        type: JSON
+        payload: email: String
+```
+#### User entity PUT APIs
+```
+Update a user by id:
+    PUT /users/{id}
+        type: JSON
+        payload: user: User
+    Response:
+        Status: 200
+        type: JSON
+        payload: user: User
+        
+Update a list of users:
+    PUT /users/{id}
+        type: JSON
+        payload: [{firstName: str, lastName: str, email: str, birthDate: str, joinDate: str, discontinued: boolean}]
+    Response:
+        Status: 200
+        type: JSON
+        payload: users: List<User>     
+```
+#### User entity DELETE APIs
+```
+Delete a user by id:
+    DELETE /users/{id}
+        type: JSON
+        payload: map: Map<String, String>
+    Response:
+        Status: 200
+        type: JSON
+        payload: user: User   
+```
+
+## Event Entity Actions
+
+#### Event entity GET APIs
+```
+Get event by id:
+    GET /events/{id}
+    Response:
+        Status: 200
+        type: JSON
+        payload: event: Event
+ 
+Get all events:
+    GET /events/
+    Response:
+        Status: 200
+        type: JSON
+        payload: event: List<Event>
+        
+Get all events for a user:
+    GET /events/user/{id}
+        type: JSON
+        payload: map: Map<String, String>, id: int
+    Response:
+        Status: 200
+        type: JSON
+        payload: events: List<Event>
+        
+Get events in a range between start LocalDateTime to end LocalDateTime:
+    GET /events/range
+        type: JSON
+        payload: map: Map<String, String>
+    Response:
+        Status: 200
+        type: JSON
+        payload: events: List<Event> 
+```
+
+#### Event entity POST APIs
+```
+Creates event for user:
+    POST /events/single/{userId}
+        type: JSON
+        payload: event: Event, userId: int 
+    Response:
+        Status: 201
+        type: JSON
+        payload: event: Event
+        
+Creates List of events for a user:
+    POST /events/list/{userId}
+        type: JSON
+        payload: events: List<Event>, userId: int 
+    Response:
+        Status: 201
+        type: JSON
+        payload: events: List<Event>
+        
+Add List of guests to an event:
+    POST /events/guests/{eventId}
+        type: JSON
+        payload: guests: List<User>, eventId: int 
+    Response:
+        Status: 201
+        type: JSON
+        payload: event: Event
+```
+
+#### Event entity PUT APIs
+```
+Update event:
+    PUT /events/{eventId}
+        type: JSON
+        payload: event: Event, eventId: int 
+    Response:
+        Status: 200
+        type: JSON
+        payload: event: Event
+
+Update list of events:
+    PUT /events
+        type: JSON
+        payload: events: List<Event> 
+    Response:
+        Status: 200
+        type: JSON
+        payload: events: List<Event> 
+```
 
 
-## Get list of Users to event
-This call gets all users assigned to an event from the DB.
-### Request
-
-`GET /event/{eventId}`
-
-    http://localhost:8080/users/event/1000
-
-### Response
-
-    HTTP/1.1 200 OK
-    Date: Fri, 28 Oct 2022 11:30:05 GMT
-    Status: 200 OK
-    Connection: keep-alive
-    Content-Type: application/json
-    Content-Length: 2
-
-    [
-        {
-            "userId": 1,
-            "firstName": "Liran",
-            "lastName": "Hadad",
-            "email": "test@test.com",
-            "birthDate": "1990-02-26",
-            "joinDate": "2022-01-01",
-            "discontinued": false
-        },
-        {
-            "userId": 2,
-            "firstName": "Snir",
-            "lastName": "Hadad",
-            "email": "test2@test.com",
-            "birthDate": "1993-07-08",
-            "joinDate": "2022-05-05",
-            "discontinued": false
-        }
-    ]
-
+#### Event entity DELETE APIs
+```
+delete event:
+    DELETE /events/{id}
+        type: JSON
+        payload: map: Map<String, String> , eventId: Integer 
+    Response:
+        Status: 200
+        type: JSON
+        payload: event: Event
+```
 
