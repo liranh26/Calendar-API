@@ -4,11 +4,11 @@
 
 ## Versions
 Minimum requirement of the following versions
-> Maven 4.0
-> Java 17 
-> Spring Boot 2.7.1 
-> Microsoft JDBC Driver For SQL Server 11.2
-> Lombok 1.18
+* Maven 4.0
+* Java 17 
+* Spring Boot 2.7.1 
+* Microsoft JDBC Driver For SQL Server 11.2
+* Lombok 1.18
 
 ## Install
 
