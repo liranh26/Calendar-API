@@ -14,7 +14,7 @@ Minimum requirement of the following versions
 
     mvn install
     java -jar calendar-0.0.1-SNAPSHOT.jar
-Note to change directry to the far file in target folder and run.
+Note to change directry to the jar file in target folder and run.
 
 ## Run the app
 
@@ -221,7 +221,7 @@ Update list of events:
 
 #### Event entity DELETE APIs
 ```
-delete event:
+Delete event:
     DELETE /events/{id}
         type: JSON
         payload: map: Map<String, String> , eventId: Integer 
@@ -231,3 +231,90 @@ delete event:
         payload: event: Event
 ```
 
+## Notification Entity Actions
+
+
+#### Notification entity GET APIs
+```
+Get all notifications for a user:
+    GET /notifications
+    Response:
+        Status: 200
+        type: JSON
+        payload: notifications: List<Notification>
+
+Get notification:
+    GET /notifications/{id}
+        type: JSON
+        payload: id: int
+    Response:
+        Status: 200
+        type: JSON
+        payload: notification: Notification
+        
+Get list of notifications by event id:
+    GET /notifications/event/{eventId}
+        type: JSON
+        payload: eventId: int
+    Response:
+        Status: 200
+        type: JSON
+        payload: notifications: List<Notification>
+```
+
+#### Notification entity POST APIs
+
+```
+Create notification for event assigned to user:
+    POST /notifications/{userId}/{eventId}
+        type: JSON
+        payload: eventId: int, userId: int, notification: Notification
+    Response:
+        Status: 201
+        type: JSON
+        payload: notification: Notification
+ 
+Create a list of notification with events assigned to user.
+    POST /notifications/{userId}/{eventId}
+        type: JSON
+        payload: notifications: List<Notification>
+    Response:
+        Status: 201
+        type: JSON
+        payload: notifications: List<Notification>
+```
+
+#### Notification entity PUT APIs
+
+```
+Update notification by id:
+    PUT /notifications/{id}
+        type: JSON
+        payload: notification: Notification, id: int
+    Response:
+        Status: 200
+        type: JSON
+        payload: notification: Notification
+       
+Update a list of notifications:
+    PUT /notifications
+        type: JSON
+        payload: notifications: List<Notification>
+    Response:
+        Status: 200
+        type: JSON
+        payload: notifications: List<Notification>
+```
+
+#### Notification entity DELETE APIs
+
+```
+Delete notification by id:
+    DELETE /notifications/{id}
+        type: JSON
+        payload: map: Map<String, String>, id: int
+    Response:
+        Status: 200
+        type: JSON
+        payload: notification: Notification
+```
